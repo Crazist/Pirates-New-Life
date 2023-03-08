@@ -26,10 +26,19 @@ namespace GameInit.Builders
         private void Builders(GameCyrcle gameCyrcle, PrefabPoolHolderComponent prefabHolder)
         {
             Pools _coinPool = new Pools(prefabHolder.GetCoinPrefab());
+
+            ResourceManager _resourceManager = new ResourceManager();
+            
+            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager);
+
+            
+            Hacks(_resourceManager);
         }
 
-        
-
+        private void Hacks(ResourceManager _resourceManager)
+        {
+            _resourceManager.SetResource(ResourceType.Gold, 11);
+        }
         private void OnDestroy()
         {
             foreach (var item in _dispose)
