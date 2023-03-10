@@ -28,7 +28,7 @@ namespace GameInit.Hero
             if (Input.GetMouseButtonUp(1))
                 _RMBIsPressed = false;
 
-            if (!_RMBIsPressed) return;
+            if (!_RMBIsPressed) return; 
 
             if (Physics.Raycast(
                     UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition),
@@ -39,8 +39,8 @@ namespace GameInit.Hero
             {
                 _heroComponent.Agent.SetDestination(_raycastHit.point);
 
-           //     _particleSystemMoveTo.transform.position = _raycastHit.point;
-           //     _particleSystemMoveTo.Play();
+               // _particleSystemMoveTo.transform.position = _raycastHit.point;
+               // _particleSystemMoveTo.Play();
             }
         }
     }

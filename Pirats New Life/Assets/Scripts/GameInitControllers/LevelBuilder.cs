@@ -5,6 +5,7 @@ using GameInit.GameCyrcleModule;
 using System.Resources;
 using GameInit.Pool;
 using GameInit.PoolPrefabs;
+using GameInit.Builders;
 
 namespace GameInit.Builders
 {
@@ -28,6 +29,8 @@ namespace GameInit.Builders
             Pools _coinPool = new Pools(prefabHolder.GetCoinPrefab());
 
             ResourceManager _resourceManager = new ResourceManager();
+
+            ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool);
             
             HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager);
 
