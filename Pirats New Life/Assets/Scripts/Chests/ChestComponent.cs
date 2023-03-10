@@ -1,10 +1,10 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class ChestComponent : MonoBehaviour
 {
     [field: SerializeField] public int GoldAmount { get; private set; }
-    [field: SerializeField] public float ColliderRadius { get; private set; }
-
+  
     public bool IsCollided { get; private set; }
 
     private void OnTriggerEnter(Collider other)
@@ -18,5 +18,4 @@ public class ChestComponent : MonoBehaviour
     {
         return this;
     }
-
 }

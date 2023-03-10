@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5413548742667659359}
-  - component: {fileID: 5413548742667659358}
-  - component: {fileID: 5413548742667659356}
   - component: {fileID: 5666086735535489164}
   - component: {fileID: 7778504022092878083}
   m_Layer: 0
@@ -35,33 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5413548742667659358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5413548742667659345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bc672d36ed16aa4f9275a733019b1a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5413548742667659356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5413548742667659345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06d8a33983ebfae4183ab8b0eec1fed6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _raycastLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!114 &5666086735535489164
 MonoBehaviour:
   m_ObjectHideFlags: 0
