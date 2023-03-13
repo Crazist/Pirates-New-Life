@@ -2,6 +2,7 @@ using GameInit.Chest;
 using GameInit.GameCyrcleModule;
 using GameInit.Pool;
 using UnityEngine;
+using GameInit.Component; 
 
 namespace GameInit.Builders
 {
