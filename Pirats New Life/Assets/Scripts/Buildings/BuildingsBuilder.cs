@@ -12,21 +12,28 @@ namespace GameInit.Builders
     public class BuildingsBuilder
     {
         private List<IBuilding> _buildingsList;
-
+        private GameCyrcle _cyrcle;
+       
         public BuildingsBuilder(GameCyrcle cyrcle, ResourceManager resourceManager)
         {
+            _cyrcle = cyrcle;
             _buildingsList = new List<IBuilding>();
 
-            var workShopComponents = UnityEngine.Object.FindObjectsOfType<WorkShopComponent>();
+            var workShopComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
 
-            CreateBuildings(workShopComponents);
+            CreateBuildings(workShopComponents, resourceManager);
         }
 
-        private void CreateBuildings(WorkShopComponent[] buildingsComponenets)
+        private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager)
         {
             foreach (var component in buildingsComponenets)
             {
-               _buildingsList.Add(new WorkShop(component));
+                switch (component.getType())
+                {
+                    case BuildingsType.WorkShopType:
+                        _buildingsList.Add(new WorkShop(component, _cyrcle, resourceManager));
+                        break;
+                }
             }
         }
     }

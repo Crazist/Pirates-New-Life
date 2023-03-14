@@ -4,6 +4,7 @@ using UnityEngine;
 public class Coin : MonoBehaviour
 {
     [SerializeField] private float _untouchableTime = 4f;
+    [SerializeField] private Rigidbody rb;
     public bool CanPickUp { get; set; }
 
     private WaitForSeconds _waitForSeconds;
@@ -15,8 +16,14 @@ public class Coin : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void Active()
+    {
+        gameObject.SetActive(true);
+    }
+
     private void Awake()
     {
+        rb.isKinematic = false;
         _waitForSeconds = new WaitForSeconds(_untouchableTime);
     }
 
@@ -31,6 +38,7 @@ public class Coin : MonoBehaviour
     private IEnumerator UntouchableCoroutine()
     {
         yield return _waitForSeconds;
+        rb.isKinematic = true;
         CanPickUp = true;
     }
 }
