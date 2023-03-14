@@ -27,8 +27,4 @@ public class HeroComponent : MonoBehaviour
     {
         return coin;
     }
-    public void ForgetCoin()
-    {
-        coin = null;
-    }
 }

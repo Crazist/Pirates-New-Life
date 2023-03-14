@@ -34,10 +34,7 @@ namespace GameInit.Builders
             
             HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager);
 
-            UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
-
-            BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager);
-
+            
             Hacks(_resourceManager);
         }
 

@@ -33,7 +33,6 @@ namespace GameInit.DropAndCollectGold
             if (_heroComponent.GetCoin() != null && _heroComponent.GetCoin().CanPickUp)
             {
                 _heroComponent.GetCoin().Hide();
-                _heroComponent.ForgetCoin();
                 resourses.SetResource(ResourceType.Gold, 1);
             }
         }

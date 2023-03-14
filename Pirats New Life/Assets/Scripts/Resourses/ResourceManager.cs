@@ -7,8 +7,7 @@ public class ResourceManager
 {
     private Dictionary<ResourceType, int> _resources;
 
-    public Action OnResourceChange { get; set; }
-    
+
     public ResourceManager()
     {
         _resources = new Dictionary<ResourceType, int>();
@@ -38,7 +37,7 @@ public class ResourceManager
             }
         }
 
-        OnResourceChange.Invoke();
+
         System.Console.WriteLine("resourse " + _resources[type]);
     }
 }
