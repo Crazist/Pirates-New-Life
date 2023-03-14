@@ -1,21 +1,24 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class ChestComponent : MonoBehaviour
+namespace GameInit.Component
 {
-    [field: SerializeField] public int GoldAmount { get; private set; }
-  
-    public bool IsCollided { get; private set; }
+    public class ChestComponent : MonoBehaviour
+    {
+        [field: SerializeField] public int GoldAmount { get; private set; }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out HeroComponent hero))
+        public bool IsCollided { get; private set; }
+
+        private void OnTriggerEnter(Collider other)
         {
-            IsCollided = true;
+            if (other.TryGetComponent(out HeroComponent hero))
+            {
+                IsCollided = true;
+            }
         }
-    }
-    public MonoBehaviour GetMono()
-    {
-        return this;
+        public MonoBehaviour GetMono()
+        {
+            return this;
+        }
     }
 }

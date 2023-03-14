@@ -7,6 +7,7 @@ using GameInit.Pool;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using GameInit.Component;
 
 namespace GameInit.Chest
 {

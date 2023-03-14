@@ -15,6 +15,8 @@ namespace GameInit.GameCyrcleModule
         private readonly List<IUpdate> _updates = new List<IUpdate>(100);
         private readonly List<ILateUpdate> _lateUpdates = new List<ILateUpdate>(20);
         private readonly List<IDayChange> _dayUpdates = new List<IDayChange>();
+
+        private bool isDay = true;
         // ==================
 
         /* public void Init()
@@ -115,7 +117,13 @@ namespace GameInit.GameCyrcleModule
                 day.OnDayChange();
             }
             yield return new WaitForSeconds(300f);
+            isDay = !isDay;
             dayChange = true;
+        }
+
+        public bool ChekIfDay()
+        {
+            return isDay;
         }
     }
 }
