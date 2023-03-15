@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7027033416705334562}
   - component: {fileID: 3210817339995585096}
   - component: {fileID: 2636978544977992703}
+  - component: {fileID: 6846974316251146936}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -83,6 +84,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6846974316251146936
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254886039208467879}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &644699357560351959
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,6 +108,7 @@ GameObject:
   - component: {fileID: 8072360674532886328}
   - component: {fileID: 4199962559258434962}
   - component: {fileID: 3693129768310726713}
+  - component: {fileID: 4655250240318134952}
   m_Layer: 0
   m_Name: WorkShop
   m_TagString: Untagged
@@ -129,8 +144,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.27, y: 1, z: 3.36}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.27, y: 2.4701757, z: 3.36}
+  m_Center: {x: 0, y: 0.7350879, z: 0}
 --- !u!114 &3693129768310726713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,6 +164,54 @@ MonoBehaviour:
   countOfGold: 1
   maxLevel: 2
   type: 0
+--- !u!114 &4655250240318134952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644699357560351959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 978c7698988564bdcbc13574bbed9959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionForSpawn: {fileID: 7825494696232110422}
+  cost: 4
+  maxCount: 2
+  itemPrefab: {fileID: 5111520151904295630, guid: 4652b4cbe90974e69ba88e5347a5ec88, type: 3}
+  type: 0
+--- !u!1 &3325293822279073376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7825494696232110422}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7825494696232110422
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3325293822279073376}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.95, y: 0, z: -0.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2696424981775612204}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6038887179508376252
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,6 +516,7 @@ GameObject:
   - component: {fileID: 2696424981775612204}
   - component: {fileID: 4474066788988168510}
   - component: {fileID: 4832648421808072053}
+  - component: {fileID: 5330148587961480742}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -475,6 +539,7 @@ Transform:
   - {fileID: 8980781189243189027}
   - {fileID: 1480090208408039324}
   - {fileID: 3947494456836664946}
+  - {fileID: 7825494696232110422}
   m_Father: {fileID: 8072360674532886328}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -528,3 +593,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &5330148587961480742
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8964992355489792989}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

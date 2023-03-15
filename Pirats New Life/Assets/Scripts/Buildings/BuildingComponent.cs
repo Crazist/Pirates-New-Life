@@ -10,12 +10,14 @@ public class BuildingComponent : MonoBehaviour
     [SerializeField] private int countOfGold = 1;
     [SerializeField] private int maxLevel = 2;
     [SerializeField] BuildingsType type;
+    private bool canProduce = false;
     private Coin coin;
     private int curForm = 0;
     private bool checkForGold = false;
     private int curGold = 0;
     private List<Coin> curCoinsList;
     private Action _action;
+    private bool inBuild = false;
 
     private void Start()
     {
@@ -27,12 +29,14 @@ public class BuildingComponent : MonoBehaviour
        _action = action;
     }
 
-    public void ChekMaxLvl()
+    public bool ChekMaxLvl()
     {
         if (curForm == maxLevel)
         {
             this.enabled = false;
+            return true;
         }
+        return false;
     }
 
     public void UpdateBuild()
@@ -42,10 +46,17 @@ public class BuildingComponent : MonoBehaviour
         formsList[curForm].gameObject.SetActive(true);
     }
 
+    public bool CanProduce()
+    {
+        return canProduce;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        if (canProduce || curGold == countOfGold) return;
+
         var _coin = other.gameObject.GetComponent<Coin>();
-        if (_coin)
+        if (_coin && !_coin.SecondTouch)
         {
             coin = other.gameObject.GetComponent<Coin>();
             curCoinsList.Add(coin);
@@ -57,16 +68,8 @@ public class BuildingComponent : MonoBehaviour
     private void GoldCollects()
     {
         curGold++;
-
-        if (checkForGold)
-        {
-            StopCoroutine(GoldCollectorWaiter());
-            StartCoroutine(GoldCollectorWaiter());
-        }
-        else
-        {
-            StartCoroutine(GoldCollectorWaiter());
-        }
+        if(!inBuild)
+        StartCoroutine(GoldCollectorWaiter());
     }
     
     public BuildingsType getType()
@@ -87,7 +90,22 @@ public class BuildingComponent : MonoBehaviour
     private IEnumerator GoldCollectorWaiter()
     {
         checkForGold = true;
-        yield return new WaitForSecondsRealtime(2);
+        inBuild = true;
+        int gold = 0;
+        do
+         {
+            if(gold < curGold)
+            {
+                gold++;
+                yield return new WaitForSecondsRealtime(3);
+            }
+            else
+            {
+                checkForGold = false;
+            }
+        }
+        while (checkForGold);
+
         if(curGold == countOfGold)
         {
             _action.Invoke();
@@ -98,17 +116,19 @@ public class BuildingComponent : MonoBehaviour
             foreach (var coin in curCoinsList)
             {
                 coin.Active();
+                coin.SecondTouch = true;
             }
         }
         curCoinsList.Clear();
         curGold = 0;
-        checkForGold = false;
+        inBuild = false; 
         StopCoroutine(GoldCollectorWaiter());
     }
     private IEnumerator BuildingInProgress()
     {
         yield return new WaitForSecondsRealtime(4);
         UpdateBuild();
+        inBuild = false;
         StopCoroutine(BuildingInProgress());
     }
 }

@@ -6,6 +6,7 @@ public class Coin : MonoBehaviour
     [SerializeField] private float _untouchableTime = 4f;
     [SerializeField] private Rigidbody rb;
     public bool CanPickUp { get; set; }
+    public bool SecondTouch { get; set; }
 
     private WaitForSeconds _waitForSeconds;
 
@@ -23,8 +24,12 @@ public class Coin : MonoBehaviour
 
     private void Awake()
     {
-        rb.isKinematic = false;
         _waitForSeconds = new WaitForSeconds(_untouchableTime);
+    }
+
+    public void TurnOnRbKinematik()
+    {
+        rb.isKinematic = true;
     }
 
     private void OnEnable()
@@ -34,11 +39,13 @@ public class Coin : MonoBehaviour
     private void OnDisable()
     {
         CanPickUp = false;
+        SecondTouch = false;
     }
     private IEnumerator UntouchableCoroutine()
     {
         yield return _waitForSeconds;
-        rb.isKinematic = true;
         CanPickUp = true;
+        yield return _waitForSeconds;
+        rb.isKinematic = true;
     }
 }

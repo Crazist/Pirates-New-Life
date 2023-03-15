@@ -20,7 +20,7 @@ namespace GameInit.Builders
             _buildingsList = new List<IBuilding>();
 
             var workShopComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
-
+            
             CreateBuildings(workShopComponents, resourceManager);
         }
 

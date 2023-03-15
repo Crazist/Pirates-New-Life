@@ -57,7 +57,8 @@ namespace GameInit.Chest
                     var x = Random.Range(pos.x - 4f, pos.x + 4f);
                     var z = Random.Range(pos.z - 4f, pos.z + 4f);
                     positions.Add(new Vector3(x, heightPosition, z));
-                    JumpOut(new Vector3(x, heightPosition, z), _pool.GetFreeElements(_chestComponent.transform.position).transform);
+                    var coin = _pool.GetFreeElements(_chestComponent.transform.position);
+                    JumpOut(new Vector3(x, heightPosition, z),coin.transform);
                 }
               //  _chestComponent.GetMono().StartCoroutine(MoveCoins());
                 _chestBuilder.RemoveChestCollider(this);

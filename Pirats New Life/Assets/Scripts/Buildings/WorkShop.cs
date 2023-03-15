@@ -16,20 +16,34 @@ namespace GameInit.Building
         private Action _startBuilding;
         private BuildingComponent _workShopComponent;
         private ResourceManager _res;
+        private Produce producer;
 
         public WorkShop(BuildingComponent workShopComponent, GameCyrcle cyrcle, ResourceManager res)
         {
            _workShopComponent = workShopComponent;
            _cyrcle = cyrcle;
            _res = res;
+            CreateProducer();
            _startBuilding += Build;
            _workShopComponent.SetAction(_startBuilding);
         }
 
         public void Build()
         {
-            _workShopComponent.ChekMaxLvl();
-            _workShopComponent.SetCountForGold(_workShopComponent.GetCurCountOFGold() * 2);
+            if(_workShopComponent.ChekMaxLvl())
+            {
+                producer.CanProduce();
+            }
+            else
+            {
+                _workShopComponent.SetCountForGold(_workShopComponent.GetCurCountOFGold() * 2);
+            }
+        }
+
+        public void CreateProducer()
+        {
+             producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>());
+            
         }
 
         public bool CheckForDay()
