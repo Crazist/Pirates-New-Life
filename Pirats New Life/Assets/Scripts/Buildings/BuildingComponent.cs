@@ -7,10 +7,10 @@ using System;
 public class BuildingComponent : MonoBehaviour
 {
     [SerializeField] private List<GameObject> formsList;
-    [SerializeField] private int countOfGold = 1;
-    [SerializeField] private int maxLevel = 2;
+    [SerializeField] private int countOfGold = 2;
+    [SerializeField] private int maxLevel = 1;
     [SerializeField] BuildingsType type;
-    private bool canProduce = false;
+    private bool canProduce = true;
     private Coin coin;
     private int curForm = 0;
     private bool checkForGold = false;
@@ -34,6 +34,7 @@ public class BuildingComponent : MonoBehaviour
         if (curForm == maxLevel)
         {
             this.enabled = false;
+            canProduce = false;
             return true;
         }
         return false;
@@ -41,8 +42,7 @@ public class BuildingComponent : MonoBehaviour
 
     public void UpdateBuild()
     {
-        formsList[curForm].gameObject.SetActive(false);
-        curForm++;
+        formsList[curForm - 1].gameObject.SetActive(false);
         formsList[curForm].gameObject.SetActive(true);
     }
 
@@ -53,7 +53,7 @@ public class BuildingComponent : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (canProduce || curGold == countOfGold) return;
+        if (!canProduce || curGold == countOfGold) return;
 
         var _coin = other.gameObject.GetComponent<Coin>();
         if (_coin && !_coin.SecondTouch)
@@ -108,6 +108,7 @@ public class BuildingComponent : MonoBehaviour
 
         if(curGold == countOfGold)
         {
+            curForm++;
             _action.Invoke();
             StartCoroutine(BuildingInProgress());
         }
@@ -117,11 +118,11 @@ public class BuildingComponent : MonoBehaviour
             {
                 coin.Active();
                 coin.SecondTouch = true;
+                inBuild = false;
             }
         }
         curCoinsList.Clear();
         curGold = 0;
-        inBuild = false; 
         StopCoroutine(GoldCollectorWaiter());
     }
     private IEnumerator BuildingInProgress()

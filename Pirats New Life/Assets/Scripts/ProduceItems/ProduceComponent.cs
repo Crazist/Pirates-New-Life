@@ -58,7 +58,7 @@ namespace GameInit.Building
 
         private void OnTriggerEnter(Collider other)
         {
-            if (canProduce || curGold == cost) return;
+            if (!canProduce || curGold == cost) return;
 
             var _coin = other.gameObject.GetComponent<Coin>();
             if (_coin && !_coin.SecondTouch)
@@ -73,10 +73,10 @@ namespace GameInit.Building
         {
             curGold++;
             if(!inBuild)
-            StartCoroutine(GoldCollectorWaiter());
+            StartCoroutine(Waiter());
         }
 
-        private IEnumerator GoldCollectorWaiter()
+        private IEnumerator Waiter()
         {
             bool checkForGold = true;
             inBuild = true;
@@ -110,7 +110,7 @@ namespace GameInit.Building
             curGold = 0;
             checkForGold = false;
             inBuild = false;
-            StopCoroutine(GoldCollectorWaiter());
+            StopCoroutine(Waiter());
         }
     }
 }

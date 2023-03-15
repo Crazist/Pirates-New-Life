@@ -161,8 +161,8 @@ MonoBehaviour:
   formsList:
   - {fileID: 254886039208467879}
   - {fileID: 8964992355489792989}
-  countOfGold: 1
-  maxLevel: 2
+  countOfGold: 2
+  maxLevel: 1
   type: 0
 --- !u!114 &4655250240318134952
 MonoBehaviour:

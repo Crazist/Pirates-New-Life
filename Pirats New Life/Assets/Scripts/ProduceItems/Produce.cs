@@ -16,6 +16,7 @@ namespace GameInit.Building
         public Produce(ProduceComponent produceComponent)
         {
             _produceComponent = produceComponent;
+            items = new List<GameObject>();
             _produceComponent.SetCanProduce(canProduce);
             _action += BuidItem;
             produceComponent.SetAction(_action);
@@ -54,7 +55,10 @@ namespace GameInit.Building
                     empty = true;
                 }
             }
-            
+            if(items.Count == 0)
+            {
+                empty = true;
+            }
             return empty;
         }
     }
