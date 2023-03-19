@@ -24,6 +24,7 @@ public class Coin : MonoBehaviour
 
     private void Awake()
     {
+        rb.isKinematic = false;
         _waitForSeconds = new WaitForSeconds(_untouchableTime);
     }
 
@@ -38,8 +39,13 @@ public class Coin : MonoBehaviour
     }
     private void OnDisable()
     {
+        rb.isKinematic = false;
         CanPickUp = false;
         SecondTouch = false;
+    }
+    private void Start()
+    {
+        rb.isKinematic = false;
     }
     private IEnumerator UntouchableCoroutine()
     {

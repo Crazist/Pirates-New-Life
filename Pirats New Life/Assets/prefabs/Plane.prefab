@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6978339078893381104}
   - component: {fileID: 6142554870516561394}
   - component: {fileID: 1033550845122730011}
-  - component: {fileID: 2643265268963520771}
   - component: {fileID: 9207827782387856878}
+  - component: {fileID: 5091577356015227229}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -85,20 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2643265268963520771
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013722098314652658}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &9207827782387856878
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,4 +113,17 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: cbee65c9ddd15498880c3d17f888f214, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 9d0e08a2cae7bef48a5f812e8534281c, type: 2}
+--- !u!65 &5091577356015227229
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013722098314652658}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 10, y: 0.1, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}

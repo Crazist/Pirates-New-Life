@@ -741,6 +741,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9207827782387856878, guid: faa1b6fdaa4cf024f97c1126a4223e6b, type: 3}
+      propertyPath: m_NavMeshData
+      value: 
+      objectReference: {fileID: 23800000, guid: 5bf3497b48965774c9281552e6782edc, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: faa1b6fdaa4cf024f97c1126a4223e6b, type: 3}
 --- !u!1001 &2796394769494842505
@@ -939,6 +943,14 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4063946979158435911, guid: 81169b230154b42af863f9d711b5c566, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 87.87451
+      objectReference: {fileID: 0}
+    - target: {fileID: 4063946979158435911, guid: 81169b230154b42af863f9d711b5c566, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -31.189026
+      objectReference: {fileID: 0}
     - target: {fileID: 4066493388543327275, guid: 81169b230154b42af863f9d711b5c566, type: 3}
       propertyPath: m_RootOrder
       value: 11
@@ -986,6 +998,10 @@ PrefabInstance:
     - target: {fileID: 6654342253080508037, guid: 81169b230154b42af863f9d711b5c566, type: 3}
       propertyPath: m_Name
       value: Ui holder
+      objectReference: {fileID: 0}
+    - target: {fileID: 7151494034226442003, guid: 81169b230154b42af863f9d711b5c566, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -30.099976
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81169b230154b42af863f9d711b5c566, type: 3}
