@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GameInit.Connector;
 
 namespace GameInit.AI
 {
     public class AISpawner
     {
         private float heightPosition = -8.48f;
-        public AISpawner(CampComponent[] camps)
+        public AISpawner(CampComponent[] camps, AIConnector _AIConnector)
         {
             foreach (var camp in camps)
             {
@@ -32,9 +33,11 @@ namespace GameInit.AI
                     var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
 
                     var obj = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
-                    var _AIComponent = obj.AddComponent<AIComponent>();
+                    var _AIComponent = obj.GetComponent<AIComponent>();
 
                     Stray stray = new Stray(_AIComponent);
+
+                    _AIConnector.StrayList.Add(stray);
                 }
             }
         }

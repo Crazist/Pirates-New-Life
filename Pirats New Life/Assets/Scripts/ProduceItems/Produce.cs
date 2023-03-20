@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using GameInit.Connector;
 
 namespace GameInit.Building
 {
@@ -12,9 +13,11 @@ namespace GameInit.Building
         private int curCount = 0;
         private List<GameObject> items;
         private bool canProduce = false;
+        AIConnector _AIConnector;
 
-        public Produce(ProduceComponent produceComponent)
+        public Produce(ProduceComponent produceComponent, AIConnector AIConnector)
         {
+            _AIConnector = AIConnector;
             _produceComponent = produceComponent;
             items = new List<GameObject>();
             _produceComponent.SetCanProduce(canProduce);
@@ -36,6 +39,7 @@ namespace GameInit.Building
             }
             GameObject instance = GameObject.Instantiate(prefab, position, Quaternion.identity);
             items.Add(instance);
+            _AIConnector.MoveToClosestAI(position);
         }
 
         public void CanProduce()

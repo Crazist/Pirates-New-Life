@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameInit.GameCyrcleModule;
 using System;
+using GameInit.Connector;
 
 namespace GameInit.Building
 {
@@ -18,12 +19,12 @@ namespace GameInit.Building
         private ResourceManager _res;
         private Produce producer;
 
-        public WorkShop(BuildingComponent workShopComponent, GameCyrcle cyrcle, ResourceManager res)
+        public WorkShop(BuildingComponent workShopComponent, GameCyrcle cyrcle, ResourceManager res, AIConnector _AIConnector)
         {
            _workShopComponent = workShopComponent;
            _cyrcle = cyrcle;
            _res = res;
-            CreateProducer();
+            CreateProducer(_AIConnector);
            _startBuilding += Build;
            _workShopComponent.SetAction(_startBuilding);
         }
@@ -40,9 +41,9 @@ namespace GameInit.Building
             }
         }
 
-        public void CreateProducer()
+        public void CreateProducer(AIConnector _AIConnector)
         {
-             producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>());
+             producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>(), _AIConnector);
             
         }
 
