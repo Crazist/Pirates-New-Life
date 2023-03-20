@@ -6,6 +6,7 @@ using System.Resources;
 using GameInit.Pool;
 using GameInit.PoolPrefabs;
 using GameInit.Builders;
+using GameInit.AI;
 
 namespace GameInit.Builders
 {
@@ -37,6 +38,8 @@ namespace GameInit.Builders
             UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager);
+
+            AIBuilder aiBuilder = new AIBuilder();
 
             Hacks(_resourceManager);
         }
