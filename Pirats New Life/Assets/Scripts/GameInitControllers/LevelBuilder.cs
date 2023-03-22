@@ -8,6 +8,7 @@ using GameInit.PoolPrefabs;
 using GameInit.Builders;
 using GameInit.AI;
 using GameInit.Connector;
+using GameInit.Animation;
 
 namespace GameInit.Builders
 {
@@ -32,18 +33,23 @@ namespace GameInit.Builders
 
             ResourceManager _resourceManager = new ResourceManager();
 
-            ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool);
+            CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
+
+            AIConnector _AIConnector = new AIConnector(_coinPool);
+            gameCyrcle.Add(_AIConnector);
+
+            ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
-            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager);
+            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _AIConnector);
 
             UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
 
-            AIConnector _AIConnector = new AIConnector();
-            _AIConnector.InitConnector();
-
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _AIConnector);
 
-            AIBuilder aiBuilder = new AIBuilder(_AIConnector);
+            AIBuilder _aiBuilder = new AIBuilder(_AIConnector, _coinPool,_coinDropAnimation, _heroBuilder);
+
+            WorkChecker _workChecker = new WorkChecker(_AIConnector, _coinDropAnimation,  _coinPool, gameCyrcle, _heroBuilder);
+            gameCyrcle.Add(_workChecker);
 
             Hacks(_resourceManager);
         }

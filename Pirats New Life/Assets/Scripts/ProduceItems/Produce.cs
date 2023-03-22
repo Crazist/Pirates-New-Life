@@ -39,7 +39,11 @@ namespace GameInit.Building
             }
             GameObject instance = GameObject.Instantiate(prefab, position, Quaternion.identity);
             items.Add(instance);
-            _AIConnector.MoveToClosestAI(position);
+            _AIConnector.MoveToClosestAI(position, () =>
+            {
+                GameObject.Destroy(instance);
+                // Add any additional code you want to execute here
+            }, _produceComponent.GetItemType());
         }
 
         public void CanProduce()

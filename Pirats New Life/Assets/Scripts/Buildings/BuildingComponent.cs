@@ -97,7 +97,7 @@ public class BuildingComponent : MonoBehaviour
             if(gold < curGold)
             {
                 gold++;
-                yield return new WaitForSecondsRealtime(3);
+                yield return new WaitForSecondsRealtime(1);
             }
             else
             {
@@ -127,7 +127,7 @@ public class BuildingComponent : MonoBehaviour
     }
     private IEnumerator BuildingInProgress()
     {
-        yield return new WaitForSecondsRealtime(4);
+        yield return new WaitForSecondsRealtime(2);
         UpdateBuild();
         inBuild = false;
         StopCoroutine(BuildingInProgress());

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace GameInit.AI
         [SerializeField] private Transform _positiontransform;
         [SerializeField] private NavMeshAgent _navMeshAgent;
 
-        public Transform GeTransform()
+        public Transform GetTransform()
         {
             return _positiontransform;
         }
@@ -18,6 +19,12 @@ namespace GameInit.AI
         {
             return _navMeshAgent;
         }
+
+        public MonoBehaviour GetMonoBehaviour()
+        {
+            return this;
+        }
+        
     }
 }
 

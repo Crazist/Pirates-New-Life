@@ -86,7 +86,7 @@ namespace GameInit.Building
                 if (gold < curGold)
                 {
                     gold++;
-                    yield return new WaitForSecondsRealtime(2);
+                    yield return new WaitForSecondsRealtime(1);
                 }
                 else
                 {

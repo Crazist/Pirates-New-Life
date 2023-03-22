@@ -4,10 +4,10 @@ namespace GameInit.PoolPrefabs
 {
     public class PrefabPoolHolderComponent : MonoBehaviour
     {
-        [SerializeField] private GameObject coin;
+        [SerializeField] private Coin coin;
 
 
-        public GameObject GetCoinPrefab()
+        public Coin GetCoinPrefab()
         {
             return coin;
         }

@@ -2,7 +2,8 @@ using GameInit.Chest;
 using GameInit.GameCyrcleModule;
 using GameInit.Pool;
 using UnityEngine;
-using GameInit.Component; 
+using GameInit.Component;
+using GameInit.Animation;
 
 namespace GameInit.Builders
 {
@@ -11,14 +12,14 @@ namespace GameInit.Builders
         private GameCyrcle _cycle;
         private ChestComponent[] _chestSettings;
 
-        public ChestBuilder(GameCyrcle cycle,ResourceManager resourceManager, Pools pool)
+        public ChestBuilder(GameCyrcle cycle,ResourceManager resourceManager, Pools pool, CoinDropAnimation coinDropAnimation)
         {
             _cycle = cycle;
             _chestSettings = Object.FindObjectsOfType<ChestComponent>();
 
             foreach (var settings in _chestSettings)
             {
-                ChestCollider chestCollider = new ChestCollider(settings, this, resourceManager, pool);
+                ChestCollider chestCollider = new ChestCollider(settings, this, resourceManager, pool, coinDropAnimation);
 
                 cycle.Add(chestCollider);
             }

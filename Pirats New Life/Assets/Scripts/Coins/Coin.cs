@@ -5,11 +5,12 @@ public class Coin : MonoBehaviour
 {
     [SerializeField] private float _untouchableTime = 4f;
     [SerializeField] private Rigidbody rb;
+    [SerializeField] private Transform _transform;
     public bool CanPickUp { get; set; }
     public bool SecondTouch { get; set; }
 
     private WaitForSeconds _waitForSeconds;
-
+   
     public void Hide()
     {
         // TODO: Hide effect
@@ -45,7 +46,13 @@ public class Coin : MonoBehaviour
     }
     private void Start()
     {
+        _transform = GetComponent<Transform>();
         rb.isKinematic = false;
+    }
+
+    public Transform GetTransform()
+    {
+        return _transform;
     }
     private IEnumerator UntouchableCoroutine()
     {

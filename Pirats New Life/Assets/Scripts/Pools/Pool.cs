@@ -6,14 +6,14 @@ namespace GameInit.Pool
 {
     public class Pools
     {
-        [SerializeField] private GameObject _prefab;
+        [SerializeField] private Coin _prefab;
 
         private Transform _container;
         private int _minCapacity = 10;
         private int _maxCapacity = Int32.MaxValue;
         private bool _isExpand;
 
-        public List<GameObject> _pool { get; private set; }
+        public List<Coin> _pool { get; private set; }
         private void OnExpand()
         {
             if (_isExpand)
@@ -22,17 +22,17 @@ namespace GameInit.Pool
             }
         }
 
-        public Pools(GameObject prefab)
+        public Pools(Coin prefab)
         {
             _prefab = prefab;
-            _pool = new List<GameObject>();
+            _pool = new List<Coin>();
 
             for (int i = 0; i < _minCapacity; i++)
             {
                 CreateObj();
             }
         }
-        private GameObject CreateObj(bool isActibebydefault = false)
+        private Coin CreateObj(bool isActibebydefault = false)
         {
             var createdObj = MonoBehaviour.Instantiate(_prefab, _container);
             createdObj.gameObject.SetActive(isActibebydefault);
@@ -41,7 +41,7 @@ namespace GameInit.Pool
 
             return createdObj;
         }
-        public bool TryGetElement(out GameObject gameobj)
+        public bool TryGetElement(out Coin gameobj)
         {
             foreach (var item in _pool)
             {
@@ -55,9 +55,9 @@ namespace GameInit.Pool
             gameobj = null;
             return false;
         }
-        public bool TryGetEngagedElement(out List<GameObject> _list)
+        public bool TryGetEngagedElement(out List<Coin> _list)
         {
-            _list = new List<GameObject>();
+            _list = new List<Coin>();
             bool isNotEmpty = false;
             foreach (var item in _pool)
             {
@@ -70,22 +70,37 @@ namespace GameInit.Pool
 
             return isNotEmpty;
         }
-        public GameObject GetFreeElements(Vector3 pos, Quaternion rotation)
+        public bool TryGetEngagedElementSecondTouch(out List<Coin> _list)
+        {
+            _list = new List<Coin>();
+            bool isNotEmpty = false;
+            foreach (var item in _pool)
+            {
+                if (item.gameObject.activeSelf)
+                {
+                        _list.Add(item);
+                        isNotEmpty = true;
+                }
+            }
+
+            return isNotEmpty;
+        }
+        public Coin GetFreeElements(Vector3 pos, Quaternion rotation)
         {
             var obj = GetFreeElements(pos);
             obj.transform.rotation = rotation;
             return obj;
         }
-        public GameObject GetFreeElements(Vector3 pos)
+        public Coin GetFreeElements(Vector3 pos)
         {
             var obj = GetFreeElements();
             obj.transform.position = pos;
             return obj;
         }
-        public GameObject GetClosestEngagedElements(Vector3 pos)
+        public Coin GetClosestEngagedElements(Vector3 pos)
         {
             var obj = GetEngagedElements();
-            GameObject closestObj = null;
+            Coin closestObj = null;
             for (int i = 0; i < obj.Count - 1; i++)
             {
                 if (Vector3.Distance(pos, obj[i].transform.position) < Vector3.Distance(pos, obj[i + 1].transform.position))
@@ -100,7 +115,26 @@ namespace GameInit.Pool
             if (obj.Count - 1 == 0 && obj.Count != 0) return obj[0];
             return closestObj;
         }
-        public GameObject GetFreeElements()
+        public Coin GetClosestEngagedElementsSecondTouch(Vector3 pos)
+        {
+            var obj = GetEngagedElementsSecondTouch();
+            Coin closestObj = null;
+            if (obj == null) return null;
+            for (int i = 0; i < obj.Count - 1; i++)
+            { 
+                if (Vector3.Distance(pos, obj[i].GetTransform().position) < Vector3.Distance(pos, obj[i + 1].GetTransform().position))
+                    {
+                        closestObj = obj[i];
+                    }
+                    else
+                    {
+                        closestObj = obj[i + 1];
+                    }
+            }
+            if (obj.Count - 1 == 0 && obj.Count != 0) return obj[0];
+            return closestObj;
+        }
+        public Coin GetFreeElements()
         {
             if (TryGetElement(out var gameObj))
             {
@@ -117,13 +151,32 @@ namespace GameInit.Pool
             }
             throw new Exception("Pool is over!");
         }
-        public List<GameObject> GetEngagedElements()
+        public List<Coin> GetEngagedElements()
         {
             if (TryGetEngagedElement(out var gameObj))
             {
                 return gameObj;
             }
             return null;
+        }
+        public List<Coin> GetEngagedElementsSecondTouch()
+        {
+            if (TryGetEngagedElementSecondTouch(out var gameObj))
+            {
+                return gameObj;
+            }
+            return null;
+        }
+        public bool CheckForActiveItems()
+        {
+            foreach (var item in _pool)
+            {
+                if (item.gameObject.activeSelf)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
