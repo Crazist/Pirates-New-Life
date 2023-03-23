@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using GameInit.Optimization;
 
 namespace GameInit.Pool
 {
@@ -103,7 +104,7 @@ namespace GameInit.Pool
             Coin closestObj = null;
             for (int i = 0; i < obj.Count - 1; i++)
             {
-                if (Vector3.Distance(pos, obj[i].transform.position) < Vector3.Distance(pos, obj[i + 1].transform.position))
+                if (Distance.Manhattan(pos, obj[i].transform.position) < Distance.Manhattan(pos, obj[i + 1].transform.position))
                 {
                     closestObj = obj[i];
                 }
@@ -122,7 +123,7 @@ namespace GameInit.Pool
             if (obj == null) return null;
             for (int i = 0; i < obj.Count - 1; i++)
             { 
-                if (Vector3.Distance(pos, obj[i].GetTransform().position) < Vector3.Distance(pos, obj[i + 1].GetTransform().position))
+                if (Distance.Manhattan(pos, obj[i].GetTransform().position) < Distance.Manhattan(pos, obj[i + 1].GetTransform().position))
                     {
                         closestObj = obj[i];
                     }

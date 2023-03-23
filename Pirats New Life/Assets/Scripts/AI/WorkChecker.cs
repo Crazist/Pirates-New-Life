@@ -78,7 +78,7 @@ namespace GameInit.AI
 
         private IWork CreateStray(IWork work)
         {
-            var stray = new Stray(work.GetComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent);
+            var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent);
             _connector.StrayList.Add(stray);
             _connector.StrayList.Remove(work);
             return stray;

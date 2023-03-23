@@ -40,7 +40,7 @@ namespace GameInit.AI
             _nextAction = new List<Action>();
         }
 
-        public AIComponent GetComponent()
+        public AIComponent GetAiComponent()
         {
             return _AIComponent;
         }
@@ -91,6 +91,7 @@ namespace GameInit.AI
             if(_inMove == false)
             {
                 _inMove = true;
+                _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
             }
@@ -101,7 +102,7 @@ namespace GameInit.AI
 
             while (agent.velocity == Vector3.zero)
             {
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
 
             while (_AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
@@ -111,8 +112,7 @@ namespace GameInit.AI
 
             action.Invoke();
             CollectGold();
-            yield return new WaitForSeconds(0.5f);
-            _inMove = false;
+             _inMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {

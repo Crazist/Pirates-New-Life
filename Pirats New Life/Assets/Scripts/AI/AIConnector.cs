@@ -4,6 +4,7 @@ using UnityEngine;
 using GameInit.AI;
 using System;
 using GameInit.Pool;
+using GameInit.Optimization;
 
 namespace GameInit.Connector
 {
@@ -16,6 +17,7 @@ namespace GameInit.Connector
         public List<IWork> SwordManList { get; set; }
 
         private Pools _pool;
+        private bool _coroutineInPlay = false;
 
         private const int _minDistance = 5;
         public AIConnector(Pools pool)
@@ -37,7 +39,7 @@ namespace GameInit.Connector
 
             foreach (var stray in StrayList)
             {
-                float distance = Vector3.Distance(stray.getTransform().position, targetPosition);
+                float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
 
                 if (distance < minDistance)
                 {
@@ -54,34 +56,42 @@ namespace GameInit.Connector
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
             IWork _stray = null;
-            Coin _coin =  null;
+            Coin _coin = null;
+            bool waitWhileCoinsDisable = false;
+            bool inMove = false;
 
-            if (_pool.CheckForActiveItems())
+            foreach (var stray in StrayList)
             {
-                foreach (var stray in StrayList)
-                {
-                    Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
-                    
-                    if(coin == null)
-                    {
-                        return;
-                    }
-                    float distance = Vector3.Distance(stray.getTransform().position, coin.GetTransform().position);
+                Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
 
-                    if (distance < minDistance)
-                    {
-                        _coin = coin;
-                        minDistance = distance;
-                        closestPosition = stray.getTransform().position;
-                        _stray = stray;
-                    }
-                }
-                if (Vector3.Distance(_stray.getTransform().position, _pool.GetClosestEngagedElements(_stray.getTransform().position).transform.position) < _minDistance)
+                if (coin == null)
                 {
-                    _stray.Move(_coin.transform.position, () => { _coin.Hide(); });
+                    break;
+                }
+
+                float distance = Distance.Manhattan(stray.getTransform().position, coin.GetTransform().position);
+
+                if (stray.GetAiComponent().GeNavMeshAgent().remainingDistance > 0)
+                {
+                    inMove = true;
+                }
+
+                if (distance < minDistance)
+                {
+                    _coin = coin;
+                    minDistance = distance;
+                    closestPosition = stray.getTransform().position;
+                    _stray = stray;
                 }
             }
+            if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
+            {
+                inMove = true;
+                _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); });
+                _stray = null;
+            }
         }
+
         public int GenerateId()
         {
             bool sameId = false;
@@ -121,7 +131,7 @@ namespace GameInit.Connector
 
         public void OnUpdate()
         {
-            CheckAndGoToCoin();
+           // CheckAndGoToCoin();
         }
     }
 }

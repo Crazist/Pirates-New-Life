@@ -31,4 +31,8 @@ public class HeroComponent : MonoBehaviour
     {
         coin = null;
     }
+    public MonoBehaviour GetMono()
+    {
+        return this;
+    }
 }
