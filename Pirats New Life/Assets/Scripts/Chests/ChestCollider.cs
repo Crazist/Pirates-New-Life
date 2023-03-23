@@ -19,6 +19,7 @@ namespace GameInit.Chest
         private ChestBuilder _chestBuilder;
         private Pools _pool;
         private CoinDropAnimation _coinDropAnimation;
+        private const bool canPickUp = false;
 
         public ChestCollider(ChestComponent chestComponent, ChestBuilder chestBuilder, ResourceManager resourceManager, Pools pool, CoinDropAnimation coinDropAnimation)
         {
@@ -32,7 +33,7 @@ namespace GameInit.Chest
         {
             if (_chestComponent.IsCollided)
             {
-                 _coinDropAnimation.RandomCoinJump(_chestComponent.transform.localPosition, _chestComponent.GoldAmount, _chestComponent.transform.position, _pool);
+                 _coinDropAnimation.RandomCoinJump(_chestComponent.transform.localPosition, _chestComponent.GoldAmount, _chestComponent.transform.position, _pool, canPickUp);
                 //  _chestComponent.GetMono().StartCoroutine(MoveCoins());
                 _chestBuilder.RemoveChestCollider(this);
                 _chestComponent.enabled = false;

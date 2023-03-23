@@ -26,6 +26,7 @@ namespace GameInit.AI
 
         private const float _minimalDistanceToHero = 1f;
         private const float _coefDistance = 0.5f;
+        private const bool canPickUp = true;
 
         public Stray(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
         {
@@ -73,7 +74,7 @@ namespace GameInit.AI
         {
             if(_coinsCount > 1)
             {
-                _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool);
+                _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool, canPickUp);
                 _coinsCount = 1;
             }
         }
@@ -110,7 +111,7 @@ namespace GameInit.AI
 
             action.Invoke();
             CollectGold();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
             _inMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)

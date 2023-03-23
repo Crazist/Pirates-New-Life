@@ -23,7 +23,7 @@ namespace GameInit.Animation
         private const float maxJumpHeightThird = 0.4f;
         private const int randJumpZero = 0;
         private const float coefChangeBounceMax = 1.2f;
-        public void RandomCoinJump(Vector3 localPosition, int amount, Vector3 position, Pools _pool)
+        public void RandomCoinJump(Vector3 localPosition, int amount, Vector3 position, Pools _pool, bool canPick)
         {
             var pos = localPosition;
             for (int i = 0; i < amount; i++)
@@ -31,6 +31,11 @@ namespace GameInit.Animation
                 var x = Random.Range(pos.x - 4f, pos.x + 4f);
                 var z = Random.Range(pos.z - 4f, pos.z + 4f);
                 var coin = _pool.GetFreeElements(position);
+                if (canPick)
+                {
+                    coin.CanPickUp = true;
+                }
+                coin.SecondTouch = true;
                 JumpOut(new Vector3(x, heightPosition, z), coin.transform);
             }
         }

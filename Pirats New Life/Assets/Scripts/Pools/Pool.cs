@@ -76,7 +76,7 @@ namespace GameInit.Pool
             bool isNotEmpty = false;
             foreach (var item in _pool)
             {
-                if (item.gameObject.activeSelf)
+                if (item.gameObject.activeSelf && !item.SecondTouch)
                 {
                         _list.Add(item);
                         isNotEmpty = true;
