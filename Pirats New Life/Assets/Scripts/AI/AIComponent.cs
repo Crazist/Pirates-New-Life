@@ -10,6 +10,7 @@ namespace GameInit.AI
     {
         [SerializeField] private Transform _positiontransform;
         [SerializeField] private NavMeshAgent _navMeshAgent;
+        [SerializeField] private List<GameObject> _models;
 
         public Transform GetTransform()
         {
@@ -23,6 +24,10 @@ namespace GameInit.AI
         public MonoBehaviour GetMonoBehaviour()
         {
             return this;
+        }
+        public List<GameObject> GetModels()
+        {
+            return _models;
         }
         
     }

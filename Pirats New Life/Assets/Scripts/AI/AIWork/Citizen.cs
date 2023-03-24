@@ -9,8 +9,9 @@ using System.Linq;
 
 namespace GameInit.AI
 {
-    public class Stray : IWork, IUpdate
+    public class Citizen : IWork, IUpdate
     {
+
         private AIComponent _AIComponent;
         private ItemsType _type = ItemsType.None;
         private int _id;
@@ -27,9 +28,9 @@ namespace GameInit.AI
         private const float _minimalDistanceToHero = 1f;
         private const float _coefDistance = 0.5f;
         private const bool canPickUp = true;
-        private const int numberOfStray = 0;
+        private const int numberOfCitizenModel = 1;
 
-        public Stray(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
+        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
         {
             _heroComponent = heroComponent;
             _coinDropAnimation = coinDropAnimation;
@@ -48,7 +49,7 @@ namespace GameInit.AI
             var modelList = _AIComponent.GetModels();
             for (int i = 0; i < modelList.Count; i++)
             {
-                if(i == numberOfStray)
+                if (i == numberOfCitizenModel)
                 {
                     modelList[i].SetActive(true);
                 }
@@ -58,6 +59,7 @@ namespace GameInit.AI
                 }
             }
         }
+
         public AIComponent GetAiComponent()
         {
             return _AIComponent;
@@ -90,7 +92,7 @@ namespace GameInit.AI
         }
         private void DropGold()
         {
-            if(_coinsCount > 1)
+            if (_coinsCount > 1)
             {
                 _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool, canPickUp);
                 _coinsCount = 1;
@@ -106,7 +108,7 @@ namespace GameInit.AI
         }
         public void Move(Vector3 position, Action action)
         {
-            if(_inMove == false)
+            if (_inMove == false)
             {
                 _inMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
@@ -130,7 +132,7 @@ namespace GameInit.AI
 
             action.Invoke();
             CollectGold();
-             _inMove = false;
+            _inMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {
@@ -150,7 +152,7 @@ namespace GameInit.AI
         }
         private IEnumerator Waiter()
         {
-            _waitToDropCoins = true; 
+            _waitToDropCoins = true;
             yield return new WaitForSecondsRealtime(3);
             var i = Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position);
             if (Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position) < _minimalDistanceToHero && _AIComponent.GeNavMeshAgent().remainingDistance < _coefDistance)

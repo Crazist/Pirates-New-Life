@@ -11,27 +11,33 @@ namespace GameInit.Connector
     public class AIConnector : IUpdate
     {
         public List<IWork> StrayList { get; set; }
+        public List<IWork> CitizenList { get; set; }
         public List<IWork> BuilderList { get; set; }
         public List<IWork> ArcherList { get; set; }
         public List<IWork> FarmerList { get; set; }
         public List<IWork> SwordManList { get; set; }
 
-        private Pools _pool;
-        private bool _coroutineInPlay = false;
+        private List<List<IWork>> ListOfLists { get; set; }
 
+        private Pools _pool;
+        
         private const int _minDistance = 5;
+       
         public AIConnector(Pools pool)
         {
-            StrayList = new List<IWork>();
-            BuilderList = new List<IWork>();
-            ArcherList = new List<IWork>();
-            FarmerList = new List<IWork>();
-            SwordManList = new List<IWork>();
+            ListOfLists = new List<List<IWork>>();
 
-            _pool = pool;
+            ListOfLists.Add(StrayList = new List<IWork>());
+            ListOfLists.Add(CitizenList = new List<IWork>());
+            ListOfLists.Add(BuilderList = new List<IWork>());
+            ListOfLists.Add(ArcherList = new List<IWork>());
+            ListOfLists.Add(FarmerList = new List<IWork>());
+            ListOfLists.Add(SwordManList = new List<IWork>());
+
+           _pool = pool;
         }
-
-        public void MoveToClosestAI(Vector3 targetPosition, Action callback, ItemsType type)
+        
+        public void MoveToClosestAIStray(Vector3 targetPosition, Action callback)
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
@@ -49,47 +55,84 @@ namespace GameInit.Connector
                 }
             }
 
+            _stray.Move(targetPosition, callback);
+        }
+
+        public void MoveToClosestAICitizen(Vector3 targetPosition, Action callback, ItemsType type)
+        {
+            float minDistance = Mathf.Infinity;
+            Vector3 closestPosition = Vector3.zero;
+            IWork _stray = null;
+
+            foreach (var stray in CitizenList)
+            {
+                float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestPosition = stray.getTransform().position;
+                    _stray = stray;
+                }
+            }
+
             _stray.Move(targetPosition, callback, type);
         }
+        public void MoveToClosestAIBuilder(Vector3 targetPosition, Action callback)
+        {
+            float minDistance = Mathf.Infinity;
+            Vector3 closestPosition = Vector3.zero;
+            IWork _stray = null;
+
+            foreach (var stray in BuilderList)
+            {
+                float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestPosition = stray.getTransform().position;
+                    _stray = stray;
+                }
+            }
+
+            _stray.Move(targetPosition, callback);
+        }
+       
         public void CheckAndGoToCoin()
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
             IWork _stray = null;
             Coin _coin = null;
-            bool waitWhileCoinsDisable = false;
-            bool inMove = false;
-
-            foreach (var stray in StrayList)
+            
+            foreach (var listOfWorks in ListOfLists)
             {
-                Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
-
-                if (coin == null)
+                foreach (var stray in listOfWorks)
                 {
-                    break;
-                }
+                    Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
 
-                float distance = Distance.Manhattan(stray.getTransform().position, coin.GetTransform().position);
+                    if (coin == null)
+                    {
+                        break;
+                    }
 
-                if (stray.GetAiComponent().GeNavMeshAgent().remainingDistance > 0)
-                {
-                    inMove = true;
-                }
+                    float distance = Distance.Manhattan(stray.getTransform().position, coin.GetTransform().position);
 
-                if (distance < minDistance)
-                {
-                    _coin = coin;
-                    minDistance = distance;
-                    closestPosition = stray.getTransform().position;
-                    _stray = stray;
+                    if (distance < minDistance)
+                    {
+                        _coin = coin;
+                        minDistance = distance;
+                        closestPosition = stray.getTransform().position;
+                        _stray = stray;
+                    }
                 }
             }
-            if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
-            {
-                inMove = true;
-                _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); });
-                _stray = null;
-            }
+                if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
+                {
+                    _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); });
+                    _stray = null;
+                }
         }
 
         public int GenerateId()

@@ -39,7 +39,7 @@ namespace GameInit.Building
             }
             GameObject instance = GameObject.Instantiate(prefab, position, Quaternion.identity);
             items.Add(instance);
-            _AIConnector.MoveToClosestAI(position, () =>
+            _AIConnector.MoveToClosestAICitizen(position, () =>
             {
                 GameObject.Destroy(instance);
                 // Add any additional code you want to execute here

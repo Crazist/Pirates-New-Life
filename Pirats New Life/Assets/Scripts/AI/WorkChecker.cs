@@ -18,6 +18,7 @@ namespace GameInit.AI
 
 
         private Dictionary<int, ItemsType> _strayList;
+        private Dictionary<int, ItemsType> _citizenList;
         private Dictionary<int, ItemsType> _builderList;
         private Dictionary<int, ItemsType> _archerList;
         private Dictionary<int, ItemsType> _farmerList;
@@ -29,8 +30,6 @@ namespace GameInit.AI
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
 
-            _strayList = new Dictionary<int, ItemsType>();
-
             Init(curcle);
         }
 
@@ -38,6 +37,9 @@ namespace GameInit.AI
         {
             _strayList = new Dictionary<int, ItemsType>();
             CopyToDictinary(_strayList, _connector.StrayList, curcle);
+
+            _citizenList = new Dictionary<int, ItemsType>();
+            CopyToDictinary(_citizenList, _connector.StrayList, curcle);
 
             _builderList = new Dictionary<int, ItemsType>();
             CopyToDictinary(_builderList, _connector.StrayList, curcle);
@@ -63,25 +65,21 @@ namespace GameInit.AI
             return dictinary;
         }
 
-        public void CreateNewWork(IWork work)
-        {
-            switch (work.GetItemType())
-            {
-                case ItemsType.None:
-                    CreateStray(work);
-                    break;
-                case ItemsType.Hammer:
-                    CreateStray(work);
-                    break;
-            }
-        }
-
+        
         private IWork CreateStray(IWork work)
         {
             var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent);
             _connector.StrayList.Add(stray);
             _connector.StrayList.Remove(work);
             return stray;
+        }
+
+        private IWork CreateCitizen(IWork work)
+        {
+            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent);
+            _connector.CitizenList.Add(citizen);
+            _connector.StrayList.Remove(work);
+            return citizen;
         }
 
         public void OnUpdate()
@@ -92,13 +90,14 @@ namespace GameInit.AI
                 {
                     if(stray.GetId() == _stray.Key && stray.GetItemType() == ItemsType.None && stray.HasCoin())
                     {
-                        //stray.RemoveAllEveants();
+                        stray.RemoveAllEveants();
+                        CreateCitizen(stray);
                         return;
                     }
                     if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
                     {
                         stray.RemoveAllEveants();
-                        CreateNewWork(stray);
+                        CreateStray(stray);
                         return;
                     }
                 }
