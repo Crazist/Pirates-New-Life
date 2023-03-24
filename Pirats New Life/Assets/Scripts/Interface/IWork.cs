@@ -13,6 +13,7 @@ namespace GameInit.AI
         public int GetId();
         public bool HasCoin();
         public void RemoveAllEveants();
+        public void CheckIfPlayerWaitForCoins();
     }
 }
 

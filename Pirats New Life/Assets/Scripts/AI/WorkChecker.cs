@@ -23,42 +23,41 @@ namespace GameInit.AI
         private Dictionary<int, ItemsType> _archerList;
         private Dictionary<int, ItemsType> _farmerList;
         private Dictionary<int, ItemsType> _swordManList;
-        public WorkChecker(AIConnector connector, CoinDropAnimation coinDropAnimation,  Pools pool, GameCyrcle curcle, HeroBuilder heroBuilder)
+        public WorkChecker(AIConnector connector, CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder)
         {
             _heroComponent = heroBuilder.GetHeroComponent();
             _connector = connector;
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
 
-            Init(curcle);
+            Init();
         }
 
-        public void Init(GameCyrcle curcle)
+        public void Init()
         {
             _strayList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_strayList, _connector.StrayList, curcle);
+            CopyToDictinary(_strayList, _connector.StrayList);
 
             _citizenList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_citizenList, _connector.StrayList, curcle);
+            CopyToDictinary(_citizenList, _connector.StrayList);
 
             _builderList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_builderList, _connector.StrayList, curcle);
+            CopyToDictinary(_builderList, _connector.StrayList);
 
             _archerList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_archerList, _connector.StrayList, curcle);
+            CopyToDictinary(_archerList, _connector.StrayList);
 
             _farmerList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_farmerList, _connector.StrayList, curcle);
+            CopyToDictinary(_farmerList, _connector.StrayList);
 
             _swordManList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_swordManList, _connector.StrayList, curcle);
+            CopyToDictinary(_swordManList, _connector.StrayList);
         }
 
-        private Dictionary<int, ItemsType> CopyToDictinary(Dictionary<int, ItemsType> dictinary, List<IWork> list, GameCyrcle curcle)
+        private Dictionary<int, ItemsType> CopyToDictinary(Dictionary<int, ItemsType> dictinary, List<IWork> list)
         {
             foreach (var item in list)
             {
-                curcle.Add((IUpdate)item);
                 dictinary.Add(item.GetId(), item.GetItemType());
             }
 

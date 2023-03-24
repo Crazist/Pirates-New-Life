@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace GameInit.AI
 {
-    public class Stray : IWork, IUpdate
+    public class Stray : IWork
     {
         private AIComponent _AIComponent;
         private ItemsType _type = ItemsType.None;
@@ -19,16 +19,13 @@ namespace GameInit.AI
         private int _coinsCount;
         private CoinDropAnimation _coinDropAnimation;
         private HeroComponent _heroComponent;
-        private bool _waitToDropCoins = false;
-        private List<Vector3> _nextMove;
-        private List<Action> _nextAction;
         private bool _inMove = false;
+        private bool _waitCoins = false;
 
-        private const float _minimalDistanceToHero = 1f;
         private const float _coefDistance = 0.5f;
         private const bool canPickUp = true;
         private const int numberOfStray = 0;
-
+        private const float _minimalDistanceToHero = 1f;
         public Stray(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
         {
             _heroComponent = heroComponent;
@@ -37,9 +34,7 @@ namespace GameInit.AI
             _AIComponent = component;
             _id = id;
 
-            _nextMove = new List<Vector3>();
-            _nextAction = new List<Action>();
-
+            
             SetStrayModel();
         }
 
@@ -150,24 +145,25 @@ namespace GameInit.AI
         }
         private IEnumerator Waiter()
         {
-            _waitToDropCoins = true; 
             yield return new WaitForSecondsRealtime(3);
             var i = Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position);
             if (Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position) < _minimalDistanceToHero && _AIComponent.GeNavMeshAgent().remainingDistance < _coefDistance)
             {
                 DropGold();
             }
-            _waitToDropCoins = false;
+
+            _waitCoins = false;
         }
         public void RemoveAllEveants()
         {
             return;
         }
 
-        public void OnUpdate()
+        public void CheckIfPlayerWaitForCoins()
         {
-            if (!_waitToDropCoins && Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position) < _minimalDistanceToHero)
+            if(_waitCoins == false)
             {
+                _waitCoins = true;
                 _AIComponent.StartCoroutine(Waiter());
             }
         }

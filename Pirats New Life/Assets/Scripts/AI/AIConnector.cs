@@ -20,9 +20,11 @@ namespace GameInit.Connector
         private List<List<IWork>> ListOfLists { get; set; }
 
         private Pools _pool;
-        
+        private HeroComponent _heroComponent;
+
         private const int _minDistance = 5;
-       
+        private const float _minimalDistanceToHero = 1f;
+
         public AIConnector(Pools pool)
         {
             ListOfLists = new List<List<IWork>>();
@@ -34,9 +36,13 @@ namespace GameInit.Connector
             ListOfLists.Add(FarmerList = new List<IWork>());
             ListOfLists.Add(SwordManList = new List<IWork>());
 
-           _pool = pool;
+            _pool = pool;
         }
         
+        public void GetHeroComponent(HeroComponent heroComponent)
+        {
+            _heroComponent = heroComponent;
+        }
         public void MoveToClosestAIStray(Vector3 targetPosition, Action callback)
         {
             float minDistance = Mathf.Infinity;
@@ -99,6 +105,23 @@ namespace GameInit.Connector
             _stray.Move(targetPosition, callback);
         }
        
+        public void CheckIfPlayerWaitForCoinsMain()
+        {
+            if (_heroComponent == null) return;
+
+            foreach (var listOfWorks in ListOfLists)
+            {
+                foreach (var stray in listOfWorks)
+                {
+                    var Ai = stray.GetAiComponent();
+                    if (Distance.Manhattan(_heroComponent.Transform.position, Ai.GetTransform().position) < _minimalDistanceToHero)
+                    {
+                        stray.CheckIfPlayerWaitForCoins();
+                    }
+                }
+            }
+            
+        }
         public void CheckAndGoToCoin()
         {
             float minDistance = Mathf.Infinity;
@@ -174,7 +197,7 @@ namespace GameInit.Connector
 
         public void OnUpdate()
         {
-           // CheckAndGoToCoin();
+            CheckIfPlayerWaitForCoinsMain();
         }
     }
 }

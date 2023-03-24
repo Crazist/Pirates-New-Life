@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace GameInit.AI
 {
-    public class Citizen : IWork, IUpdate
+    public class Citizen : IWork
     {
 
         private AIComponent _AIComponent;
@@ -20,7 +20,7 @@ namespace GameInit.AI
         private int _coinsCount;
         private CoinDropAnimation _coinDropAnimation;
         private HeroComponent _heroComponent;
-        private bool _waitToDropCoins = false;
+        private bool _waitCoins = false;
         private List<Vector3> _nextMove;
         private List<Action> _nextAction;
         private bool _inMove = false;
@@ -152,24 +152,24 @@ namespace GameInit.AI
         }
         private IEnumerator Waiter()
         {
-            _waitToDropCoins = true;
             yield return new WaitForSecondsRealtime(3);
             var i = Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position);
             if (Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position) < _minimalDistanceToHero && _AIComponent.GeNavMeshAgent().remainingDistance < _coefDistance)
             {
                 DropGold();
             }
-            _waitToDropCoins = false;
+            _waitCoins = false;
         }
         public void RemoveAllEveants()
         {
             return;
         }
 
-        public void OnUpdate()
+        public void CheckIfPlayerWaitForCoins()
         {
-            if (!_waitToDropCoins && Vector3.Distance(_heroComponent.Transform.position, _AIComponent.GetTransform().position) < _minimalDistanceToHero)
+            if (_waitCoins == false)
             {
+                _waitCoins = true;
                 _AIComponent.StartCoroutine(Waiter());
             }
         }
