@@ -6,6 +6,7 @@ using GameInit.Pool;
 using GameInit.Animation;
 using GameInit.GameCyrcleModule;
 using GameInit.Builders;
+using GameInit.MainPositions;
 
 namespace GameInit.AI
 {
@@ -15,7 +16,7 @@ namespace GameInit.AI
         private CoinDropAnimation _coinDropAnimation;
         private Pools _pool;
         private HeroComponent _heroComponent;
-
+        private TownHallComponent _townHallComponent;
 
         private Dictionary<int, ItemsType> _strayList;
         private Dictionary<int, ItemsType> _citizenList;
@@ -29,6 +30,8 @@ namespace GameInit.AI
             _connector = connector;
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
+
+            _townHallComponent = Object.FindObjectOfType<TownHallComponent>();
 
             Init();
         }
@@ -75,7 +78,7 @@ namespace GameInit.AI
 
         private IWork CreateCitizen(IWork work)
         {
-            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker());
+            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
             _connector.CitizenList.Add(citizen);
             _connector.StrayList.Remove(work);
             _connector.MoveToClosestAICitizen();

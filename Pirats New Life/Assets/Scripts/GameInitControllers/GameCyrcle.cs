@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -16,9 +15,11 @@ namespace GameInit.GameCyrcleModule
         private readonly List<ILateUpdate> _lateUpdates = new List<ILateUpdate>(20);
         private readonly List<IDayChange> _dayUpdates = new List<IDayChange>();
 
+        [SerializeField] private DayChange _dayChange;
+
         private bool isDay = true;
         // ==================
-
+       
         /* public void Init()
          {
              _classesToUpdate[CyrcleMethod.Update] = new List<ICallable>();

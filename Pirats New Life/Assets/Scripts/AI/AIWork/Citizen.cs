@@ -22,8 +22,6 @@ namespace GameInit.AI
         private CoinDropAnimation _coinDropAnimation;
         private HeroComponent _heroComponent;
         private bool _waitCoins = false;
-        private List<Vector3> _nextMove;
-        private List<Action> _nextAction;
         private RandomWalker _RandomWalker;
         
         private const float _minimalDistanceToHero = 1f;
@@ -33,7 +31,7 @@ namespace GameInit.AI
         private const int radiusRandomWalk = 10;
         public bool InMove { get; set; } = false;
 
-        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker)
+        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
         {
             _heroComponent = heroComponent;
             _coinDropAnimation = coinDropAnimation;
@@ -41,11 +39,8 @@ namespace GameInit.AI
             _AIComponent = component;
             _id = id;
 
-            _nextMove = new List<Vector3>();
-            _nextAction = new List<Action>();
-
             _RandomWalker = randomWalker;
-            _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), _AIComponent.GetTransform().position, this, radiusRandomWalk); 
+            _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), mainPosition, this, radiusRandomWalk); 
             SetStrayModel();
         }
 
@@ -138,7 +133,6 @@ namespace GameInit.AI
             action.Invoke();
             CollectGold();
             InMove = false;
-            _AIComponent.GetMonoBehaviour().StartCoroutine(StartRandomWallk());
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {
@@ -157,7 +151,6 @@ namespace GameInit.AI
             action.Invoke();
             _type = type;
             InMove = false;
-            _AIComponent.GetMonoBehaviour().StartCoroutine(StartRandomWallk());
         }
         private IEnumerator Waiter()
         {
@@ -172,15 +165,6 @@ namespace GameInit.AI
         public void RemoveAllEveants()
         {
             _AIComponent.GetMonoBehaviour().StopAllCoroutines();
-        }
-
-        private IEnumerator StartRandomWallk()
-        {
-            yield return new WaitForSecondsRealtime(5);
-            if (!InMove)
-            {
-                _RandomWalker.Move();
-            }
         }
 
         public void CheckIfPlayerWaitForCoins()
