@@ -67,7 +67,7 @@ namespace GameInit.AI
         
         private IWork CreateStray(IWork work)
         {
-            var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent);
+            var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent, work.GetRandomWalker());
             _connector.StrayList.Add(stray);
             _connector.StrayList.Remove(work);
             return stray;
@@ -75,9 +75,10 @@ namespace GameInit.AI
 
         private IWork CreateCitizen(IWork work)
         {
-            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent);
+            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker());
             _connector.CitizenList.Add(citizen);
             _connector.StrayList.Remove(work);
+            _connector.MoveToClosestAICitizen();
             return citizen;
         }
 

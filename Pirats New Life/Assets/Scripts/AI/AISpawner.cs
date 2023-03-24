@@ -4,6 +4,7 @@ using UnityEngine;
 using GameInit.Connector;
 using GameInit.Animation;
 using GameInit.Pool;
+using GameInit.RandomWalk;
 
 namespace GameInit.AI
 {
@@ -37,7 +38,9 @@ namespace GameInit.AI
                     var obj = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
                     var _AIComponent = obj.GetComponent<AIComponent>();
 
-                    Stray stray = new Stray(_AIComponent, _AIConnector.GenerateId(), pool, _coinDropAnimation, heroComponent);
+                    var randomWalker = new RandomWalker(); 
+                    Stray stray = new Stray(_AIComponent, _AIConnector.GenerateId(), pool, _coinDropAnimation, heroComponent, randomWalker);
+                    
 
                     _AIConnector.StrayList.Add(stray);
                 }

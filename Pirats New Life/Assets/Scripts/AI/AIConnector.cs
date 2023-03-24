@@ -4,7 +4,9 @@ using UnityEngine;
 using GameInit.AI;
 using System;
 using GameInit.Pool;
+using GameInit.RandomWalk;
 using GameInit.Optimization;
+using GameInit.GameCyrcleModule;
 
 namespace GameInit.Connector
 {
@@ -21,6 +23,7 @@ namespace GameInit.Connector
 
         private Pools _pool;
         private HeroComponent _heroComponent;
+        private List<Action> lateMove;
 
         private const int _minDistance = 5;
         private const float _minimalDistanceToHero = 1f;
@@ -28,6 +31,7 @@ namespace GameInit.Connector
         public AIConnector(Pools pool)
         {
             ListOfLists = new List<List<IWork>>();
+            lateMove = new List<Action>();
 
             ListOfLists.Add(StrayList = new List<IWork>());
             ListOfLists.Add(CitizenList = new List<IWork>());
@@ -64,6 +68,13 @@ namespace GameInit.Connector
             _stray.Move(targetPosition, callback);
         }
 
+        public void MoveToClosestAICitizen()
+        {
+            if(lateMove.Count != 0)
+            {
+                lateMove[0].Invoke();
+            }
+        }
         public void MoveToClosestAICitizen(Vector3 targetPosition, Action callback, ItemsType type)
         {
             float minDistance = Mathf.Infinity;
@@ -82,7 +93,17 @@ namespace GameInit.Connector
                 }
             }
 
-            _stray.Move(targetPosition, callback, type);
+            if(_stray != null)
+            {
+                _stray.Move(targetPosition, callback, type);
+            }
+            else
+            {
+                lateMove.Add(() =>
+                {
+                    MoveToClosestAICitizen(targetPosition, callback, type);
+                });
+            }
         }
         public void MoveToClosestAIBuilder(Vector3 targetPosition, Action callback)
         {
@@ -120,7 +141,6 @@ namespace GameInit.Connector
                     }
                 }
             }
-            
         }
         public void CheckAndGoToCoin()
         {
@@ -133,6 +153,11 @@ namespace GameInit.Connector
             {
                 foreach (var stray in listOfWorks)
                 {
+                    if (stray.InMove)
+                    {
+                        return;
+                    }
+
                     Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
 
                     if (coin == null)

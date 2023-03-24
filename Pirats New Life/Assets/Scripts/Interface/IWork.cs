@@ -1,3 +1,4 @@
+using GameInit.RandomWalk;
 using System;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ namespace GameInit.AI
 {
     public interface IWork
     {
+        public bool InMove { get; set; }
         public Transform getTransform();
         public void Move(Vector3 position, Action action, ItemsType type);
         public void Move(Vector3 position, Action action);
@@ -14,6 +16,7 @@ namespace GameInit.AI
         public bool HasCoin();
         public void RemoveAllEveants();
         public void CheckIfPlayerWaitForCoins();
+        public RandomWalker GetRandomWalker();
     }
 }
 

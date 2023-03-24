@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 using GameInit.Pool;
 using GameInit.Animation;
 using System.Linq;
+using GameInit.RandomWalk;
 
 namespace GameInit.AI
 {
@@ -23,14 +24,16 @@ namespace GameInit.AI
         private bool _waitCoins = false;
         private List<Vector3> _nextMove;
         private List<Action> _nextAction;
-        private bool _inMove = false;
-
+        private RandomWalker _RandomWalker;
+        
         private const float _minimalDistanceToHero = 1f;
         private const float _coefDistance = 0.5f;
         private const bool canPickUp = true;
         private const int numberOfCitizenModel = 1;
+        private const int radiusRandomWalk = 10;
+        public bool InMove { get; set; } = false;
 
-        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
+        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker)
         {
             _heroComponent = heroComponent;
             _coinDropAnimation = coinDropAnimation;
@@ -41,6 +44,8 @@ namespace GameInit.AI
             _nextMove = new List<Vector3>();
             _nextAction = new List<Action>();
 
+            _RandomWalker = randomWalker;
+            _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), _AIComponent.GetTransform().position, this, radiusRandomWalk); 
             SetStrayModel();
         }
 
@@ -100,7 +105,7 @@ namespace GameInit.AI
         }
         public void Move(Vector3 position, Action action, ItemsType type)
         {
-            if (_inMove == false)
+            if (InMove == false)
             {
                 _AIComponent.GeNavMeshAgent().SetDestination(position);
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
@@ -108,9 +113,9 @@ namespace GameInit.AI
         }
         public void Move(Vector3 position, Action action)
         {
-            if (_inMove == false)
+            if (InMove == false)
             {
-                _inMove = true;
+                InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
@@ -132,10 +137,12 @@ namespace GameInit.AI
 
             action.Invoke();
             CollectGold();
-            _inMove = false;
+            InMove = false;
+            _AIComponent.GetMonoBehaviour().StartCoroutine(StartRandomWallk());
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {
+            InMove = true;
             var agent = _AIComponent.GeNavMeshAgent();
 
             while (agent.velocity == Vector3.zero)
@@ -149,6 +156,8 @@ namespace GameInit.AI
 
             action.Invoke();
             _type = type;
+            InMove = false;
+            _AIComponent.GetMonoBehaviour().StartCoroutine(StartRandomWallk());
         }
         private IEnumerator Waiter()
         {
@@ -162,7 +171,16 @@ namespace GameInit.AI
         }
         public void RemoveAllEveants()
         {
-            return;
+            _AIComponent.GetMonoBehaviour().StopAllCoroutines();
+        }
+
+        private IEnumerator StartRandomWallk()
+        {
+            yield return new WaitForSecondsRealtime(5);
+            if (!InMove)
+            {
+                _RandomWalker.Move();
+            }
         }
 
         public void CheckIfPlayerWaitForCoins()
@@ -172,6 +190,10 @@ namespace GameInit.AI
                 _waitCoins = true;
                 _AIComponent.StartCoroutine(Waiter());
             }
+        }
+        public RandomWalker GetRandomWalker()
+        {
+            return _RandomWalker;
         }
     }
 }
