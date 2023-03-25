@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,9 +18,11 @@ namespace GameInit.GameCyrcleModule
 
         [SerializeField] private DayChange _dayChange;
 
-        private bool isDay = true;
+        private Action _dayChangeAction;
+        
+        [SerializeField] private bool isDay = true;
         // ==================
-       
+
         /* public void Init()
          {
              _classesToUpdate[CyrcleMethod.Update] = new List<ICallable>();
@@ -41,6 +44,11 @@ namespace GameInit.GameCyrcleModule
          }*/
 
         // ====== TEST ======
+        private void Start()
+        {
+            _dayChangeAction += DayChange;
+            _dayChange.SetDayChangeAction(_dayChangeAction);
+        }
         public void Add(IUpdate update)
         {
             _updates.Add(update);
@@ -83,12 +91,6 @@ namespace GameInit.GameCyrcleModule
             {
                 update?.OnUpdate();
             }
-
-            if (dayChange)
-            {
-                StartCoroutine(DayChange());
-            }
-            // ==================
         }
 
         private void LateUpdate()
@@ -105,23 +107,16 @@ namespace GameInit.GameCyrcleModule
             }
             // ==================
         }
-
-        private void OnDisable()
-        {
-            StopCoroutine(DayChange());
-        }
-        private IEnumerator DayChange()
+        public void DayChange()
         {
             dayChange = false;
             foreach (var day in _dayUpdates)
             {
                 day.OnDayChange();
             }
-            yield return new WaitForSeconds(300f);
             isDay = !isDay;
             dayChange = true;
         }
-
         public bool ChekIfDay()
         {
             return isDay;

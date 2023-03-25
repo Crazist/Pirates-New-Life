@@ -6,6 +6,7 @@ namespace GameInit.Component
     public class ChestComponent : MonoBehaviour
     {
         [field: SerializeField] public int GoldAmount { get; private set; }
+        [SerializeField] private Animator _animator;
 
         public bool IsCollided { get; private set; }
 
@@ -19,6 +20,10 @@ namespace GameInit.Component
         public MonoBehaviour GetMono()
         {
             return this;
+        }
+        public Animator GetAnimator()
+        {
+            return _animator;
         }
     }
 }

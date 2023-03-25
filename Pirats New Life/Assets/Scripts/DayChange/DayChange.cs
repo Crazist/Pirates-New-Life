@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,8 +14,14 @@ public class DayChange : MonoBehaviour
     [SerializeField, Range(0, 24)] private float TimeOfday;
 
     private float cycleDuration = 600f; // 10 minutes in seconds
+    
+    private Action _dayChangeAction;
 
     private float cycleProgress = 6f / 24f;
+
+    private const int StartDay = 6;
+
+    private const int StartNight = 22;
     private void OnValidate()
     {
         if(DirectionalLight != null)
@@ -42,7 +49,17 @@ public class DayChange : MonoBehaviour
         }
 
     }
-   
+  
+    public void SetDayChangeAction(Action dayChangeAction)
+    {
+        _dayChangeAction = dayChangeAction;
+    }
+    private void On24HourCycle()
+    {
+        Debug.Log("24 hour cycle has elapsed");
+        _dayChangeAction.Invoke();
+        // Put your code here that you want to execute every 24 hours
+    }
 
     private void Update()
     {
@@ -51,6 +68,10 @@ public class DayChange : MonoBehaviour
             cycleProgress += Time.deltaTime / cycleDuration;
             cycleProgress %= 1f;
             TimeOfday = cycleProgress * 24f;
+            if ((TimeOfday >= StartDay && TimeOfday < StartDay + Time.deltaTime) || (TimeOfday >= StartNight && TimeOfday < StartNight + Time.deltaTime))
+            {
+                On24HourCycle();
+            }
             UpdateLighting(cycleProgress);
         }
     }
