@@ -1,10 +1,12 @@
 
+using GameInit.AI;
+
 namespace GameInit.Building
 {
     public interface IBuilding
     {
-       void Build();
-       bool CheckForDay();
+       public void Build();
+       public void SetBuilder(IWork worker);
     }
 }
 

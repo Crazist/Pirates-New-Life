@@ -7,9 +7,15 @@ using System;
 public class BuildingComponent : MonoBehaviour
 {
     [SerializeField] private List<GameObject> formsList;
+    [SerializeField] private List<Transform> _positionForBuildFirst;
+    [SerializeField] private List<Transform> _positionForBuildSecond;
+    [SerializeField] private List<Transform> _positionForBuildThird;
+    [SerializeField] private List<Transform> _positionForBuildFourth;
     [SerializeField] private int countOfGold = 2;
     [SerializeField] private int maxLevel = 1;
     [SerializeField] BuildingsType type;
+    [SerializeField] private bool _currentlyBuilding = false;
+    [SerializeField] private bool _momentalBuild = true;
     private bool canProduce = true;
     private Coin coin;
     private int curForm = 0;
@@ -18,12 +24,32 @@ public class BuildingComponent : MonoBehaviour
     private List<Coin> curCoinsList;
     private Action _action;
     private bool inBuild = false;
+    
 
     private void Start()
     {
         curCoinsList = new List<Coin>();
     }
-
+    public List<Transform> GetBuildPositions()
+    {
+        switch (curForm - 1)
+        {
+            case 0:
+                return _positionForBuildFirst;
+            case 1:
+                return _positionForBuildSecond;
+            case 2:
+                return _positionForBuildThird;
+            case 3:
+                return _positionForBuildFourth;
+        }
+        return _positionForBuildFirst;
+    }
+    public void SetInBuild(bool _inBuild)
+    {
+        inBuild = _inBuild;
+        _currentlyBuilding = _inBuild;
+    }
     public void SetAction(Action action)
     {
        _action = action;
@@ -39,11 +65,15 @@ public class BuildingComponent : MonoBehaviour
         }
         return false;
     }
-
+    public MonoBehaviour GetMonoBehaviour()
+    {
+        return this;
+    }
     public void UpdateBuild()
     {
         formsList[curForm - 1].gameObject.SetActive(false);
         formsList[curForm].gameObject.SetActive(true);
+        ChekMaxLvl();
     }
 
     public bool CanProduce()
@@ -53,7 +83,10 @@ public class BuildingComponent : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!canProduce || curGold == countOfGold) return;
+        if (!canProduce || curGold == countOfGold || _currentlyBuilding)
+        {
+            return;
+        }
 
         var _coin = other.gameObject.GetComponent<Coin>();
         if (_coin && !_coin.SecondTouch)
@@ -110,7 +143,11 @@ public class BuildingComponent : MonoBehaviour
         {
             curForm++;
             _action.Invoke();
-            StartCoroutine(BuildingInProgress());
+            if (_momentalBuild)
+            {
+                _currentlyBuilding = true;
+                StartCoroutine(BuildingInProgress());
+            }
         }
         else
         {
@@ -123,13 +160,16 @@ public class BuildingComponent : MonoBehaviour
         }
         curCoinsList.Clear();
         curGold = 0;
-        StopCoroutine(GoldCollectorWaiter());
     }
     private IEnumerator BuildingInProgress()
     {
         yield return new WaitForSecondsRealtime(2);
         UpdateBuild();
         inBuild = false;
-        StopCoroutine(BuildingInProgress());
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 }

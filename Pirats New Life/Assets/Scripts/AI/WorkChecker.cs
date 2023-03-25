@@ -17,17 +17,15 @@ namespace GameInit.AI
         private Pools _pool;
         private HeroComponent _heroComponent;
         private TownHallComponent _townHallComponent;
+        private AIConnector _AIConnector;
 
-        private Dictionary<int, ItemsType> _strayList;
-        private Dictionary<int, ItemsType> _citizenList;
-        private Dictionary<int, ItemsType> _builderList;
-        private Dictionary<int, ItemsType> _archerList;
-        private Dictionary<int, ItemsType> _farmerList;
-        private Dictionary<int, ItemsType> _swordManList;
-        public WorkChecker(AIConnector connector, CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder)
+        private Dictionary<int, ItemsType> _copyList;
+        
+        public WorkChecker(BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder, BuilderConnectors _builderConnectors)
         {
+            _AIConnector = _builderConnectors.GetAiConnector();
             _heroComponent = heroBuilder.GetHeroComponent();
-            _connector = connector;
+            _connector = builderConnectors.GetAiConnector();
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
 
@@ -38,23 +36,8 @@ namespace GameInit.AI
 
         public void Init()
         {
-            _strayList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_strayList, _connector.StrayList);
-
-            _citizenList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_citizenList, _connector.StrayList);
-
-            _builderList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_builderList, _connector.StrayList);
-
-            _archerList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_archerList, _connector.StrayList);
-
-            _farmerList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_farmerList, _connector.StrayList);
-
-            _swordManList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_swordManList, _connector.StrayList);
+            _copyList = new Dictionary<int, ItemsType>();
+            CopyToDictinary(_copyList, _connector.StrayList);
         }
 
         private Dictionary<int, ItemsType> CopyToDictinary(Dictionary<int, ItemsType> dictinary, List<IWork> list)
@@ -73,6 +56,18 @@ namespace GameInit.AI
             var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent, work.GetRandomWalker());
             _connector.StrayList.Add(stray);
             _connector.StrayList.Remove(work);
+            foreach (var list in _connector.ListOfLists)
+            {
+                foreach (var item in list)
+                {
+                    if(item.GetId() == stray.GetId())
+                    {
+                        list.Remove(item);
+                        break;
+                    }
+                }
+            }
+            ModifCollection(stray);
             return stray;
         }
 
@@ -81,20 +76,62 @@ namespace GameInit.AI
             var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
             _connector.CitizenList.Add(citizen);
             _connector.StrayList.Remove(work);
-            _connector.MoveToClosestAICitizen();
+            _connector.MoveToClosest();
+            ModifCollection(citizen);
+            _AIConnector.CheckAndGoToCoin();
             return citizen;
         }
+        private IWork CreateBuilder(IWork work)
+        {
+            var builder = new Builder(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            _connector.BuilderList.Add(builder);
+            _connector.CitizenList.Remove(work);
+            _connector.MoveToClosest();
+            ModifCollection(builder);
+            _AIConnector.CheckAndGoToCoin();
+            return builder;
+        }
 
+        private void ModifCollection(IWork citizen)
+        {
+            foreach (var copy in _copyList)
+            {
+                if (copy.Key == citizen.GetId())
+                {
+                    _copyList.Remove(copy.Key);
+                    break;
+                }
+            }
+            _copyList.Add(citizen.GetId(), citizen.GetItemType());
+        }
         public void OnUpdate()
         {
             foreach (var stray in _connector.StrayList)
             {
-                foreach (var _stray in _strayList)
+                foreach (var _stray in _copyList)
                 {
                     if(stray.GetId() == _stray.Key && stray.GetItemType() == ItemsType.None && stray.HasCoin())
                     {
                         stray.RemoveAllEveants();
                         CreateCitizen(stray);
+                        return;
+                    }
+                    if (stray.GetId() == _stray.Key && stray.HasCoin() && stray.GetItemType() != _stray.Value)
+                    {
+                        stray.RemoveAllEveants();
+                        CreateStray(stray);
+                        return;
+                    }
+                }
+            }
+            foreach (var stray in _connector.CitizenList)
+            {
+                foreach (var _stray in _copyList)
+                {
+                    if (stray.GetId() == _stray.Key && stray.HasCoin() && stray.GetItemType() != _stray.Value && stray.GetItemType() == ItemsType.Hammer)
+                    {
+                        stray.RemoveAllEveants();
+                        CreateBuilder(stray);
                         return;
                     }
                     if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
@@ -104,7 +141,6 @@ namespace GameInit.AI
                         return;
                     }
                 }
-
             }
         }
     }

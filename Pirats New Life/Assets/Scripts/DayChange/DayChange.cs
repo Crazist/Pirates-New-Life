@@ -13,11 +13,11 @@ public class DayChange : MonoBehaviour
    
     [SerializeField, Range(0, 24)] private float TimeOfday;
 
-    private float cycleDuration = 600f; // 10 minutes in seconds
+    private float cycleDuration = 50f; // 10 minutes in seconds
     
     private Action _dayChangeAction;
 
-    private float cycleProgress = 6f / 24f;
+    private float cycleProgress = 5.3f / 24f;
 
     private const int StartDay = 6;
 
@@ -65,10 +65,12 @@ public class DayChange : MonoBehaviour
     {
         if (Application.isPlaying)
         {
+            var curTime = TimeOfday;
             cycleProgress += Time.deltaTime / cycleDuration;
             cycleProgress %= 1f;
             TimeOfday = cycleProgress * 24f;
-            if ((TimeOfday >= StartDay && TimeOfday < StartDay + Time.deltaTime) || (TimeOfday >= StartNight && TimeOfday < StartNight + Time.deltaTime))
+            var futureDeley = TimeOfday - curTime;
+            if ((TimeOfday >= StartDay && TimeOfday <  StartDay + futureDeley) || (TimeOfday >= StartNight && TimeOfday <  StartNight + futureDeley))
             {
                 On24HourCycle();
             }

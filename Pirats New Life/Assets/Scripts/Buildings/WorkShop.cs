@@ -1,28 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GameInit.GameCyrcleModule;
 using System;
 using GameInit.Connector;
+using GameInit.AI;
 
 namespace GameInit.Building
 {
-    public class WorkShop : IBuilding, IDayChange
+    public class WorkShop : IBuilding
     {
         private bool isBuilded = false;
-        private bool inBuildProgress = false;
-
-        private List<IBuilding> _buildingsList;
-        private GameCyrcle _cyrcle;
+        
         private Action _startBuilding;
         private BuildingComponent _workShopComponent;
         private ResourceManager _res;
         private Produce producer;
 
-        public WorkShop(BuildingComponent workShopComponent, GameCyrcle cyrcle, ResourceManager res, AIConnector _AIConnector)
+        public WorkShop(BuildingComponent workShopComponent, ResourceManager res, AIConnector _AIConnector)
         {
            _workShopComponent = workShopComponent;
-           _cyrcle = cyrcle;
            _res = res;
             CreateProducer(_AIConnector);
            _startBuilding += Build;
@@ -49,12 +43,7 @@ namespace GameInit.Building
 
         public bool CheckForDay()
         {
-            return _cyrcle.ChekIfDay();
-        }
-
-        public void OnDayChange()
-        {
-            throw new System.NotImplementedException();
+            return false;
         }
 
         public bool GetBuildingState()
@@ -62,6 +51,10 @@ namespace GameInit.Building
             return isBuilded;
         }
 
+        public void SetBuilder(IWork worker)
+        {
+            return; //no builder in fast build building
+        }
     }
 }
 

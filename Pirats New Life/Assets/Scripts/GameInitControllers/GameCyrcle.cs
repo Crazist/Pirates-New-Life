@@ -20,7 +20,7 @@ namespace GameInit.GameCyrcleModule
 
         private Action _dayChangeAction;
         
-        [SerializeField] private bool isDay = true;
+        [SerializeField] private bool isDay = false;
         // ==================
 
         /* public void Init()
@@ -59,7 +59,7 @@ namespace GameInit.GameCyrcleModule
             _lateUpdates.Add(lateUpdate);
         }
 
-        public void Add(IDayChange dayUpdates)
+        public void AddDayChange(IDayChange dayUpdates)
         {
             _dayUpdates.Add(dayUpdates);
         }
@@ -110,11 +110,11 @@ namespace GameInit.GameCyrcleModule
         public void DayChange()
         {
             dayChange = false;
+            isDay = !isDay;
             foreach (var day in _dayUpdates)
             {
                 day.OnDayChange();
             }
-            isDay = !isDay;
             dayChange = true;
         }
         public bool ChekIfDay()

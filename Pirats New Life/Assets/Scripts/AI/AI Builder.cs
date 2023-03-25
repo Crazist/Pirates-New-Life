@@ -10,10 +10,10 @@ namespace GameInit.AI
 {
     public class AIBuilder
     {
-        public AIBuilder(AIConnector AIConnector, Pools pool, CoinDropAnimation coinDropAnimation, HeroBuilder _heroBuilder)
+        public AIBuilder(BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroBuilder _heroBuilder)
         {
             var camps = UnityEngine.Object.FindObjectsOfType<CampComponent>();
-            AISpawner spawner = new AISpawner(camps, AIConnector, pool, coinDropAnimation, _heroBuilder.GetHeroComponent());
+            AISpawner spawner = new AISpawner(camps, builderConnectors.GetAiConnector(), pool, coinDropAnimation, _heroBuilder.GetHeroComponent());
         }
 
     }

@@ -30,7 +30,8 @@ namespace GameInit.AI
         private const int numberOfCitizenModel = 1;
         private const int radiusRandomWalk = 10;
         public bool InMove { get; set; } = false;
-
+        public bool InWork { get; set; } = false;
+        public bool GoingForCoin { get; set; } = false;
         public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
         {
             _heroComponent = heroComponent;
@@ -40,7 +41,8 @@ namespace GameInit.AI
             _id = id;
 
             _RandomWalker = randomWalker;
-            _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), mainPosition, this, radiusRandomWalk); 
+            _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), mainPosition, this, radiusRandomWalk);
+            CollectGold();
             SetStrayModel();
         }
 
@@ -110,6 +112,7 @@ namespace GameInit.AI
         {
             if (InMove == false)
             {
+                GoingForCoin = true;
                 InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
@@ -130,8 +133,10 @@ namespace GameInit.AI
                 yield return null;
             }
 
-            action.Invoke();
+            action?.Invoke();
             CollectGold();
+
+            GoingForCoin = false;
             InMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)
@@ -148,7 +153,7 @@ namespace GameInit.AI
                 yield return null;
             }
 
-            action.Invoke();
+            action?.Invoke();
             _type = type;
             InMove = false;
         }
@@ -179,6 +184,7 @@ namespace GameInit.AI
         {
             return _RandomWalker;
         }
+
     }
 }
 

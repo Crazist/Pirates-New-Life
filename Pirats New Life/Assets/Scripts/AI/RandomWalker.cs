@@ -29,14 +29,17 @@ namespace GameInit.RandomWalk
         }
         public void Move()
         {
-            Vector3 randomDirection = Random.insideUnitSphere * (_radius);
-            randomDirection += _spawnPoint;
+            if (!_work.InWork)
+            {
+                Vector3 randomDirection = Random.insideUnitSphere * (_radius);
+                randomDirection += _spawnPoint;
 
-            NavMeshHit hit;
-            NavMesh.SamplePosition(randomDirection, out hit, _radius, NavMesh.AllAreas);
-            Vector3 finalPosition = hit.position;
+                NavMeshHit hit;
+                NavMesh.SamplePosition(randomDirection, out hit, _radius, NavMesh.AllAreas);
+                Vector3 finalPosition = hit.position;
 
-            _agent.SetDestination(finalPosition);
+                _agent.SetDestination(finalPosition);
+            }
         }
         private IEnumerator CheckForStartRandomWallk()
         {
@@ -44,7 +47,7 @@ namespace GameInit.RandomWalk
             {
                 yield return new WaitForEndOfFrame();
 
-                if (!_inPlay)
+                if (!_inPlay && !_work.InWork)
                 {
                     _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(StartRandomWallk());
                 }

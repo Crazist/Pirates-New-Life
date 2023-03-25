@@ -7,10 +7,11 @@ using GameInit.Pool;
 using GameInit.RandomWalk;
 using GameInit.Optimization;
 using GameInit.GameCyrcleModule;
+using GameInit.Building;
 
 namespace GameInit.Connector
 {
-    public class AIConnector : IUpdate
+    public class AIConnector : IUpdate, IDayChange
     {
         public List<IWork> StrayList { get; set; }
         public List<IWork> CitizenList { get; set; }
@@ -19,17 +20,20 @@ namespace GameInit.Connector
         public List<IWork> FarmerList { get; set; }
         public List<IWork> SwordManList { get; set; }
 
-        private List<List<IWork>> ListOfLists { get; set; }
+        public List<List<IWork>> ListOfLists { get; set; }
 
         private Pools _pool;
         private HeroComponent _heroComponent;
         private List<Action> lateMove;
+        private GameCyrcle _gameCyrcle;
+        private List<IWork> stillInMove;
 
         private const int _minDistance = 5;
         private const float _minimalDistanceToHero = 1f;
 
-        public AIConnector(Pools pool)
+        public AIConnector(Pools pool, GameCyrcle cyrcle)
         {
+            stillInMove = new List<IWork>();
             ListOfLists = new List<List<IWork>>();
             lateMove = new List<Action>();
 
@@ -40,6 +44,7 @@ namespace GameInit.Connector
             ListOfLists.Add(FarmerList = new List<IWork>());
             ListOfLists.Add(SwordManList = new List<IWork>());
 
+            _gameCyrcle = cyrcle;
             _pool = pool;
         }
         
@@ -68,11 +73,12 @@ namespace GameInit.Connector
             _stray.Move(targetPosition, callback);
         }
 
-        public void MoveToClosestAICitizen()
+        public void MoveToClosest()
         {
-            if(lateMove.Count != 0)
+            for (int i = 0; i < lateMove.Count; i++)
             {
-                lateMove[0].Invoke();
+                lateMove[i].Invoke();
+                lateMove.Remove(lateMove[i]);
             }
         }
         public void MoveToClosestAICitizen(Vector3 targetPosition, Action callback, ItemsType type)
@@ -83,13 +89,16 @@ namespace GameInit.Connector
 
             foreach (var stray in CitizenList)
             {
-                float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
-
-                if (distance < minDistance)
+                if (!stray.InMove)
                 {
-                    minDistance = distance;
-                    closestPosition = stray.getTransform().position;
-                    _stray = stray;
+                    float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closestPosition = stray.getTransform().position;
+                        _stray = stray;
+                    }
                 }
             }
 
@@ -105,25 +114,40 @@ namespace GameInit.Connector
                 });
             }
         }
-        public void MoveToClosestAIBuilder(Vector3 targetPosition, Action callback)
+        public IWork MoveToClosestAIBuilder(Vector3 targetPosition, Action callback, IBuilding building)
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
             IWork _stray = null;
 
-            foreach (var stray in BuilderList)
+            foreach (var builder in BuilderList)
             {
-                float distance = Distance.Manhattan(stray.getTransform().position, targetPosition);
-
-                if (distance < minDistance)
+                if (builder.InWork != true)
                 {
-                    minDistance = distance;
-                    closestPosition = stray.getTransform().position;
-                    _stray = stray;
+                    float distance = Distance.Manhattan(builder.getTransform().position, targetPosition);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closestPosition = builder.getTransform().position;
+                        _stray = builder;
+                    }
                 }
             }
 
-            _stray.Move(targetPosition, callback);
+            if (_stray != null && _gameCyrcle.ChekIfDay())
+            {
+                _stray.Move(targetPosition, callback);
+            }
+            else
+            {
+                lateMove.Add(() =>
+                {
+                    building.SetBuilder(_stray);
+                    MoveToClosestAIBuilder(targetPosition, callback, building);
+                });
+            }
+            return _stray;
         }
        
         public void CheckIfPlayerWaitForCoinsMain()
@@ -153,26 +177,25 @@ namespace GameInit.Connector
             {
                 foreach (var stray in listOfWorks)
                 {
-                    if (stray.InMove)
+                    if (!stray.InMove || stray.GoingForCoin)
                     {
-                        return;
-                    }
 
-                    Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
+                        Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
 
-                    if (coin == null)
-                    {
-                        break;
-                    }
+                        if (coin == null)
+                        {
+                            break;
+                        }
 
-                    float distance = Distance.Manhattan(stray.getTransform().position, coin.GetTransform().position);
+                        float distance = Distance.Manhattan(stray.getTransform().position, coin.GetTransform().position);
 
-                    if (distance < minDistance)
-                    {
-                        _coin = coin;
-                        minDistance = distance;
-                        closestPosition = stray.getTransform().position;
-                        _stray = stray;
+                        if (distance < minDistance)
+                        {
+                            _coin = coin;
+                            minDistance = distance;
+                            closestPosition = stray.getTransform().position;
+                            _stray = stray;
+                        }
                     }
                 }
             }
@@ -220,9 +243,63 @@ namespace GameInit.Connector
             return false;
         }
 
+        private void NightReturnAll()
+        {
+            List<IWork> stillInMove = new List<IWork>();
+
+
+            if (!_gameCyrcle.ChekIfDay())
+            {
+                foreach (var listOfWorks in ListOfLists)
+                {
+                    foreach (var stray in listOfWorks)
+                    {
+                        stray.InWork = _gameCyrcle.ChekIfDay();
+                        if (!stray.InMove)
+                        {
+                            stray.GetRandomWalker().Move();
+                        }
+                        else
+                        {
+                            stillInMove.Add(stray);
+                        }
+                    }
+                }
+            }
+
+            _heroComponent.GetMono().StartCoroutine(WaitWhyleAllFinishMove());
+        }
+
         public void OnUpdate()
         {
             CheckIfPlayerWaitForCoinsMain();
+        }
+
+        public void OnDayChange()
+        {
+            NightReturnAll();
+        }
+
+        private IEnumerator WaitWhyleAllFinishMove()
+        {
+            bool waitMove = true;
+            do
+            {
+                waitMove = false;
+                yield return new WaitForEndOfFrame();
+                for (int i = 0; i < stillInMove.Count; i++)
+                {
+                    if(stillInMove[i].InMove == false)
+                    {
+                        stillInMove[i].GetRandomWalker().Move();
+                    }
+                    else
+                    {
+                        waitMove = true;
+                    }
+                }
+
+            } while (waitMove);
         }
     }
 }

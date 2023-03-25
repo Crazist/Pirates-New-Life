@@ -15,14 +15,14 @@ namespace GameInit.Builders
         private List<IBuilding> _buildingsList;
         private GameCyrcle _cyrcle;
        
-        public BuildingsBuilder(GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector _AIConnector)
+        public BuildingsBuilder(GameCyrcle cyrcle, ResourceManager resourceManager, BuilderConnectors builderConnectors)
         {
             _cyrcle = cyrcle;
             _buildingsList = new List<IBuilding>();
 
-            var workShopComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
+            var allBuildingsComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
             
-            CreateBuildings(workShopComponents, resourceManager, _AIConnector);
+            CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors.GetAiConnector());
         }
 
         private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, AIConnector _AIConnector)
@@ -32,7 +32,11 @@ namespace GameInit.Builders
                 switch (component.getType())
                 {
                     case BuildingsType.WorkShopType:
-                        _buildingsList.Add(new WorkShop(component, _cyrcle, resourceManager, _AIConnector));
+                        _buildingsList.Add(new WorkShop(component, resourceManager, _AIConnector));
+                        break;
+                    case BuildingsType.Wall:
+                        var building = new Wall(component, resourceManager, _AIConnector, _cyrcle);
+                        _cyrcle.AddDayChange(building);
                         break;
                 }
             }

@@ -161,9 +161,14 @@ MonoBehaviour:
   formsList:
   - {fileID: 254886039208467879}
   - {fileID: 8964992355489792989}
+  _positionForBuildFirst: []
+  _positionForBuildSecond: []
+  _positionForBuildThird: []
+  _positionForBuildFourth: []
   countOfGold: 2
   maxLevel: 1
   type: 0
+  _momentalBuild: 1
 --- !u!114 &4655250240318134952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,7 +185,7 @@ MonoBehaviour:
   cost: 4
   maxCount: 2
   itemPrefab: {fileID: 5111520151904295630, guid: 4652b4cbe90974e69ba88e5347a5ec88, type: 3}
-  type: 0
+  type: 1
 --- !u!1 &3325293822279073376
 GameObject:
   m_ObjectHideFlags: 0

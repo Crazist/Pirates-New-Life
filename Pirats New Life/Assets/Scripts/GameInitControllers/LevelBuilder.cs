@@ -35,21 +35,20 @@ namespace GameInit.Builders
 
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
-            AIConnector _AIConnector = new AIConnector(_coinPool);
-            gameCyrcle.Add(_AIConnector);
+            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle);
 
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
-            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _AIConnector);
-            _AIConnector.GetHeroComponent(_heroBuilder.GetHeroComponent());
+            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors);
+            _builderConnectors.GetAiConnector().GetHeroComponent(_heroBuilder.GetHeroComponent());
 
             UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
 
-            BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _AIConnector);
+            BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors);
 
-            AIBuilder _aiBuilder = new AIBuilder(_AIConnector, _coinPool,_coinDropAnimation, _heroBuilder);
+            AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool,_coinDropAnimation, _heroBuilder);
 
-            WorkChecker _workChecker = new WorkChecker(_AIConnector, _coinDropAnimation,  _coinPool, _heroBuilder);
+            WorkChecker _workChecker = new WorkChecker(_builderConnectors, _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors);
             gameCyrcle.Add(_workChecker);
 
             Hacks(_resourceManager);
@@ -57,7 +56,7 @@ namespace GameInit.Builders
 
         private void Hacks(ResourceManager _resourceManager)
         {
-            _resourceManager.SetResource(ResourceType.Gold, 11);
+            _resourceManager.SetResource(ResourceType.Gold, 40);
         }
         private void OnDestroy()
         {

@@ -2,7 +2,10 @@ namespace GameInit.Building
 {
     public enum BuildingsType
     {
-        WorkShopType
+        WorkShopType,
+        Wall,
+        Tower,
+        Farm
     }
 }
 

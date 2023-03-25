@@ -29,7 +29,9 @@ namespace GameInit.AI
         private const float _minimalDistanceToHero = 1f;
         private const int radiusRandomWalk = 5;
         public bool InMove { get; set; } = false;
-
+        public bool InWork { get; set; } = false;
+        public bool GoingForCoin { get; set; } = false;
+        
         public Stray(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker)
         {
             _heroComponent = heroComponent;
@@ -103,7 +105,9 @@ namespace GameInit.AI
         {
             if(InMove == false)
             {
+                GoingForCoin = true;
                 InMove = true;
+
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
@@ -123,8 +127,10 @@ namespace GameInit.AI
                 yield return null;
             }
 
-            action.Invoke();
+            action?.Invoke();
             CollectGold();
+
+            GoingForCoin = false;
             InMove = false;
         }
 
@@ -157,6 +163,7 @@ namespace GameInit.AI
         {
             return _RandomWalker;
         }
+
     }
 }
 

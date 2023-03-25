@@ -26,6 +26,10 @@ namespace GameInit.Building
             return maxCount;
         }
 
+        public MonoBehaviour GetMonoBehavior()
+        {
+            return this;
+        }
         public GameObject GetItemPrefab()
         {
             return itemPrefab;
