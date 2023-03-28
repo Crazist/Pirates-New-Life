@@ -10,7 +10,7 @@ namespace GameInit.AI
 {
     public class AISpawner
     {
-        private float heightPosition = -8.48f;
+        private float heightPosition = 0.44f;
         public AISpawner(CampComponent[] camps, AIConnector _AIConnector, Pools pool, CoinDropAnimation _coinDropAnimation, HeroComponent heroComponent)
         {
             foreach (var camp in camps)

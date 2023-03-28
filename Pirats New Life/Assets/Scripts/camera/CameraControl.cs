@@ -32,19 +32,19 @@ public class CameraControl : MonoBehaviour
 			Vector3 pos = _cameraMain.transform.position;
 			if (Input.GetKey("w") || Input.mousePosition.y >= Screen.height - _panBorderThickness)
 			{
-				pos.z += _speed * Time.deltaTime;
+				pos.x -= _speed * Time.deltaTime;
 			}
 			if (Input.GetKey("s") || Input.mousePosition.y <= _panBorderThickness)
 			{
-				pos.z -= _speed * Time.deltaTime;
+				pos.x += _speed * Time.deltaTime;
 			}
 			if (Input.GetKey("d") || Input.mousePosition.x >= Screen.width - _panBorderThickness)
 			{
-				pos.x += _speed * Time.deltaTime;
+				pos.z += _speed * Time.deltaTime;
 			}
 			if (Input.GetKey("a") || Input.mousePosition.x <= _panBorderThickness)
 			{
-				pos.x -= _speed * Time.deltaTime;
+				pos.z -= _speed * Time.deltaTime;
 			}
 
 			float scroll = Input.GetAxis("Mouse ScrollWheel");

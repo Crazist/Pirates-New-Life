@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5666086735535489164}
   - component: {fileID: 7778504022092878083}
   - component: {fileID: 4401177362346168053}
+  - component: {fileID: 6176239413188185034}
   m_Layer: 0
   m_Name: Monobehscriptshendler
   m_TagString: Untagged
@@ -161,3 +162,16 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   DirectionalLight: {fileID: 0}
   TimeOfday: 0
+--- !u!114 &6176239413188185034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5413548742667659345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aad1c16bebde433ea59835be1364c86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coin: {fileID: 783989943504792734, guid: abc1e419465ef45e7a7f961546ac1c8b, type: 3}

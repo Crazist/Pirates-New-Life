@@ -9,7 +9,7 @@ namespace GameInit.Animation
     public class CoinDropAnimation
     {
         private float speedSplash = 0.5f;
-        private const float heightPosition = -8.71f;
+        private const float heightPosition = 0.44f;
 
         private float _jumpHeight = 3f;
         private float _bounceTimes = 0.5f;
