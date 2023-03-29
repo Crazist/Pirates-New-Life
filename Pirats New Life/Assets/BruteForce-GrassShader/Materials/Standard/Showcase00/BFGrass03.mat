@@ -2,14 +2,19 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: BFGrass03
   m_Shader: {fileID: 4800000, guid: 7cd5d6fe2c6238e469561875c01946f3, type: 3}
-  m_ShaderKeywords: USE_CS USE_RT USE_S USE_SC _RTEFFECT_ON
+  m_ValidKeywords:
+  - USE_RT
+  - USE_S
+  - USE_SC
+  m_InvalidKeywords:
+  - _RTEFFECT_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -53,7 +58,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 4e1d764fa7e47f34eae88e37253c2542, type: 3}
-        m_Scale: {x: 1.46, y: 1}
+        m_Scale: {x: 0.3, y: 4}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -79,6 +84,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
@@ -94,11 +100,11 @@ Material:
     - _GrassCut: 0
     - _GrassSaturation: 2.25
     - _GrassShading: 0.026
-    - _GrassThinness: 0.82
+    - _GrassThinness: 0.939
     - _GrassThinnessIntersection: 1.01
     - _LightIntensity: 1
     - _Metallic: 0
-    - _MinimumNumberStacks: 2
+    - _MinimumNumberStacks: 17
     - _Mode: 0
     - _NearCameraSmoosh: 0.5
     - _NoisePower: 4
@@ -117,22 +123,23 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TilingN1: 6.06
+    - _TilingN1: 10.49
     - _TilingN2: 0.05
     - _TilingN3: 0.4
     - _UVSec: 0
     - _UseAmbientLight: 0
-    - _UseCS: 1
+    - _UseCS: 0
     - _UsePR: 0
     - _UseRT: 1
     - _UseShadow: 1
     - _UseShadowCast: 1
     - _UseSuperStack: 0
     - _UseTP: 0
+    - _UseVP: 0
     - _UseVR: 0
     - _UseWC: 0
-    - _WindForce: 0.3
-    - _WindMovement: 0.2
+    - _WindForce: 0.1
+    - _WindMovement: 0.1
     - _WorldRotation: 0
     - _WorldScale: 10
     - _ZWrite: 1
@@ -141,8 +148,9 @@ Material:
     - _Color: {r: 0.548, g: 0.49964702, b: 0.40294117, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.90800005, g: 0.90800005, b: 0.90800005, a: 1}
-    - _OffsetVector: {r: 0, g: 0.1, b: 0, a: 0}
+    - _OffsetVector: {r: 0, g: 1.07, b: 0, a: 0}
     - _PJShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ProjectedShadowColor: {r: 0.574, g: 0.38083723, b: 0.022076905, a: 1}
     - _RimColor: {r: 0.36900002, g: 0.3344892, b: 0.14069782, a: 1}
     - _SelfShadowColor: {r: 0.385, g: 0.36869615, b: 0.09009001, a: 1}
+  m_BuildTextureStacks: []

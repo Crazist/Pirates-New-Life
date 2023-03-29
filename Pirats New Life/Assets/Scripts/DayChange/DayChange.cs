@@ -13,7 +13,7 @@ public class DayChange : MonoBehaviour
    
     [SerializeField, Range(0, 24)] private float TimeOfday;
 
-    private float cycleDuration = 600f; // 10 minutes in seconds
+    private float cycleDuration = 60f; // 10 minutes in seconds
     
     private Action _dayChangeAction;
 
@@ -86,7 +86,7 @@ public class DayChange : MonoBehaviour
         if (DirectionalLight != null)
         {
             DirectionalLight.color = DirectinalColor.Evaluate(timePercent);
-            DirectionalLight.transform.localRotation = Quaternion.Euler(new Vector3((timePercent * 360f) - 90f, 170f, 0f));
+           // DirectionalLight.transform.localRotation = Quaternion.Euler(new Vector3((timePercent * 360f) - 90f, 170f, 0f));
         }
     }
     public Gradient GetAmbientColor()
