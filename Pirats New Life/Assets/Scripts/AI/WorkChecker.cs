@@ -91,7 +91,16 @@ namespace GameInit.AI
             _AIConnector.CheckAndGoToCoin();
             return builder;
         }
-
+        private IWork CreateFarmer(IWork work)
+        {
+            var farmer = new Farmer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            _connector.FarmerList.Add(farmer);
+            _connector.CitizenList.Remove(work);
+            _connector.MoveToClosest();
+            ModifCollection(farmer);
+            _AIConnector.CheckAndGoToCoin();
+            return farmer;
+        }
         private void ModifCollection(IWork citizen)
         {
             foreach (var copy in _copyList)
@@ -128,13 +137,22 @@ namespace GameInit.AI
             {
                 foreach (var _stray in _copyList)
                 {
-                    if (stray.GetId() == _stray.Key && stray.HasCoin() && stray.GetItemType() != _stray.Value && stray.GetItemType() == ItemsType.Hammer)
+                    if (stray.GetId() == _stray.Key && stray.HasCoin() && stray.GetItemType() != _stray.Value)
                     {
-                        stray.RemoveAllEveants();
-                        CreateBuilder(stray);
-                        return;
+                        if (stray.GetItemType() == ItemsType.Hammer)
+                        {
+                            stray.RemoveAllEveants();
+                            CreateBuilder(stray);
+                            return;
+                        }
+                        if (stray.GetItemType() == ItemsType.Hoe)
+                        {
+                            stray.RemoveAllEveants();
+                            CreateFarmer(stray);
+                            return;
+                        }
                     }
-                    if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
+                   if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
                     {
                         stray.RemoveAllEveants();
                         CreateStray(stray);

@@ -5,7 +5,7 @@ using GameInit.AI;
 
 namespace GameInit.Building
 {
-    public class WorkShop : IBuilding
+    public class ProductionBuilding : IBuilding
     {
         private bool isBuilded = false;
         
@@ -14,7 +14,7 @@ namespace GameInit.Building
         private ResourceManager _res;
         private Produce producer;
 
-        public WorkShop(BuildingComponent workShopComponent, ResourceManager res, AIConnector _AIConnector)
+        public ProductionBuilding(BuildingComponent workShopComponent, ResourceManager res, AIConnector _AIConnector)
         {
            _workShopComponent = workShopComponent;
            _res = res;
@@ -38,7 +38,6 @@ namespace GameInit.Building
         public void CreateProducer(AIConnector _AIConnector)
         {
              producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>(), _AIConnector);
-            
         }
 
         public bool CheckForDay()

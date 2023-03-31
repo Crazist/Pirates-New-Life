@@ -1,5 +1,6 @@
 public enum ItemsType
 {
     None,
-    Hammer
+    Hammer,
+    Hoe
 }

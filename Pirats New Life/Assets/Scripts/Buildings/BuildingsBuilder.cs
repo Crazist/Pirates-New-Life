@@ -32,7 +32,10 @@ namespace GameInit.Builders
                 switch (component.getType())
                 {
                     case BuildingsType.WorkShopType:
-                        _buildingsList.Add(new WorkShop(component, resourceManager, _AIConnector));
+                        _buildingsList.Add(new ProductionBuilding(component, resourceManager, _AIConnector));
+                        break;
+                    case BuildingsType.Farm:
+                        _buildingsList.Add(new ProductionBuilding(component, resourceManager, _AIConnector));
                         break;
                     case BuildingsType.Wall:
                         var building = new Wall(component, resourceManager, _AIConnector, _cyrcle);
