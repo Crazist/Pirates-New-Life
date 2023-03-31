@@ -3,81 +3,44 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour
 {
-	[SerializeField] private int _speed;
-	[SerializeField] private int _dragSpeed;
-	[SerializeField] private int _minHeight;
-	[SerializeField] private int _maxHeight;
-	[SerializeField] private int _scrollSpeed;
-	[SerializeField] private int _panBorderThickness;
-	[SerializeField] private Vector2 _panLimit;
-	[SerializeField] private Camera _cameraMain;
+    [SerializeField] private Transform playerTransform; // reference to the character's transform
+    [SerializeField] private float cameraSpeed = 1.0f; // the speed at which the camera moves
 
-	[SerializeField] private Vector3 _originPos;
-	[SerializeField] private Vector3 _offset;
+    [SerializeField] private float zoneSize = 2.0f; // the size of the zone in which the camera moves
 
-	private Vector3 _lastPos = Vector3.zero;
-	private int _speedMultiplay = 100;
-	private bool _drag = false;
+    private float minX; // the minimum x position of the camera
+    private float maxX; // the maximum x position of the camera
 
-	private const int constY = 0;
-	private void Update()
-	{
-		MoveController();
-		DragAndDropCameraMove();
-	}
-	private void MoveController()
-	{
-		if (!_drag)
-		{
-			Vector3 pos = _cameraMain.transform.position;
-			if (Input.GetKey("w") || Input.mousePosition.y >= Screen.height - _panBorderThickness)
-			{
-				pos.x -= _speed * Time.deltaTime;
-			}
-			if (Input.GetKey("s") || Input.mousePosition.y <= _panBorderThickness)
-			{
-				pos.x += _speed * Time.deltaTime;
-			}
-			if (Input.GetKey("d") || Input.mousePosition.x >= Screen.width - _panBorderThickness)
-			{
-				pos.z += _speed * Time.deltaTime;
-			}
-			if (Input.GetKey("a") || Input.mousePosition.x <= _panBorderThickness)
-			{
-				pos.z -= _speed * Time.deltaTime;
-			}
+    void Start()
+    {
+        // calculate the minimum and maximum x positions based on the zone size
+        minX = transform.position.x - zoneSize;
+        maxX = transform.position.x + zoneSize;
+    }
 
-			float scroll = Input.GetAxis("Mouse ScrollWheel");
-			pos.y -= scroll * _scrollSpeed * _speedMultiplay * Time.deltaTime;
+    void Update()
+    {
+        // get the current x position of the camera
+        float currentX = transform.position.x;
 
-			pos.x = Mathf.Clamp(pos.x, -_panLimit.x, _panLimit.x);
-			pos.y = Mathf.Clamp(pos.y, _minHeight, _maxHeight);
-			pos.z = Mathf.Clamp(pos.z, -_panLimit.y, _panLimit.y);
+        // get the current x position of the player
+        float playerX = playerTransform.position.x;
 
-			_cameraMain.transform.position = pos;
-		}
-	}
+        // check if the player is moving within the zone
+        if (playerX < minX || playerX > maxX)
+        {
+            // calculate the new x position of the camera
+            float newX = Mathf.Lerp(currentX, playerX, cameraSpeed * Time.deltaTime);
 
-	private void DragAndDropCameraMove()
-	{
+            // update the camera position
+            transform.position = new Vector3(newX, transform.position.y, transform.position.z);
+        }
 
-		if (Input.GetMouseButton(2))
-		{
-			float h = _dragSpeed * Input.GetAxis("Mouse X");
-			float v = _dragSpeed * Input.GetAxis("Mouse Y");
-			_lastPos = _cameraMain.transform.position;
-			_offset = new Vector3(h, constY, v);
-			_drag = true;
-		}
-		else
-		{
-			_drag = false;
-		}
-		if (_drag)
-		{
-			_lastPos = Vector3.Lerp(_lastPos, _cameraMain.transform.position - _offset, 0.5f);
-			_cameraMain.transform.position = _lastPos;
-		}
-	}
-
+        if(transform.position.x < currentX + 1 || transform.position.x < currentX - 1) 
+        {
+            minX = transform.position.x - zoneSize;
+            maxX = transform.position.x + zoneSize;
+        }
+    }
 }
+

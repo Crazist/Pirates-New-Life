@@ -41,7 +41,9 @@ namespace GameInit.Building
             items.Add(instance);
             _AIConnector.MoveToClosestAICitizen(position, () =>
             {
+                items.Remove(instance);
                 GameObject.Destroy(instance);
+                _produceComponent.SetCanProduce(CheckCountOfItems());
                 // Add any additional code you want to execute here
             }, _produceComponent.GetItemType());
         }
