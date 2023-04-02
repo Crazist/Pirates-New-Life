@@ -37,7 +37,11 @@ namespace GameInit.Building
 
         public void CreateProducer(AIConnector _AIConnector)
         {
-             producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>(), _AIConnector);
+            var produceComponent = _workShopComponent.gameObject.GetComponent<ProduceComponent>();
+            if (produceComponent != null)
+            {
+                producer = new Produce(_workShopComponent.gameObject.GetComponent<ProduceComponent>(), _AIConnector);
+            }
         }
 
         public bool CheckForDay()

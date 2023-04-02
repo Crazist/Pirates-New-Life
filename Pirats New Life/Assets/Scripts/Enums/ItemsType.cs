@@ -2,5 +2,7 @@ public enum ItemsType
 {
     None,
     Hammer,
-    Hoe
+    Hoe,
+    Bowl,
+    Sword
 }

@@ -149,7 +149,41 @@ namespace GameInit.Connector
             }
             return _stray;
         }
-       
+        public IWork MoveToClosestAIFarmer(Vector3 targetPosition, Action callback, IBuilding building)
+        {
+            float minDistance = Mathf.Infinity;
+            Vector3 closestPosition = Vector3.zero;
+            IWork _farmer = null;
+
+            foreach (var farmer in FarmerList)
+            {
+                if (farmer.InWork != true)
+                {
+                    float distance = Distance.Manhattan(farmer.getTransform().position, targetPosition);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closestPosition = farmer.getTransform().position;
+                        _farmer = farmer;
+                    }
+                }
+            }
+
+            if (_farmer != null && _gameCyrcle.ChekIfDay())
+            {
+                _farmer.Move(targetPosition, callback);
+            }
+            else
+            {
+                lateMove.Add(() =>
+                {
+                    building.SetBuilder(_farmer);
+                    MoveToClosestAIBuilder(targetPosition, callback, building);
+                });
+            }
+            return _farmer;
+        }
         public void CheckIfPlayerWaitForCoinsMain()
         {
             if (_heroComponent == null) return;

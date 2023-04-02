@@ -45,6 +45,7 @@ public class BuildingComponent : MonoBehaviour
         }
         return _positionForBuildFirst;
     }
+    
     public void SetInBuild(bool _inBuild)
     {
         inBuild = _inBuild;
@@ -54,7 +55,14 @@ public class BuildingComponent : MonoBehaviour
     {
        _action = action;
     }
-
+    public List<GameObject> GetFormList()
+    {
+        return formsList;
+    }
+    public void IncreaseForm()
+    {
+        curForm++;
+    }
     public bool ChekMaxLvl()
     {
         if (curForm == maxLevel)

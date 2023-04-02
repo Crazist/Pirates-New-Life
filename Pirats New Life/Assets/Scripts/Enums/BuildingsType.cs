@@ -5,7 +5,10 @@ namespace GameInit.Building
         WorkShopType,
         Wall,
         Tower,
-        Farm
+        FarmItemHolder,
+        Farm,
+        ArcherBuilding,
+        SwordManBuilding
     }
 }
 

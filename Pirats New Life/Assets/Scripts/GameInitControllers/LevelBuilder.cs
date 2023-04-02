@@ -44,7 +44,7 @@ namespace GameInit.Builders
 
             UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
 
-            BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors);
+            BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);
 
             AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool,_coinDropAnimation, _heroBuilder);
 
