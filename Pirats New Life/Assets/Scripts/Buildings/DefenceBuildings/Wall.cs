@@ -23,6 +23,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private bool _coroutineInPlay = false;
     private int _index = -1;
 
+    private const bool _isEnemy = false;
     private bool _isDay = false;
     public Wall(BuildingComponent buildingComponent, ResourceManager res, AIConnector AIConnector, GameCyrcle cyrcle)
     {
@@ -143,5 +144,10 @@ public class Wall : IBuilding, IDayChange, IKDTree
         _positionOnVector2.y = _wallComponent.GetBuildPositions()[0].position.z;
 
         return _positionOnVector2;
+    }
+
+    public bool CheckIfEnemy()
+    {
+        return _isEnemy;
     }
 }

@@ -10,6 +10,7 @@ namespace GameInit.Optimization.KDTree
         public KDNode node;
         public Vector2 tempClosestPoint;
         public float distance;
+        public IKDTree obj;
 
         public KDQueryNode()
         {

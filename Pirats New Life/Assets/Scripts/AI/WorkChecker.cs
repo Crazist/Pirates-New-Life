@@ -75,6 +75,8 @@ namespace GameInit.AI
         private IWork CreateCitizen(IWork work)
         {
             var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            _AIWarConnector.PointsInWorld.Add(citizen);
+            _AIWarConnector.UpdateTree();
             _AIConnector.CitizenList.Add(citizen);
             _AIConnector.StrayList.Remove(work);
             _AIConnector.MoveToClosest();

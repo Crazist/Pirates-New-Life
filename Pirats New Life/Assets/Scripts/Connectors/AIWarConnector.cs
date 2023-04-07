@@ -15,13 +15,11 @@ namespace GameInit.Connector
 {
     public class AIWarConnector : IUpdate, IDayChange
     {
-        public List<IKDTree> SwordManList { get; set; }
-        public List<IKDTree> ArcherList { get; set; }
-        public List<IKDTree> EnemyList { get; set; }
-        public List<IKDTree> Buildings { get; set; }
-        public List<IKDTree> Workers { get; set; }
-
-        public List<List<IKDTree>> ListOfLists { get; set; }
+        public List<IWork> SwordManList { get; set; }
+        public List<IWork> ArcherList { get; set; }
+        public List<IEnemy> EnemyList { get; set; }
+      
+        public List<IKDTree> PointsInWorld { get; set; }
 
         private Pools _pool;
         private HeroComponent _heroComponent;
@@ -31,19 +29,22 @@ namespace GameInit.Connector
         private ResourceManager _resourceManager;
         private AIConnector _AIConnector;
         private KDTree _tree;
+        private KDQuery _treeQuery;
+        private float lastUpdateTime = 0.0f;
+        private const float updateInterval = 0.5f;
 
         private const int _minDistance = 5;
         private const float _minimalDistanceToHero = 1f;
+        private const float _heightPosition = 0.44f;
 
         public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector)
         {
-            ListOfLists = new List<List<IKDTree>>();
+            PointsInWorld = new List<IKDTree>();
 
-            ListOfLists.Add(SwordManList = new List<IKDTree>());
-            ListOfLists.Add(ArcherList = new List<IKDTree>());
-            ListOfLists.Add(EnemyList = new List<IKDTree>());
-            ListOfLists.Add(Buildings = new List<IKDTree>());
-            Workers = new List<IKDTree>();
+            SwordManList = new List<IWork>();
+            ArcherList = new List<IWork>();
+            EnemyList = new List<IEnemy>();
+            
 
             _AIConnector = AIConnector;
             _resourceManager = resourceManager;
@@ -51,6 +52,7 @@ namespace GameInit.Connector
             _pool = pool;
 
             _tree = new KDTree();
+            _treeQuery = new KDQuery();
         }
 
         public void StartMove(IKDTree enemy)
@@ -65,8 +67,30 @@ namespace GameInit.Connector
         private bool isFirst = true;
         public void OnUpdate()
         {
-          
-            
+            if (Time.time - lastUpdateTime > updateInterval && PointsInWorld.Count != 0)
+            {
+
+                _tree.Build(PointsInWorld, 3);
+                foreach (var item in EnemyList)
+                {
+                    List<int> index = new List<int>();
+                    _treeQuery.ClosestPoint(_tree, (IKDTree)item, index);
+                    
+                    Vector3 target = new Vector3();
+
+                    target.x = PointsInWorld[index[0]].GetPositionVector2().x;
+                    target.z = PointsInWorld[index[0]].GetPositionVector2().y;
+                    target.y = _heightPosition;
+
+                    item.Move(target, null);
+                }
+                
+                lastUpdateTime = Time.time;
+            }
+        }
+        public void UpdateTree()
+        {
+            _tree.Build(PointsInWorld, 3);
         }
         public void DrawGiz()
         {

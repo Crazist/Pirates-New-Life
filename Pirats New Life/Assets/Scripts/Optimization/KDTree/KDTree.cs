@@ -95,7 +95,7 @@ namespace GameInit.Optimization.KDTree
                 Array.Resize(ref _permutation, Count);
             }
         }
-        public void BuildTree()
+        private void BuildTree()
         {
 
             ResetKDNodeStack();

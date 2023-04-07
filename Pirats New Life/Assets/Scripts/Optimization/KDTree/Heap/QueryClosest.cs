@@ -12,6 +12,7 @@ namespace GameInit.Optimization.KDTree
 
             Reset();
 
+            var _isEnemy = queryPosition.CheckIfEnemy();
             IKDTree[] points = tree.points;
             int[] permutation = tree.permutation;
 
@@ -50,7 +51,7 @@ namespace GameInit.Optimization.KDTree
 
                 node = queryNode.node;
 
-                if (!node.isLeaf)
+                if (!node.isLeaf && queryNode.obj.CheckIfEnemy() != _isEnemy)
                 {
 
                     partitionAxis = node.partitionAxis;
@@ -102,16 +103,17 @@ namespace GameInit.Optimization.KDTree
                     // LEAF
                     for (int i = node.start; i < node.end; i++)
                     {
-
                         int index = permutation[i];
 
-                        sqrDist = Vector2.SqrMagnitude(points[index].GetPositionVector2() - queryPosition.GetPositionVector2());
-
-                        if (sqrDist <= SSR)
+                        if(points[index].CheckIfEnemy() != _isEnemy)
                         {
+                            sqrDist = Vector2.SqrMagnitude(points[index].GetPositionVector2() - queryPosition.GetPositionVector2());
 
-                            SSR = sqrDist;
-                            smallestIndex = index;
+                            if (sqrDist <= SSR)
+                            {
+                                SSR = sqrDist;
+                                smallestIndex = index;
+                            }
                         }
                     }
 

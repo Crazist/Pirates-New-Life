@@ -49,6 +49,7 @@ namespace GameInit.Optimization.KDTree
             var queryNode = PushGetQueue();
             queryNode.node = node;
             queryNode.tempClosestPoint = tempClosestPoint.GetPositionVector2();
+            queryNode.obj = tempClosestPoint;
         }
 
         protected void PushToHeap(KDNode node, Vector2 tempClosestPoint, IKDTree queryPosition)
@@ -56,6 +57,7 @@ namespace GameInit.Optimization.KDTree
 
             var queryNode = PushGetQueue();
             queryNode.node = node;
+            queryNode.obj = queryPosition;
             queryNode.tempClosestPoint = tempClosestPoint;
 
             float sqrDist = Vector2.SqrMagnitude(tempClosestPoint - queryPosition.GetPositionVector2());

@@ -75,10 +75,11 @@ namespace GameInit.AI
                     var obj = GameObject.Instantiate(camp.GetEnemy(), position, Quaternion.identity);
                     var _AIComponent = obj.GetComponent<AIComponent>();
 
-                    DefaultEnemy enemy = new DefaultEnemy(_AIComponent.GetTransform());
+                    DefaultEnemy enemy = new DefaultEnemy(_AIComponent);
 
-
+                    _AIWarConnector.PointsInWorld.Add(enemy);
                     _AIWarConnector.EnemyList.Add(enemy);
+                    _AIWarConnector.UpdateTree();
                 }
             }
         }

@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Farmer : IWork
+public class Farmer : IWork, IKDTree
 {
     private AIComponent _AIComponent;
     private ItemsType _type = ItemsType.None;
@@ -20,6 +20,7 @@ public class Farmer : IWork
     private bool _waitCoins = false;
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
+    private const bool _isEnemy = false;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;
@@ -161,4 +162,17 @@ public class Farmer : IWork
         return _RandomWalker;
     }
 
+    public Vector2 GetPositionVector2()
+    {
+        Vector2 _positionOnVector2;
+        _positionOnVector2.x = _AIComponent.GetTransform().position.x;
+        _positionOnVector2.y = _AIComponent.GetTransform().position.z;
+
+        return _positionOnVector2;
+    }
+
+    public bool CheckIfEnemy()
+    {
+        return _isEnemy;
+    }
 }

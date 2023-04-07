@@ -26,6 +26,7 @@ public class Archer : IWork, IKDTree
     private const int numberOfArcher = 4;
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
+    private const bool _isEnemy = false;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
@@ -168,6 +169,15 @@ public class Archer : IWork, IKDTree
 
     public Vector2 GetPositionVector2()
     {
-        throw new NotImplementedException();
+        Vector2 _positionOnVector2;
+        _positionOnVector2.x = _AIComponent.GetTransform().position.x;
+        _positionOnVector2.y = _AIComponent.GetTransform().position.z;
+
+        return _positionOnVector2;
+    }
+
+    public bool CheckIfEnemy()
+    {
+        return _isEnemy;
     }
 }

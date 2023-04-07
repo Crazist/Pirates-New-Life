@@ -10,7 +10,7 @@ using GameInit.RandomWalk;
 
 namespace GameInit.AI
 {
-    public class Stray : IWork, IKDTree
+    public class Stray : IWork
     {
         private AIComponent _AIComponent;
         private ItemsType _type = ItemsType.None;

@@ -10,7 +10,7 @@ using GameInit.RandomWalk;
 
 namespace GameInit.AI
 {
-    public class Citizen : IWork
+    public class Citizen : IWork, IKDTree
     {
 
         private AIComponent _AIComponent;
@@ -29,6 +29,7 @@ namespace GameInit.AI
         private const bool canPickUp = true;
         private const int numberOfCitizenModel = 1;
         private const int radiusRandomWalk = 10;
+        private const bool _isEnemy = false;
         public bool InMove { get; set; } = false;
         public bool InWork { get; set; } = false;
         public bool GoingForCoin { get; set; } = false;
@@ -185,6 +186,19 @@ namespace GameInit.AI
             return _RandomWalker;
         }
 
+        public Vector2 GetPositionVector2()
+        {
+            Vector2 _positionOnVector2;
+            _positionOnVector2.x = _AIComponent.GetTransform().position.x;
+            _positionOnVector2.y = _AIComponent.GetTransform().position.z;
+
+            return _positionOnVector2;
+        }
+
+        public bool CheckIfEnemy()
+        {
+            return _isEnemy;
+        }
     }
 }
 

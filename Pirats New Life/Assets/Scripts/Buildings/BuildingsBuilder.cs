@@ -38,7 +38,8 @@ namespace GameInit.Builders
                 {
                     case BuildingsType.Wall:
                         var building = new Wall(component, resourceManager, _AIConnector, _cyrcle);
-                        _WarConnector.Buildings.Add(building);
+                        _WarConnector.PointsInWorld.Add(building);
+                        _WarConnector.UpdateTree();
                         _cyrcle.AddDayChange(building);
                         break;
                     case BuildingsType.Farm:
