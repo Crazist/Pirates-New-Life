@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwordMan : IWar, IWork
+public class SwordMan :  IWork, IKDTree
 {
     private AIComponent _AIComponent;
     private ItemsType _type = ItemsType.None;
@@ -29,6 +29,7 @@ public class SwordMan : IWar, IWork
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
+    public bool Alive { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public SwordMan(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
     {
@@ -162,6 +163,16 @@ public class SwordMan : IWar, IWork
     }
 
     public void GiveDamage()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Vector2 GetPositionVector2()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GetDamage(int damage)
     {
         throw new NotImplementedException();
     }

@@ -15,6 +15,13 @@ namespace GameInit.Optimization
             return x + z;
         }
 
+        public static float Manhattan(Vector2 a, Vector2 b)
+        {
+            var x = Math.Abs(a.x - b.x);
+            var y = Math.Abs(a.y - b.y);
+            return x + y;
+        }
+
         /// <summary>
         /// Returns square magnitude of direction. Ignores Y axis.
         /// </summary>

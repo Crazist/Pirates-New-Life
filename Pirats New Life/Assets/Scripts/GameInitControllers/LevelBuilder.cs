@@ -35,7 +35,7 @@ namespace GameInit.Builders
 
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
-            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle);
+            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager);
 
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             

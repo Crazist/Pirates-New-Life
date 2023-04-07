@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GameInit.Builders;
+using System.Diagnostics;
 
 [Serializable]
 public class ResourceManager
@@ -18,6 +18,17 @@ public class ResourceManager
         }
     }
 
+    public void GetDamage()
+    {
+        if (_resources.ContainsKey(ResourceType.Gold) && _resources[ResourceType.Gold] == 0)
+        {
+            Debug.WriteLine("Lose");
+        }
+        else
+        {
+            SetResource(ResourceType.Gold, -1);
+        }
+    }
     public int GetResource(ResourceType type)
     {
         if (_resources.ContainsKey(type))

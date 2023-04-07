@@ -5,50 +5,75 @@ using GameInit.AI;
 using System;
 using GameInit.Pool;
 using GameInit.RandomWalk;
-using GameInit.Optimization;
+using GameInit.Optimization.KDTree;
 using GameInit.GameCyrcleModule;
 using GameInit.Building;
+using GameInit.Builders;
+using GameInit.Connector;
 
-public class AIWorkConnector : IUpdate, IDayChange
+namespace GameInit.Connector
 {
-    public List<IWar> SwordManList { get; set; }
-    public List<IWar> ArcherList { get; set; }
-    public List<IWar> EnemyList { get; set; }
-   
-
-    public List<List<IWar>> ListOfLists { get; set; }
-
-    private Pools _pool;
-    private HeroComponent _heroComponent;
-    private List<Action> lateMove;
-    private GameCyrcle _gameCyrcle;
-   
-    private const int _minDistance = 5;
-    private const float _minimalDistanceToHero = 1f;
-
-    public AIWorkConnector(Pools pool, GameCyrcle cyrcle)
+    public class AIWarConnector : IUpdate, IDayChange
     {
-        ListOfLists = new List<List<IWar>>();
-        
-        ListOfLists.Add(SwordManList = new List<IWar>());
-        ListOfLists.Add(ArcherList = new List<IWar>());
-        EnemyList = new List<IWar>();
-        
+        public List<IKDTree> SwordManList { get; set; }
+        public List<IKDTree> ArcherList { get; set; }
+        public List<IKDTree> EnemyList { get; set; }
+        public List<IKDTree> Buildings { get; set; }
+        public List<IKDTree> Workers { get; set; }
 
-        _gameCyrcle = cyrcle;
-        _pool = pool;
-    }
+        public List<List<IKDTree>> ListOfLists { get; set; }
 
-    public void GetHeroComponent(HeroComponent heroComponent)
-    {
-        _heroComponent = heroComponent;
-    }
+        private Pools _pool;
+        private HeroComponent _heroComponent;
+        private List<Action> lateMove;
+        private GameCyrcle _gameCyrcle;
+        private BuildingsBuilder _buildingsBuilder;
+        private ResourceManager _resourceManager;
+        private AIConnector _AIConnector;
+        private KDTree _tree;
 
-    public void OnUpdate()
-    {
-    }
+        private const int _minDistance = 5;
+        private const float _minimalDistanceToHero = 1f;
 
-    public void OnDayChange()
-    {
+        public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector)
+        {
+            ListOfLists = new List<List<IKDTree>>();
+
+            ListOfLists.Add(SwordManList = new List<IKDTree>());
+            ListOfLists.Add(ArcherList = new List<IKDTree>());
+            ListOfLists.Add(EnemyList = new List<IKDTree>());
+            ListOfLists.Add(Buildings = new List<IKDTree>());
+            Workers = new List<IKDTree>();
+
+            _AIConnector = AIConnector;
+            _resourceManager = resourceManager;
+            _gameCyrcle = cyrcle;
+            _pool = pool;
+
+            _tree = new KDTree();
+        }
+
+        public void StartMove(IKDTree enemy)
+        {
+
+        }
+
+        public void GetHeroComponent(HeroComponent heroComponent)
+        {
+            _heroComponent = heroComponent;
+        }
+        private bool isFirst = true;
+        public void OnUpdate()
+        {
+          
+            
+        }
+        public void DrawGiz()
+        {
+            _tree.DrawNode(_tree.rootNode);
+        }
+        public void OnDayChange()
+        {
+        }
     }
 }

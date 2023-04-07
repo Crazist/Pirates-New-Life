@@ -10,7 +10,7 @@ using GameInit.RandomWalk;
 
 namespace GameInit.AI
 {
-    public class Stray : IWork
+    public class Stray : IWork, IKDTree
     {
         private AIComponent _AIComponent;
         private ItemsType _type = ItemsType.None;
@@ -22,7 +22,7 @@ namespace GameInit.AI
         private HeroComponent _heroComponent;
         private bool _waitCoins = false;
         private RandomWalker _RandomWalker;
-
+        
         private const float _coefDistance = 0.5f;
         private const bool canPickUp = true;
         private const int numberOfStray = 0;
@@ -164,6 +164,14 @@ namespace GameInit.AI
             return _RandomWalker;
         }
 
+        public Vector2 GetPositionVector2()
+        {
+            Vector2 _positionOnVector2;
+            _positionOnVector2.x = _AIComponent.GetTransform().position.x;
+            _positionOnVector2.y = _AIComponent.GetTransform().position.z;
+
+            return _positionOnVector2;
+        }
     }
 }
 

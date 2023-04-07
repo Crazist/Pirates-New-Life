@@ -12,7 +12,7 @@ namespace GameInit.AI
 {
     public class WorkChecker : IUpdate
     {
-        private AIWorkConnector _AIWorkConnector;
+        private AIWarConnector _AIWarConnector;
         private CoinDropAnimation _coinDropAnimation;
         private Pools _pool;
         private HeroComponent _heroComponent;
@@ -24,12 +24,13 @@ namespace GameInit.AI
         public WorkChecker(BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder, BuilderConnectors _builderConnectors)
         {
             _AIConnector = _builderConnectors.GetAiConnector();
-            _AIWorkConnector = _builderConnectors.GetAIWorkConnector();
+            _AIWarConnector = _builderConnectors.GetAIWarConnector();
             _heroComponent = heroBuilder.GetHeroComponent();
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
 
             _townHallComponent = Object.FindObjectOfType<TownHallComponent>();
+            _townHallComponent.GetWar(_AIWarConnector);
 
             Init();
         }
@@ -104,7 +105,7 @@ namespace GameInit.AI
         private void CreateSwordMan(IWork work)
         {
             var swordMan = new SwordMan(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
-            _AIWorkConnector.SwordManList.Add(swordMan);
+            _AIWarConnector.SwordManList.Add(swordMan);
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             ModifCollection(work);
@@ -113,7 +114,7 @@ namespace GameInit.AI
         private void CreateArcher(IWork work)
         {
             var archer = new Archer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
-            _AIWorkConnector.ArcherList.Add(archer);
+            _AIWarConnector.ArcherList.Add(archer);
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             ModifCollection(work);

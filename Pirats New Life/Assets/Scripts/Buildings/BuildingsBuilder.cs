@@ -24,17 +24,21 @@ namespace GameInit.Builders
 
             var allBuildingsComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
             
-            CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors.GetAiConnector(), heroComponent, pool, coinDropAnimation);
+            CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors, heroComponent, pool, coinDropAnimation);
         }
 
-        private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, AIConnector _AIConnector, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation)
+        private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation)
         {
+            var _AIConnector = builderConnectors.GetAiConnector();
+            var _WarConnector = builderConnectors.GetAIWarConnector();
+
             foreach (var component in buildingsComponenets)
             {
                 switch (component.getType())
                 {
                     case BuildingsType.Wall:
                         var building = new Wall(component, resourceManager, _AIConnector, _cyrcle);
+                        _WarConnector.Buildings.Add(building);
                         _cyrcle.AddDayChange(building);
                         break;
                     case BuildingsType.Farm:

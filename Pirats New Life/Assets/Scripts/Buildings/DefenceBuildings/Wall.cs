@@ -7,7 +7,7 @@ using UnityEngine;
 using GameInit.GameCyrcleModule;
 using GameInit.AI;
 
-public class Wall : IBuilding, IDayChange
+public class Wall : IBuilding, IDayChange, IKDTree
 {
     private bool isBuilded = false;
     private bool inBuildProgress = false;
@@ -134,5 +134,14 @@ public class Wall : IBuilding, IDayChange
             Debug.Log("Wall building interrupted.");
         }
         _coroutineInPlay = false;
+    }
+
+    public Vector2 GetPositionVector2()
+    {
+        Vector2 _positionOnVector2;
+        _positionOnVector2.x = _wallComponent.GetBuildPositions()[0].position.x;
+        _positionOnVector2.y = _wallComponent.GetBuildPositions()[0].position.z;
+
+        return _positionOnVector2;
     }
 }

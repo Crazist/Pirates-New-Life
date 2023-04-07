@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Archer : IWar, IWork
+public class Archer : IWork, IKDTree
 {
     private AIComponent _AIComponent;
     private ItemsType _type = ItemsType.None;
@@ -162,6 +162,11 @@ public class Archer : IWar, IWork
     }
 
     public void GiveDamage()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Vector2 GetPositionVector2()
     {
         throw new NotImplementedException();
     }

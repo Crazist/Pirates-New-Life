@@ -121,5 +121,6 @@ namespace GameInit.GameCyrcleModule
         {
             return isDay;
         }
+       
     }
 }
