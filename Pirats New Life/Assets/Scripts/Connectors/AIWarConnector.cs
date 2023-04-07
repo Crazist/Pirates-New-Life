@@ -70,7 +70,7 @@ namespace GameInit.Connector
             if (Time.time - lastUpdateTime > updateInterval && PointsInWorld.Count != 0)
             {
 
-                _tree.Build(PointsInWorld, 3);
+                _tree.Rebuild(3);
                 foreach (var item in EnemyList)
                 {
                     List<int> index = new List<int>();
