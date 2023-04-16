@@ -30,12 +30,14 @@ namespace GameInit.Builders
         private void Builders(GameCyrcle gameCyrcle, PrefabPoolHolderComponent prefabHolder)
         {
             Pools _coinPool = new Pools(prefabHolder.GetCoinPrefab());
+            EnemyPool _enemyPool = new EnemyPool(prefabHolder.GetEnemyPrefab());
+            ArrowPool _arrowPool = new ArrowPool(prefabHolder.GetArrowPrefab());
 
             ResourceManager _resourceManager = new ResourceManager();
 
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
-            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager);
+            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager, _arrowPool);
 
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
@@ -46,9 +48,9 @@ namespace GameInit.Builders
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);
 
-            AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool,_coinDropAnimation, _heroBuilder);
+            AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool, _coinDropAnimation, _heroBuilder, gameCyrcle, _enemyPool);
 
-            WorkChecker _workChecker = new WorkChecker(_builderConnectors, _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors);
+            WorkChecker _workChecker = new WorkChecker( _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors);
             gameCyrcle.Add(_workChecker);
 
             Hacks(_resourceManager);

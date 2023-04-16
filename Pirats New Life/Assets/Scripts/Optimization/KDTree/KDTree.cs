@@ -62,6 +62,8 @@ namespace GameInit.Optimization.KDTree
         {
             SetCount(items.Count);
 
+            maxPointPerLeaf = MaxPointPerLeafCalculate();
+
             for (int i = 0; i < Count; i++)
             {
                 points[i] = items[i];
@@ -76,12 +78,30 @@ namespace GameInit.Optimization.KDTree
                 permutation[i] = i;
             }
 
+            maxPointsPerLeaf = MaxPointPerLeafCalculate();
+
             if (_maxPointsPerLeafNoded > 0)
             {
                 _maxPointsPerLeafNoded = maxPointsPerLeaf;
             }
 
             BuildTree();
+        }
+        private int MaxPointPerLeafCalculate()
+        {
+            switch (Count)
+            {
+                case var n when n > 100:
+                    return 10;
+                case var n when n > 300:
+                    return 30;
+                case var n when n > 400:
+                    return 40;
+                case var n when n > 500:
+                    return 50;
+                default:
+                    return 10;
+            }
         }
         public void SetCount(int newSize)
         {
@@ -122,7 +142,6 @@ namespace GameInit.Optimization.KDTree
                 else
                 {
                     node = _nodesStack[_nodesCount];
-                    node.Clear();
                     node.partitionAxis = -1;
                 }
             }
@@ -133,7 +152,7 @@ namespace GameInit.Optimization.KDTree
                 Array.Resize(ref _nodesStack, _nodesStack.Length * 2);
                 node = _nodesStack[_nodesCount] = new KDNode();
             }
-
+            node.Clear();
             _nodesCount++;
 
             return node;
@@ -247,7 +266,6 @@ namespace GameInit.Optimization.KDTree
                 splitAxis = 1;
                 axisSize = parentBoundsSize.y;
             }
-
 
             // Our axis min-max bounds
             float boundsStart = parentBounds.min[splitAxis];
@@ -369,7 +387,7 @@ namespace GameInit.Optimization.KDTree
                     // move from right to the left until "out of bounds" value found
                     RP--;
                 }
-                while (LP < RP && _points[permutation[RP]].GetPositionVector2()[axis] >= partitionPivot);
+                while (LP < RP && _points[permutation[RP]].GetPositionVector2()[axis] > partitionPivot);
 
                 if (LP < RP)
                 {

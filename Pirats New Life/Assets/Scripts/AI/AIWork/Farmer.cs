@@ -10,7 +10,7 @@ using UnityEngine;
 public class Farmer : IWork, IKDTree
 {
     private AIComponent _AIComponent;
-    private ItemsType _type = ItemsType.None;
+    private ItemsType _type = ItemsType.Hoe;
     private int _id;
     private bool _hasCoin = false;
     private Pools _pool;
@@ -27,9 +27,11 @@ public class Farmer : IWork, IKDTree
     private const int numberOfBuilder = 3;
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
+    private const bool _canDamage = false;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
+    public int HP { get; set; } = 1;
 
     public Farmer(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
     {
@@ -171,8 +173,42 @@ public class Farmer : IWork, IKDTree
         return _positionOnVector2;
     }
 
+    public void GetDamage(int damage)
+    {
+        if (HP - damage <= 0)
+        {
+            Die();
+            HP = 0;
+            _coinsCount = 0;
+            _hasCoin = false;
+        }
+        else
+        {
+            HP = HP - damage;
+        }
+    }
+
+    private void Die()
+    {
+        
+    }
     public bool CheckIfEnemy()
     {
         return _isEnemy;
+    }
+
+    public bool CheckIfCanDamage()
+    {
+        return _canDamage;
+    }
+
+    public int CountOFDamage()
+    {
+        return 0; // can not damage
+    }
+
+    public void Attack()
+    {
+        //can not damage
     }
 }

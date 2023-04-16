@@ -13,7 +13,7 @@ public class DayChange : MonoBehaviour
    
     [SerializeField, Range(0, 24)] private float TimeOfday;
 
-    private float cycleDuration = 60f; // 10 minutes in seconds
+    private float cycleDuration = 100f; // 10 minutes in seconds
     
     private Action _dayChangeAction;
 

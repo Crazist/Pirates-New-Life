@@ -10,7 +10,7 @@ using UnityEngine;
 public class SwordMan :  IWork, IKDTree
 {
     private AIComponent _AIComponent;
-    private ItemsType _type = ItemsType.None;
+    private ItemsType _type = ItemsType.Sword;
     private int _id;
     private bool _hasCoin = false;
     private Pools _pool;
@@ -20,6 +20,9 @@ public class SwordMan :  IWork, IKDTree
     private bool _waitCoins = false;
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
+    private float _delayForAttack = 0.5f;
+    private bool _canDamage = true;
+    private int _damage = 1;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;
@@ -27,6 +30,8 @@ public class SwordMan :  IWork, IKDTree
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
     private const bool _isEnemy = false;
+    
+    public int HP { get; set; } = 10;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
@@ -100,7 +105,8 @@ public class SwordMan :  IWork, IKDTree
     }
     public void Move(Vector3 position, Action action, ItemsType type)
     {
-        return; //Will not move to position never;
+        InMove = false;
+        _AIComponent.GeNavMeshAgent().destination = position;
     }
     public void Move(Vector3 position, Action action)
     {
@@ -163,11 +169,6 @@ public class SwordMan :  IWork, IKDTree
         return _RandomWalker;
     }
 
-    public void GiveDamage()
-    {
-        throw new NotImplementedException();
-    }
-
     public Vector2 GetPositionVector2()
     {
         Vector2 _positionOnVector2;
@@ -179,11 +180,47 @@ public class SwordMan :  IWork, IKDTree
 
     public void GetDamage(int damage)
     {
-        throw new NotImplementedException();
+        if (HP - damage <= 0)
+        {
+            Die();
+            HP = 0;
+            _coinsCount = 0;
+            _hasCoin = false;
+        }
+        else
+        {
+            HP = HP - damage;
+        }
     }
 
+    private void Die()
+    {
+       
+    }
     public bool CheckIfEnemy()
     {
         return _isEnemy;
+    }
+
+    public bool CheckIfCanDamage()
+    {
+        return _canDamage;
+    }
+
+    public int CountOFDamage()
+    {
+        return _damage; 
+    }
+    private IEnumerator AttackDelay()
+    {
+        _canDamage = false;
+        yield return new WaitForSecondsRealtime(_delayForAttack);
+        _canDamage = true;
+    }
+
+    public void Attack()
+    {
+        _AIComponent.StartCoroutine(AttackDelay());
+        //animation
     }
 }

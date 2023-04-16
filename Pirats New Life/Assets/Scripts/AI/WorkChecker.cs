@@ -19,9 +19,8 @@ namespace GameInit.AI
         private TownHallComponent _townHallComponent;
         private AIConnector _AIConnector;
 
-        private Dictionary<int, ItemsType> _copyList;
         
-        public WorkChecker(BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder, BuilderConnectors _builderConnectors)
+        public WorkChecker(CoinDropAnimation coinDropAnimation,  Pools pool, HeroBuilder heroBuilder, BuilderConnectors _builderConnectors)
         {
             _AIConnector = _builderConnectors.GetAiConnector();
             _AIWarConnector = _builderConnectors.GetAIWarConnector();
@@ -32,43 +31,36 @@ namespace GameInit.AI
             _townHallComponent = Object.FindObjectOfType<TownHallComponent>();
             _townHallComponent.GetWar(_AIWarConnector);
 
-            Init();
         }
 
-        public void Init()
-        {
-            _copyList = new Dictionary<int, ItemsType>();
-            CopyToDictinary(_copyList, _AIConnector.StrayList);
-        }
-
-        private Dictionary<int, ItemsType> CopyToDictinary(Dictionary<int, ItemsType> dictinary, List<IWork> list)
-        {
-            foreach (var item in list)
-            {
-                dictinary.Add(item.GetId(), item.GetItemType());
-            }
-
-            return dictinary;
-        }
-
-        
         private IWork CreateStray(IWork work)
         {
+            work.RemoveAllEveants();
             var stray = new Stray(work.GetAiComponent(), work.GetId(), _pool,  _coinDropAnimation, _heroComponent, work.GetRandomWalker());
             _AIConnector.StrayList.Add(stray);
-            _AIConnector.StrayList.Remove(work);
-            foreach (var list in _AIConnector.ListOfLists)
+
+            switch (work.GetItemType())
             {
-                foreach (var item in list)
-                {
-                    if(item.GetId() == stray.GetId())
-                    {
-                        list.Remove(item);
-                        break;
-                    }
-                }
+                case ItemsType.None:
+                    _AIConnector.CitizenList.Remove(work);
+                    break;
+                case ItemsType.Hammer:
+                    _AIConnector.BuilderList.Remove(work);
+                    break;
+                case ItemsType.Hoe:
+                    _AIConnector.FarmerList.Remove(work);
+                    break;
+                case ItemsType.Bowl:
+                    _AIConnector.ArcherList.Remove(work);
+                    _AIWarConnector.ArcherList.Remove(work);
+                    break;
+                case ItemsType.Sword:
+                    _AIConnector.SwordManList.Remove(work);
+                    _AIWarConnector.SwordManList.Remove(work);
+                    break;
             }
-            ModifCollection(stray);
+
+            _AIWarConnector.UpdateTree();
             return stray;
         }
 
@@ -80,7 +72,6 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Add(citizen);
             _AIConnector.StrayList.Remove(work);
             _AIConnector.MoveToClosest();
-            ModifCollection(citizen);
             _AIConnector.CheckAndGoToCoin();
             return citizen;
         }
@@ -89,9 +80,10 @@ namespace GameInit.AI
             var builder = new Builder(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
             _AIConnector.BuilderList.Add(builder);
             _AIConnector.CitizenList.Remove(work);
+            _AIWarConnector.PointsInWorld.Add(builder);
             _AIConnector.MoveToClosest();
-            ModifCollection(builder);
             _AIConnector.CheckAndGoToCoin();
+            _AIWarConnector.UpdateTree();
             return builder;
         }
         private IWork CreateFarmer(IWork work)
@@ -99,48 +91,40 @@ namespace GameInit.AI
             var farmer = new Farmer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
             _AIConnector.FarmerList.Add(farmer);
             _AIConnector.CitizenList.Remove(work);
+            _AIWarConnector.PointsInWorld.Add(farmer);
             _AIConnector.MoveToClosest();
-            ModifCollection(farmer);
             _AIConnector.CheckAndGoToCoin();
+            _AIWarConnector.UpdateTree();
             return farmer;
         }
         private void CreateSwordMan(IWork work)
         {
             var swordMan = new SwordMan(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            _AIWarConnector.PointsInWorld.Add(swordMan);
             _AIWarConnector.SwordManList.Add(swordMan);
+            _AIConnector.SwordManList.Add(swordMan);
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
-            ModifCollection(work);
             _AIConnector.CheckAndGoToCoin();
+            _AIWarConnector.UpdateTree();
         }
         private void CreateArcher(IWork work)
         {
             var archer = new Archer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
             _AIWarConnector.ArcherList.Add(archer);
+            _AIWarConnector.PointsInWorld.Add(archer);
+            _AIConnector.ArcherList.Add(archer);
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
-            ModifCollection(work);
             _AIConnector.CheckAndGoToCoin();
+            _AIWarConnector.UpdateTree();
         }
-        private void ModifCollection(IWork citizen)
-        {
-            foreach (var copy in _copyList)
-            {
-                if (copy.Key == citizen.GetId())
-                {
-                    _copyList.Remove(copy.Key);
-                    break;
-                }
-            }
-            _copyList.Add(citizen.GetId(), citizen.GetItemType());
-        }
+      
         private void SwapWorkForCitizen()
         {
             foreach (var stray in _AIConnector.CitizenList)
             {
-                foreach (var _stray in _copyList)
-                {
-                    if (stray.GetId() == _stray.Key && stray.HasCoin() && stray.GetItemType() != _stray.Value)
+                if (stray.HasCoin())
                     {
                         switch (stray.GetItemType())
                         {
@@ -163,13 +147,51 @@ namespace GameInit.AI
                             default:
                                 break;
                         }
-                    }
-                    if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
-                    {
-                        stray.RemoveAllEveants();
-                        CreateStray(stray);
-                        return;
-                    }
+                }
+                if (!stray.HasCoin() && stray.GetItemType() == ItemsType.None)
+                {
+                    stray.RemoveAllEveants();
+                    CreateStray(stray);
+                    return;
+                }
+            }
+        }
+        private void LoseWork()
+        {
+            foreach (var stray in _AIConnector.BuilderList)
+            {
+                if (!stray.HasCoin() && stray.GetItemType() != ItemsType.None)
+                {
+                    stray.RemoveAllEveants();
+                    CreateStray(stray);
+                    return;
+                }
+            }
+            foreach (var stray in _AIConnector.FarmerList)
+            {
+                if (!stray.HasCoin() && stray.GetItemType() != ItemsType.None)
+                {
+                    stray.RemoveAllEveants();
+                    CreateStray(stray);
+                    return;
+                }
+            }
+            foreach (var stray in _AIConnector.ArcherList)
+            {
+                if (!stray.HasCoin() && stray.GetItemType() != ItemsType.None)
+                {
+                    stray.RemoveAllEveants();
+                    CreateStray(stray);
+                    return;
+                }
+            }
+            foreach (var stray in _AIConnector.SwordManList)
+            {
+                if (!stray.HasCoin() && stray.GetItemType() != ItemsType.None)
+                {
+                    stray.RemoveAllEveants();
+                    CreateStray(stray);
+                    return;
                 }
             }
         }
@@ -177,23 +199,15 @@ namespace GameInit.AI
         {
             foreach (var stray in _AIConnector.StrayList)
             {
-                foreach (var _stray in _copyList)
-                {
-                    if(stray.GetId() == _stray.Key && stray.GetItemType() == ItemsType.None && stray.HasCoin())
+               if(stray.GetItemType() == ItemsType.None && stray.HasCoin())
                     {
                         stray.RemoveAllEveants();
                         CreateCitizen(stray);
                         return;
                     }
-                    if (stray.GetId() == _stray.Key && !stray.HasCoin() && stray.GetItemType() != _stray.Value)
-                    {
-                        stray.RemoveAllEveants();
-                        CreateStray(stray);
-                        return;
-                    }
-                }
             }
             SwapWorkForCitizen();
+            LoseWork();
         }
     }
 }

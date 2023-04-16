@@ -25,7 +25,10 @@ public class BuildingComponent : MonoBehaviour
     private Action _action;
     private bool inBuild = false;
     
-
+    public GameObject GetGm()
+    {
+        return gameObject;
+    }
     private void Start()
     {
         curCoinsList = new List<Coin>();
@@ -62,6 +65,12 @@ public class BuildingComponent : MonoBehaviour
     public void IncreaseForm()
     {
         curForm++;
+    }
+    public void ResetForm()
+    {
+        formsList[curForm].gameObject.SetActive(false);
+        curForm = 0;
+        formsList[curForm].gameObject.SetActive(true);
     }
     public bool ChekMaxLvl()
     {

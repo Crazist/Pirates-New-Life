@@ -30,9 +30,11 @@ namespace GameInit.AI
         private const int numberOfCitizenModel = 1;
         private const int radiusRandomWalk = 10;
         private const bool _isEnemy = false;
+        private const bool _canDamage = false;
         public bool InMove { get; set; } = false;
         public bool InWork { get; set; } = false;
         public bool GoingForCoin { get; set; } = false;
+        public int HP { get; set; } = 1;
         public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
         {
             _heroComponent = heroComponent;
@@ -195,9 +197,43 @@ namespace GameInit.AI
             return _positionOnVector2;
         }
 
+        public void GetDamage(int damage)
+        {
+            if (HP - damage <= 0)
+            {
+                Die();
+                HP = 0;
+                _coinsCount = 0;
+                _hasCoin = false;
+            }
+            else
+            {
+                HP = HP - damage;
+            }
+        }
+
+        private void Die()
+        {
+           // _AIComponent.GetGm().SetActive(false);
+        }
         public bool CheckIfEnemy()
         {
             return _isEnemy;
+        }
+
+        public bool CheckIfCanDamage()
+        {
+            return _canDamage;
+        }
+
+        public int CountOFDamage()
+        {
+            return 0; // can not damage
+        }
+
+        public void Attack()
+        {
+            //can not damage
         }
     }
 }

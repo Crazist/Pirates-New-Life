@@ -18,13 +18,17 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private GameCyrcle _cyrcle;
     private AIConnector _AIConnector;
     private IWork _curentlyWorker;
-    private float timeToBuild = 100.0f; // time to build in seconds
+    private float timeToBuild = 10.0f; // time to build in seconds
     private float progress = 0.0f; // current progress towards completing the wall
     private bool _coroutineInPlay = false;
     private int _index = -1;
-
+    private int _hpPerLvl = 100;
+    
     private const bool _isEnemy = false;
     private bool _isDay = false;
+    private const bool _canDamage = false;
+
+    public int HP { get; set; } = 0;
     public Wall(BuildingComponent buildingComponent, ResourceManager res, AIConnector AIConnector, GameCyrcle cyrcle)
     {
         _AIConnector = AIConnector;
@@ -121,7 +125,9 @@ public class Wall : IBuilding, IDayChange, IKDTree
         if (progress >= timeToBuild)
         {
             // wall is built
+            HP = HP + _hpPerLvl;
             _curentlyWorker.InWork = false;
+            _curentlyWorker.GetRandomWalker().Move();
             isBuilded = true;
             inBuildProgress = false;
             _wallComponent.UpdateBuild();
@@ -145,9 +151,39 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
         return _positionOnVector2;
     }
-
+    public void GetDamage(int damage)
+    {
+        if (HP - damage <= 0)
+        {
+            Die();
+            HP = 0;
+        }
+        else
+        {
+            HP = HP - damage;
+        }
+    }
+    private void Die()
+    {
+        _wallComponent.ResetForm();
+    }
     public bool CheckIfEnemy()
     {
         return _isEnemy;
+    }
+
+    public bool CheckIfCanDamage()
+    {
+        return _canDamage;
+    }
+
+    public int CountOFDamage()
+    {
+        return 0; // can not damage
+    }
+   
+    public void Attack()
+    {
+        //can not damage
     }
 }

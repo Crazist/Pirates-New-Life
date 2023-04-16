@@ -12,6 +12,17 @@ namespace GameInit.AI
         [SerializeField] private float spawnDiffMin = 1;
         [SerializeField] private Transform transformSpawnPosition;
 
+        private List<IWork> _strays;
+
+        private void Start()
+        {
+            _strays = new List<IWork>();
+        }
+        public List<IWork> GetStrayList()
+        {
+            return _strays;
+        }
+
         public GameObject GetCitizenPrefab()
         {
             return CitizenPrefab;

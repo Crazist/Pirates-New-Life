@@ -10,7 +10,7 @@ using UnityEngine;
 public class Archer : IWork, IKDTree
 {
     private AIComponent _AIComponent;
-    private ItemsType _type = ItemsType.None;
+    private ItemsType _type = ItemsType.Bowl;
     private int _id;
     private bool _hasCoin = false;
     private Pools _pool;
@@ -20,6 +20,9 @@ public class Archer : IWork, IKDTree
     private bool _waitCoins = false;
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
+    private bool _canDamage = true;
+    private int _damage = 1;
+    private float _delayForAttack = 3f;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;
@@ -30,6 +33,7 @@ public class Archer : IWork, IKDTree
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
+    public int HP { get; set; } = 1;
 
     public Archer(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
     {
@@ -175,9 +179,50 @@ public class Archer : IWork, IKDTree
 
         return _positionOnVector2;
     }
+    public void GetDamage(int damage)
+    {
+        if (HP - damage <= 0)
+        {
+            Die();
+            HP = 0;
+            _coinsCount = 0;
+            _hasCoin = false;
+        }
+        else
+        {
+            HP = HP - damage;
+        }
+    }
 
+    private void Die()
+    {
+       
+    }
     public bool CheckIfEnemy()
     {
         return _isEnemy;
+    }
+
+    public bool CheckIfCanDamage()
+    {
+        return _canDamage;
+    }
+
+    public int CountOFDamage()
+    {
+        return _damage;
+    }
+    private IEnumerator AttackDelay()
+    {
+        _canDamage = false;
+        yield return new WaitForSecondsRealtime(_delayForAttack);
+        _canDamage = true;
+    }
+
+    public void Attack()
+    {
+        if(_canDamage)
+        _AIComponent.StartCoroutine(AttackDelay());
+        //animation
     }
 }

@@ -10,7 +10,7 @@ using UnityEngine;
 public class Builder : IWork, IKDTree
 {
     private AIComponent _AIComponent;
-    private ItemsType _type = ItemsType.None;
+    private ItemsType _type = ItemsType.Hammer;
     private int _id;
     private bool _hasCoin = false;
     private Pools _pool;
@@ -20,6 +20,7 @@ public class Builder : IWork, IKDTree
     private bool _waitCoins = false;
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
+    private int _hp = 1;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;
@@ -27,6 +28,9 @@ public class Builder : IWork, IKDTree
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
     private const bool _isEnemy = false;
+    private const bool _canDamage = false;
+
+    public int HP { get; set; } = 1;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
@@ -170,9 +174,42 @@ public class Builder : IWork, IKDTree
 
         return _positionOnVector2;
     }
+    public void GetDamage(int damage)
+    {
+        if (HP - damage <= 0)
+        {
+            Die();
+            HP = 0;
+            _coinsCount = 0;
+            _hasCoin = false;
+        }
+        else
+        {
+            HP = HP - damage;
+        }
+    }
 
+    private void Die()
+    {
+     
+    }
     public bool CheckIfEnemy()
     {
         return _isEnemy;
+    }
+
+    public bool CheckIfCanDamage()
+    {
+        return _canDamage;
+    }
+
+    public int CountOFDamage()
+    {
+        return 0; // can not damage
+    }
+    
+    public void Attack()
+    {
+        //can not damage
     }
 }

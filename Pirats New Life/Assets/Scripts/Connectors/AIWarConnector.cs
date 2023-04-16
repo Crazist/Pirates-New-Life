@@ -10,6 +10,7 @@ using GameInit.GameCyrcleModule;
 using GameInit.Building;
 using GameInit.Builders;
 using GameInit.Connector;
+using System.Diagnostics;
 
 namespace GameInit.Connector
 {
@@ -30,6 +31,7 @@ namespace GameInit.Connector
         private AIConnector _AIConnector;
         private KDTree _tree;
         private KDQuery _treeQuery;
+        private ArrowPool _arrowPool;
         private float lastUpdateTime = 0.0f;
         private const float updateInterval = 0.5f;
 
@@ -37,7 +39,7 @@ namespace GameInit.Connector
         private const float _minimalDistanceToHero = 1f;
         private const float _heightPosition = 0.44f;
 
-        public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector)
+        public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool)
         {
             PointsInWorld = new List<IKDTree>();
 
@@ -50,6 +52,7 @@ namespace GameInit.Connector
             _resourceManager = resourceManager;
             _gameCyrcle = cyrcle;
             _pool = pool;
+            _arrowPool = arrowPool;
 
             _tree = new KDTree();
             _treeQuery = new KDQuery();
@@ -69,24 +72,56 @@ namespace GameInit.Connector
         {
             if (Time.time - lastUpdateTime > updateInterval && PointsInWorld.Count != 0)
             {
-
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 _tree.Rebuild(3);
-                foreach (var item in EnemyList)
+               
+                for (int i = 0; i < EnemyList.Count; i++)
+                    {
+                        List<int> index = new List<int>();
+                        _treeQuery.ClosestPoint(_tree, (IKDTree)EnemyList[i], index);
+                    if (index.Count != 0)
+                    {
+                        Vector3 target = new Vector3();
+
+                        target.x = PointsInWorld[index[0]].GetPositionVector2().x;
+                        target.z = PointsInWorld[index[0]].GetPositionVector2().y;
+                        target.y = _heightPosition;
+
+                        EnemyList[i].Move(target);
+                    }
+                }
+                for (int i = 0; i < SwordManList.Count; i++)
                 {
                     List<int> index = new List<int>();
-                    _treeQuery.ClosestPoint(_tree, (IKDTree)item, index);
-                    
-                    Vector3 target = new Vector3();
+                    _treeQuery.ClosestPoint(_tree, (IKDTree)SwordManList[i], index);
+                    if (index.Count != 0)
+                    {
+                        Vector3 target = new Vector3();
 
-                    target.x = PointsInWorld[index[0]].GetPositionVector2().x;
-                    target.z = PointsInWorld[index[0]].GetPositionVector2().y;
-                    target.y = _heightPosition;
+                        target.x = PointsInWorld[index[0]].GetPositionVector2().x;
+                        target.z = PointsInWorld[index[0]].GetPositionVector2().y;
+                        target.y = _heightPosition;
 
-                    item.Move(target, null);
+                        SwordManList[i].Move(target, null, ItemsType.None);
+                    }
                 }
                 
+                for (int i = 0; i < ArcherList.Count; i++)
+                {
+                    _treeQuery.ShootClosest(_tree, (IKDTree)ArcherList[i], PointsInWorld, EnemyList, _arrowPool, _treeQuery);
+                }
+               
+                for (int i = 0; i < PointsInWorld.Count; i++)
+                {
+                    if (PointsInWorld[i].HP > 0)
+                        _treeQuery.DamageClosest(_tree, PointsInWorld[i], PointsInWorld, EnemyList);
+                }
+
+                stopwatch.Stop(); // останавливаем таймер
+                UnityEngine.Debug.Log(stopwatch.Elapsed.TotalMilliseconds.ToString("F2") + " microseconds for tree to build"); // выводим результат в микросекундах
                 lastUpdateTime = Time.time;
             }
+           
         }
         public void UpdateTree()
         {
