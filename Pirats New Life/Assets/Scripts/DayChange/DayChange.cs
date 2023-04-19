@@ -10,11 +10,11 @@ public class DayChange : MonoBehaviour
     [SerializeField] private Gradient DirectinalColor;
     [SerializeField] private Gradient FogColor;
     [SerializeField] private Light DirectionalLight;
-   
+
+    [SerializeField] private float cycleDuration = 240f; // 4 minutes in seconds
+
     [SerializeField, Range(0, 24)] private float TimeOfday;
 
-    private float cycleDuration = 100f; // 10 minutes in seconds
-    
     private Action _dayChangeAction;
 
     private float cycleProgress = 5.3f / 24f;

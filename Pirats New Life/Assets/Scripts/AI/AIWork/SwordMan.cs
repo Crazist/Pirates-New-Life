@@ -35,8 +35,7 @@ public class SwordMan :  IWork, IKDTree
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public bool GoingForCoin { get; set; } = false;
-    public bool Alive { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
+    
     public SwordMan(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
     {
         _heroComponent = heroComponent;

@@ -301,6 +301,7 @@ namespace GameInit.Connector
                 }
             }
 
+            if(_heroComponent.gameObject.activeSelf)
             _heroComponent.GetMono().StartCoroutine(WaitWhyleAllFinishMove());
         }
 

@@ -11,6 +11,9 @@ namespace GameInit.Enemy
         [SerializeField] private float spawnDiffMax = 3;
         [SerializeField] private float spawnDiffMin = 1;
         [SerializeField] private Transform transformSpawnPosition;
+        [SerializeField] private int _multiplier = 1;
+
+        public int Multiplier { get { return _multiplier; } }
         public void SetCount(int count)
         {
             _count = count;

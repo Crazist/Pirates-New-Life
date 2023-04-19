@@ -44,6 +44,8 @@ namespace GameInit.AI
             _coinDropAnimation = coinDropAnimation;
             _cyrcle = cyrcle;
 
+            multiplier = _EnemySpawnComponents[0].Multiplier;
+
             SpawnStray();
         }
 
@@ -147,13 +149,10 @@ namespace GameInit.AI
         }
         private void Spawnenemy()
         {
-            multiplier++;
-            float valueToMultiply = 2 * Mathf.Log(multiplier + 1);
-
             // Проверяем, можем ли мы создать еще врага
-            if (currentEnemies < maxEnemies && currentEnemies * valueToMultiply <= maxEnemies)
+            if (currentEnemies < maxEnemies && currentEnemies + multiplier <= maxEnemies)
             {
-                currentEnemies += (int)valueToMultiply; // умножаем количество врагов на значение valueToMultiply
+                currentEnemies = currentEnemies + multiplier; // умножаем количество врагов на значение valueToMultiply
             }
 
             foreach (var camp in _EnemySpawnComponents)

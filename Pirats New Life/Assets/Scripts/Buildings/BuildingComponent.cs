@@ -108,7 +108,7 @@ public class BuildingComponent : MonoBehaviour
         var _coin = other.gameObject.GetComponent<Coin>();
         if (_coin && !_coin.SecondTouch)
         {
-            coin = other.gameObject.GetComponent<Coin>();
+            coin = _coin;
             curCoinsList.Add(coin);
             coin.Hide();
             GoldCollects();

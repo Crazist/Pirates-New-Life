@@ -25,6 +25,10 @@ public class HeroComponent : MonoBehaviour
 
     private void Update()
     {
+        if (!gameObject.activeSelf)
+        {
+            StopAllCoroutines();
+        }
         if (Input.GetKey(KeyCode.LeftShift) && currentStamina > 0f)
         {
             isSprinting = true;
@@ -45,10 +49,6 @@ public class HeroComponent : MonoBehaviour
         }
     }
 
-    private void OnGUI()
-    {
-        GUI.Box(new Rect(10, 10, 100, 20), "Stamina: " + currentStamina);
-    }
     private void Awake()
     {
         Transform = transform;
@@ -74,5 +74,9 @@ public class HeroComponent : MonoBehaviour
     public MonoBehaviour GetMono()
     {
         return this;
+    }
+    public Transform GetTransform()
+    {
+        return transform;
     }
 }

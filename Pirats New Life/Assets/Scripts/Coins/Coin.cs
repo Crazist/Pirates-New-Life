@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour
 {
-    [SerializeField] private float _untouchableTime = 4f;
+    [SerializeField] private float _untouchableTime = 3f;
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Transform _transform;
     public bool CanPickUp { get; set; }

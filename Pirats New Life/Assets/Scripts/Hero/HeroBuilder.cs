@@ -11,14 +11,15 @@ namespace GameInit.Builders
     {
         public HeroComponent HeroComponent { get; private set; }
 
-        public HeroBuilder(GameCyrcle GameCyrcle, Pools _pool, ResourceManager resources, BuilderConnectors builderConnectors)
+        public HeroBuilder(GameCyrcle GameCyrcle, Pools _pool, ResourceManager resources, BuilderConnectors builderConnectors, BuilderConnectors _BuilderConnectors, UIBuilder _UIBuilder)
         {
             HeroComponent hero = Object.FindObjectOfType<HeroComponent>();
 
             HeroComponent = hero.GetComponent<HeroComponent>();
 
             DropCoins dropCoins = new DropCoins(_pool, hero.transform, resources, HeroComponent, builderConnectors.GetAiConnector());
-            HeroMove move = new HeroMove(HeroComponent);
+            HeroMove move = new HeroMove(HeroComponent, _UIBuilder);
+            _BuilderConnectors.GetAIWarConnector().PointsInWorld.Add(move);
 
             GameCyrcle.Add(dropCoins);
             GameCyrcle.Add(move);

@@ -2,13 +2,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using GameInit.GameCyrcleModule;
-using System.Resources;
 using GameInit.Pool;
 using GameInit.PoolPrefabs;
-using GameInit.Builders;
 using GameInit.AI;
-using GameInit.Connector;
 using GameInit.Animation;
+using GameInit.TraderLogic;
 
 namespace GameInit.Builders
 {
@@ -35,24 +33,25 @@ namespace GameInit.Builders
 
             ResourceManager _resourceManager = new ResourceManager();
 
+            UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
+
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
             BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager, _arrowPool);
 
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
-            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors);
+            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors, _builderConnectors, _uiBuilder);
             _builderConnectors.GetAiConnector().GetHeroComponent(_heroBuilder.GetHeroComponent());
-
-            UIBuilder _uiBuilder = new UIBuilder(_resourceManager);
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);
 
             AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool, _coinDropAnimation, _heroBuilder, gameCyrcle, _enemyPool);
 
-            WorkChecker _workChecker = new WorkChecker( _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors);
-            gameCyrcle.Add(_workChecker);
-
+            gameCyrcle.Add(new WorkChecker( _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors));
+            
+            gameCyrcle.AddDayChange(new Trader(gameCyrcle, _coinDropAnimation, _coinPool));
+            
             Hacks(_resourceManager);
         }
 
