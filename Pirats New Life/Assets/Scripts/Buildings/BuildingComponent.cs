@@ -16,23 +16,20 @@ public class BuildingComponent : MonoBehaviour
     [SerializeField] BuildingsType type;
     [SerializeField] private bool _currentlyBuilding = false;
     [SerializeField] private bool _momentalBuild = true;
+    
     private bool canProduce = true;
     private Coin coin;
     private int curForm = 0;
     private bool checkForGold = false;
     private int curGold = 0;
-    private List<Coin> curCoinsList;
     private Action _action;
     private bool inBuild = false;
-    
+    private Action<int> _dropBeforePickUp;
     public GameObject GetGm()
     {
         return gameObject;
     }
-    private void Start()
-    {
-        curCoinsList = new List<Coin>();
-    }
+   
     public List<Transform> GetBuildPositions()
     {
         switch (curForm - 1)
@@ -49,14 +46,19 @@ public class BuildingComponent : MonoBehaviour
         return _positionForBuildFirst;
     }
     
+    public int GetCurForm()
+    {
+        return curForm;
+    }
     public void SetInBuild(bool _inBuild)
     {
         inBuild = _inBuild;
         _currentlyBuilding = _inBuild;
     }
-    public void SetAction(Action action)
+    public void SetAction(Action action, Action<int> DropBeforePickUp)
     {
        _action = action;
+       _dropBeforePickUp = DropBeforePickUp;
     }
     public List<GameObject> GetFormList()
     {
@@ -93,6 +95,10 @@ public class BuildingComponent : MonoBehaviour
         ChekMaxLvl();
     }
 
+    public void SetCanProduce(bool canProd)
+    {
+        canProduce = canProd;
+    }
     public bool CanProduce()
     {
         return canProduce;
@@ -109,7 +115,6 @@ public class BuildingComponent : MonoBehaviour
         if (_coin && !_coin.SecondTouch)
         {
             coin = _coin;
-            curCoinsList.Add(coin);
             coin.Hide();
             GoldCollects();
         }
@@ -168,14 +173,8 @@ public class BuildingComponent : MonoBehaviour
         }
         else
         {
-            foreach (var coin in curCoinsList)
-            {
-                coin.Active();
-                coin.SecondTouch = true;
-                inBuild = false;
-            }
+            _dropBeforePickUp.Invoke(curGold);
         }
-        curCoinsList.Clear();
         curGold = 0;
     }
     private IEnumerator BuildingInProgress()

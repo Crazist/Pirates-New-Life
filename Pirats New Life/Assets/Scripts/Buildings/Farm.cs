@@ -34,9 +34,11 @@ public class Farm : IBuilding, IDayChange, IUpdate
     private int _curCountOfWorkers = 0;
     private int _index = -1;
     private int _curForm = 2;
-
+    private Action<int> DropBeforePickUp;
+    
+    private const bool canPickUp = false;
     private const int _minimalDistanceToHero = 2;
-    private const bool canPickUp = true;
+    private const bool _canPickUp = true;
     private const int _minimalCountOfGoldToDrop= 20;
     private const int _ChangeFormFirstTime = 10;
     private const int _ChangeFormSecndTime = 20;
@@ -52,11 +54,15 @@ public class Farm : IBuilding, IDayChange, IUpdate
         _cyrcle = cyrcle;
         _farmComponent = buildingComponent;
         _res = res;
+        DropBeforePickUp += DropBeforePickUpCoin;
         _startBuilding += Build;
 
-        _farmComponent.SetAction(_startBuilding);
+        _farmComponent.SetAction(_startBuilding, DropBeforePickUp);
     }
-
+    private void DropBeforePickUpCoin(int count)
+    {
+        _coinDropAnimation.RandomCoinJump(_farmComponent.GetBuildPositions()[0].position, count, _farmComponent.GetBuildPositions()[0].position, _pool, _canPickUp);
+    }
     public void SetBuilder(IWork worker)
     {
         _curentlyWorker = worker;
@@ -174,6 +180,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             _curentlyWorker = null;
             _farmComponent.IncreaseForm();
             MoveBuilder();
+            _AIConnector.MoveToClosest();
             Debug.Log("Wall built!");
         }
         else

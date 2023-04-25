@@ -18,16 +18,15 @@ public class ResourceManager
         }
     }
 
-    public void GetDamage()
+    public bool GetDamage(int damage, out int curGold)
     {
+        curGold = GetResource(ResourceType.Gold);
+        SetResource(ResourceType.Gold, -damage);
         if (_resources.ContainsKey(ResourceType.Gold) && _resources[ResourceType.Gold] == 0)
         {
-            Debug.WriteLine("Lose");
+           return true;
         }
-        else
-        {
-            SetResource(ResourceType.Gold, -1);
-        }
+        return false;
     }
     public int GetResource(ResourceType type)
     {

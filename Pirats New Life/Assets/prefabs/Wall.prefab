@@ -157,7 +157,7 @@ BoxCollider:
   m_GameObject: {fileID: 375009508745046952}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -479,7 +479,7 @@ BoxCollider:
   m_GameObject: {fileID: 7961959874866049620}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -704,26 +704,10 @@ BoxCollider:
   m_GameObject: {fileID: 1500248962109848167}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.011484282, y: 0.21134682, z: 0.026500681}
   m_Center: {x: 0.008687065, y: -0.09890223, z: 0.0032503372}
---- !u!208 &5249861788916213172
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1500248962109848167}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.006, y: 0.106000006, z: 0.013}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0.009000001, y: -0.09900001, z: 0.003}
-  m_TimeToStationary: 0.5
 --- !u!4 &2277173071310020829 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d23702ce1de8fd642a48005a36f9a16e, type: 3}

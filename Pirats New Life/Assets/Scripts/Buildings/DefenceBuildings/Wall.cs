@@ -6,10 +6,13 @@ using System.Collections;
 using UnityEngine;
 using GameInit.GameCyrcleModule;
 using GameInit.AI;
+using GameInit.Animation;
+using GameInit.Pool;
+using GameInit.Builders;
 
 public class Wall : IBuilding, IDayChange, IKDTree
 {
-    private bool isBuilded = false;
+    public bool isBuilded { get; set; } = false;
     private bool inBuildProgress = false;
 
     private Action _startBuilding;
@@ -17,26 +20,44 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private ResourceManager _res;
     private GameCyrcle _cyrcle;
     private AIConnector _AIConnector;
+    private AIWarConnector _AIWarConnector;
     private IWork _curentlyWorker;
+    private List<Wall> _walls;
     private float timeToBuild = 10.0f; // time to build in seconds
     private float progress = 0.0f; // current progress towards completing the wall
     private bool _coroutineInPlay = false;
     private int _index = -1;
     private int _hpPerLvl = 100;
-    
+    private Action<int> DropBeforePickUp;
+    private CoinDropAnimation _coinDropAnimation;
+    private Pools _coinPool;
+    public int CirclePosition { get; set; }
+    public bool IsRight { get; set; }
+
+    private const bool canPickUp = false;
+    private const int _firstForm = 1;
     private const bool _isEnemy = false;
     private bool _isDay = false;
     private const bool _canDamage = false;
 
     public int HP { get; set; } = 0;
-    public Wall(BuildingComponent buildingComponent, ResourceManager res, AIConnector AIConnector, GameCyrcle cyrcle)
+    public Wall(BuildingComponent buildingComponent, ResourceManager res, BuilderConnectors BuilderConnectors, GameCyrcle cyrcle, List<Wall> wall, Pools coinPool, CoinDropAnimation coinDropAnimation)
     {
-        _AIConnector = AIConnector;
+        _coinDropAnimation = coinDropAnimation;
+        _coinPool = coinPool;
+        _walls = wall;
+        _AIConnector = BuilderConnectors.GetAiConnector();
+        _AIWarConnector = BuilderConnectors.GetAIWarConnector();
         _cyrcle = cyrcle;
         _wallComponent = buildingComponent;
         _res = res;
+        DropBeforePickUp += DropBeforePickUpCoin;
         _startBuilding += Build;
-        _wallComponent.SetAction(_startBuilding);
+        _wallComponent.SetAction(_startBuilding, DropBeforePickUp);
+    }
+    private void DropBeforePickUpCoin(int count)
+    {
+        _coinDropAnimation.RandomCoinJump(_wallComponent.GetBuildPositions()[1].position, count, _wallComponent.GetBuildPositions()[1].position, _coinPool, canPickUp);
     }
 
     public void SetBuilder(IWork worker)
@@ -107,6 +128,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
         while (_isDay && progress < timeToBuild && _curentlyWorker != null)
         {
             yield return new WaitForSeconds(10.0f); // wait for 1 second before checking progress again
+            if(_curentlyWorker != null)
             _curentlyWorker.Move(RandomBuildPosition(), null);
         }
     }
@@ -124,6 +146,16 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
         if (progress >= timeToBuild)
         {
+            if(_wallComponent.GetCurForm() == _firstForm)
+            {
+                foreach (var wall in _walls)
+                {
+                    if(wall.CirclePosition == CirclePosition + 1 && IsRight == wall.IsRight)
+                    {
+                        wall.GetWallComponent().SetCanProduce(true);
+                    }
+                }
+            }
             // wall is built
             HP = HP + _hpPerLvl;
             _curentlyWorker.InWork = false;
@@ -133,6 +165,9 @@ public class Wall : IBuilding, IDayChange, IKDTree
             _wallComponent.UpdateBuild();
             _wallComponent.SetInBuild(false);
             Debug.Log("Wall built!");
+            _curentlyWorker = null;
+            _AIConnector.MoveToClosest();
+            _AIWarConnector.SetSwordManToNewPosition();
         }
         else
         {
@@ -143,6 +178,10 @@ public class Wall : IBuilding, IDayChange, IKDTree
         _coroutineInPlay = false;
     }
 
+    public BuildingComponent GetWallComponent()
+    {
+        return _wallComponent;
+    }
     public Vector2 GetPositionVector2()
     {
         Vector2 _positionOnVector2;
@@ -151,6 +190,11 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
         return _positionOnVector2;
     }
+    public Vector3 GetPositionVector3()
+    {
+        return _wallComponent.GetBuildPositions()[0].position;
+    }
+
     public void GetDamage(int damage)
     {
         if (HP - damage <= 0)

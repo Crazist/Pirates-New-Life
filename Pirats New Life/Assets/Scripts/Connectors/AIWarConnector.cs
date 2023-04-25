@@ -19,7 +19,9 @@ namespace GameInit.Connector
         public List<IWork> SwordManList { get; set; }
         public List<IWork> ArcherList { get; set; }
         public List<IEnemy> EnemyList { get; set; }
-      
+        public List<Wall> RightWall { get; set; }
+        public List<Wall> LeftWall { get; set; }
+
         public List<IKDTree> PointsInWorld { get; set; }
 
         private Pools _pool;
@@ -38,7 +40,8 @@ namespace GameInit.Connector
         private const int _minDistance = 5;
         private const float _minimalDistanceToHero = 1f;
         private const float _heightPosition = 0.44f;
-
+        private const int radiusRandomWalk = 4;
+        private const int offset = 5;
         public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool)
         {
             PointsInWorld = new List<IKDTree>();
@@ -46,7 +49,10 @@ namespace GameInit.Connector
             SwordManList = new List<IWork>();
             ArcherList = new List<IWork>();
             EnemyList = new List<IEnemy>();
-            
+
+            RightWall = new List<Wall>();
+            LeftWall = new List<Wall>();
+
 
             _AIConnector = AIConnector;
             _resourceManager = resourceManager;
@@ -56,11 +62,6 @@ namespace GameInit.Connector
 
             _tree = new KDTree();
             _treeQuery = new KDQuery();
-        }
-
-        public void StartMove(IKDTree enemy)
-        {
-
         }
 
         public void GetHeroComponent(HeroComponent heroComponent)
@@ -123,6 +124,53 @@ namespace GameInit.Connector
             }
            
         }
+        public void SetSwordManToNewPosition()
+        {
+            Wall lastRightWall = null;
+            Wall lastLeftWall = null;
+
+            // Находим последнюю незавершенную стену справа и слева
+            for (int i = 0; i < RightWall.Count; i++)
+            {
+                if (RightWall[i].isBuilded)
+                {
+                    lastRightWall = RightWall[i];
+                }
+            }
+            for (int i = 0; i < LeftWall.Count; i++)
+            {
+                if (LeftWall[i].isBuilded)
+                {
+                    lastLeftWall = LeftWall[i];
+                }
+            }
+
+            // Перемещаем SwordMan по последовательности стен
+            for (int i = 0; i < SwordManList.Count; i++)
+            {
+                Vector3 targetWall = Vector3.zero;
+                if (i % 2 == 0 && lastRightWall != null)  // Четные SwordMan передвигаются к lastRightWall, нечетные - к lastLeftWall
+                {
+                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offset, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                }
+                else if(lastLeftWall != null)
+                {
+                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                }
+
+                if (targetWall != Vector3.zero)
+                {
+                    SwordManList[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+                }
+            }
+
+            // Последний SwordMan передвигается к lastLeftWall, если она есть
+            if (SwordManList.Count > 0 && lastLeftWall != null)
+            {
+                Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x - offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                SwordManList[SwordManList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+            }
+        }
         public void UpdateTree()
         {
             _tree.Build(PointsInWorld, 3);
@@ -133,6 +181,7 @@ namespace GameInit.Connector
         }
         public void OnDayChange()
         {
+            SetSwordManToNewPosition();
         }
     }
 }

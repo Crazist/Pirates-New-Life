@@ -89,7 +89,7 @@ public class SwordMan :  IWork, IKDTree
         return _hasCoin;
     }
 
-    private void CollectGold()
+    public void CollectGold()
     {
         _hasCoin = true;
         _coinsCount++;
@@ -126,14 +126,13 @@ public class SwordMan :  IWork, IKDTree
             yield return new WaitForEndOfFrame();
         }
 
-        while (_AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+        while (agent.velocity != Vector3.zero && _AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
         {
             yield return null;
         }
 
         action?.Invoke();
-        CollectGold();
-
+        
         GoingForCoin = false;
         InMove = false;
     }

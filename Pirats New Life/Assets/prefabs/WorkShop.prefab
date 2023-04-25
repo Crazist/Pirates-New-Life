@@ -145,7 +145,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 6.21, y: 0.58, z: 6.51}
-  m_Center: {x: 0, y: 0.7350879, z: 0}
+  m_Center: {x: 0, y: 0.09, z: 0}
 --- !u!114 &3693129768310726713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,13 +161,15 @@ MonoBehaviour:
   formsList:
   - {fileID: 254886039208467879}
   - {fileID: 8964992355489792989}
-  _positionForBuildFirst: []
+  _positionForBuildFirst:
+  - {fileID: 8072360674532886328}
   _positionForBuildSecond: []
   _positionForBuildThird: []
   _positionForBuildFourth: []
   countOfGold: 2
   maxLevel: 1
   type: 0
+  _currentlyBuilding: 0
   _momentalBuild: 1
 --- !u!114 &4655250240318134952
 MonoBehaviour:

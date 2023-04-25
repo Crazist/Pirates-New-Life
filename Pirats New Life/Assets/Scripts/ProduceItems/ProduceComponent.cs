@@ -17,9 +17,9 @@ namespace GameInit.Building
 
         private int curGold = 0;
         private bool canProduce = false;
-        private List<Coin> curCoinsList;
         private Action _action;
         private bool inBuild = false;
+        private Action<int> _dropBeforePickUp;
 
         public int GetMaxCount()
         {
@@ -35,14 +35,10 @@ namespace GameInit.Building
             return itemPrefab;
         }
 
-        private void Start()
-        {
-            curCoinsList = new List<Coin>();
-        }
-
-        public void SetAction(Action action)
+        public void SetAction(Action action, Action<int> DropBeforePickUp)
         {
             _action = action;
+            _dropBeforePickUp = DropBeforePickUp;
         }
 
         public Transform GetPositionForSpawn()
@@ -67,7 +63,6 @@ namespace GameInit.Building
             var _coin = other.gameObject.GetComponent<Coin>();
             if (_coin && !_coin.SecondTouch)
             {
-                curCoinsList.Add(_coin);
                 _coin.Hide();
                 GoldCollects();
             }
@@ -104,13 +99,8 @@ namespace GameInit.Building
             }
             else
             {
-                foreach (var coin in curCoinsList)
-                {
-                    coin.Active();
-                    coin.SecondTouch = true;
-                }
+                _dropBeforePickUp.Invoke(curGold);
             }
-            curCoinsList.Clear();
             curGold = 0;
             checkForGold = false;
             inBuild = false;

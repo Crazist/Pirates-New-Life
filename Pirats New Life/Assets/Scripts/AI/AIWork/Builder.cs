@@ -88,7 +88,7 @@ public class Builder : IWork, IKDTree
         return _hasCoin;
     }
 
-    private void CollectGold()
+    public void CollectGold()
     {
         _hasCoin = true;
         _coinsCount++;
@@ -107,13 +107,11 @@ public class Builder : IWork, IKDTree
     }
     public void Move(Vector3 position, Action action)
     {
-        if (InMove == false)
-        {
+            InWork = true;
             GoingForCoin = true;
             InMove = true;
             _AIComponent.GeNavMeshAgent().destination = position;
             _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
-        }
     }
     private IEnumerator Waiter(Action action)
     {
@@ -124,16 +122,17 @@ public class Builder : IWork, IKDTree
             yield return new WaitForEndOfFrame();
         }
 
-        while (_AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+        while (agent.velocity != Vector3.zero && _AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
         {
             yield return null;
         }
 
         action?.Invoke();
-        CollectGold();
-
+        
         GoingForCoin = false;
+        InWork = true;
         InMove = false;
+        _RandomWalker.Move();
     }
 
     private IEnumerator Waiter()

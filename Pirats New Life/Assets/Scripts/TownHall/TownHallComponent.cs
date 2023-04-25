@@ -7,19 +7,15 @@ namespace GameInit.MainPositions
 {
     public class TownHallComponent : MonoBehaviour
     {
-        private Transform _transform;
         private AIWarConnector _AIWarConnector;
-        void Start()
-        {
-            _transform = GetComponent<Transform>();
-        }
+        
         public void GetWar(AIWarConnector AIWarConnector)
         {
             _AIWarConnector = AIWarConnector;
         }
         public Transform GetTransform()
         {
-            return _transform;
+            return transform;
         }
         private void OnDrawGizmos()
         {

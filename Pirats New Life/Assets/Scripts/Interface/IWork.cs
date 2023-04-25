@@ -19,6 +19,7 @@ namespace GameInit.AI
         public void RemoveAllEveants();
         public void CheckIfPlayerWaitForCoins();
         public RandomWalker GetRandomWalker();
+        public void CollectGold();
     }
 }
 

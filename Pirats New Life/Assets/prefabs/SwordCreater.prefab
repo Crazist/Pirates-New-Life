@@ -149,7 +149,8 @@ MonoBehaviour:
   formsList:
   - {fileID: 8009817794490886816}
   - {fileID: 5503063911224347567}
-  _positionForBuildFirst: []
+  _positionForBuildFirst:
+  - {fileID: 7652538245684609579}
   _positionForBuildSecond: []
   _positionForBuildThird: []
   _positionForBuildFourth: []
@@ -187,7 +188,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 6.21, y: 0.58, z: 6.51}
-  m_Center: {x: 0, y: 0.7350879, z: 0}
+  m_Center: {x: 0, y: -0.07, z: 0}
 --- !u!1 &7400951302223466807
 GameObject:
   m_ObjectHideFlags: 0

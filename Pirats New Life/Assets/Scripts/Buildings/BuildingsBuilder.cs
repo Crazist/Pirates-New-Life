@@ -1,43 +1,44 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameInit.Building;
 using GameInit.GameCyrcleModule;
-using System;
-using GameInit.Component;
-using System.ComponentModel;
-using GameInit.Connector;
 using GameInit.Pool;
 using GameInit.Animation;
+using GameInit.MainPositions;
+using GameInit.Optimization;
 
 namespace GameInit.Builders
 {
     public class BuildingsBuilder
     {
-        private List<IBuilding> _buildingsList;
-        private GameCyrcle _cyrcle;
-       
+        private List<Wall> _buildingsList;
+        private const int _baseCanProduce = 0;
         public BuildingsBuilder(GameCyrcle cyrcle, ResourceManager resourceManager, BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation)
         {
-            _cyrcle = cyrcle;
-            _buildingsList = new List<IBuilding>();
+            _buildingsList = new List<Wall>();
+
+            TownHallComponent _townHallComponent = UnityEngine.Object.FindObjectOfType<TownHallComponent>();
 
             var allBuildingsComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
             
-            CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors, heroComponent, pool, coinDropAnimation);
+            CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors, heroComponent, pool, coinDropAnimation, cyrcle, _townHallComponent);
         }
 
-        private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation)
+        private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, 
+            BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation, GameCyrcle _cyrcle, TownHallComponent _townHallComponent)
         {
             var _AIConnector = builderConnectors.GetAiConnector();
             var _WarConnector = builderConnectors.GetAIWarConnector();
+
+            var center = _townHallComponent.GetTransform().position;
 
             foreach (var component in buildingsComponenets)
             {
                 switch (component.getType())
                 {
                     case BuildingsType.Wall:
-                        var building = new Wall(component, resourceManager, _AIConnector, _cyrcle);
+                        var building = new Wall(component, resourceManager, builderConnectors, _cyrcle, _buildingsList, pool, coinDropAnimation);
+                        _buildingsList.Add(building);
                         _WarConnector.PointsInWorld.Add(building);
                         _WarConnector.UpdateTree();
                         _cyrcle.AddDayChange(building);
@@ -48,10 +49,56 @@ namespace GameInit.Builders
                         _cyrcle.Add(farm);
                         break;
                     default:
-                        _buildingsList.Add(new ProductionBuilding(component, resourceManager, _AIConnector));
+                       new ProductionBuilding(component, resourceManager, _AIConnector, pool, coinDropAnimation);
                         break;
                 }
             }
+            CalculateWallsPosition(center, builderConnectors);
+        }
+
+        private void CalculateWallsPosition(Vector3 center, BuilderConnectors builderConnectors)
+        {
+            List<Wall> rightWalls = new List<Wall>();
+            List<Wall> leftWalls = new List<Wall>();
+
+            var _WarConnector = builderConnectors.GetAIWarConnector();
+
+            foreach (var wall in _buildingsList)
+            {
+                if (center.x > wall.GetPositionVector2().x)
+                {
+                    leftWalls.Add(wall);
+                }
+                else
+                {
+                    rightWalls.Add(wall);
+                }
+            }
+
+            leftWalls.Sort((a, b) => Distance.Manhattan(a.GetPositionVector3(), center).CompareTo(Distance.Manhattan(b.GetPositionVector3(), center)));
+            rightWalls.Sort((a, b) => Distance.Manhattan(a.GetPositionVector3(), center).CompareTo(Distance.Manhattan(b.GetPositionVector3(), center)));
+
+            for (int i = 0; i < leftWalls.Count; i++)
+            {
+                leftWalls[i].CirclePosition = i;
+                leftWalls[i].IsRight = false;
+                if(i == _baseCanProduce)
+                     leftWalls[i].GetWallComponent().SetCanProduce(true);
+                else
+                    leftWalls[i].GetWallComponent().SetCanProduce(false);
+            }
+            for (int i = 0; i < rightWalls.Count; i++)
+            {
+                rightWalls[i].CirclePosition = i;
+                rightWalls[i].IsRight = true;
+                if (i == _baseCanProduce)
+                    rightWalls[i].GetWallComponent().SetCanProduce(true);
+                else
+                    rightWalls[i].GetWallComponent().SetCanProduce(false);
+            }
+
+            _WarConnector.RightWall = rightWalls;
+            _WarConnector.LeftWall = leftWalls;
         }
     }
 }

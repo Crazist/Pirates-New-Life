@@ -6,6 +6,8 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private Transform playerTransform; // reference to the character's transform
     [SerializeField] private float cameraSpeed = 1.0f; // the speed at which the camera moves
 
+    [SerializeField] private Animator _animator;
+
     [SerializeField] private float zoneSize = 2.0f; // the size of the zone in which the camera moves
 
     private float minX; // the minimum x position of the camera
@@ -40,6 +42,23 @@ public class CameraControl : MonoBehaviour
         {
             minX = transform.position.x - zoneSize;
             maxX = transform.position.x + zoneSize;
+        }
+    }
+
+    public void ShakeCameraAnimation()
+    {
+        var _rand = Random.Range(0, 3);
+        switch (_rand)
+        {
+            case 0:
+                _animator.SetTrigger("shake");
+                break;
+            case 1:
+                _animator.SetTrigger("shake2");
+                break;
+            case 2:
+                _animator.SetTrigger("shake3");
+                break;
         }
     }
 }

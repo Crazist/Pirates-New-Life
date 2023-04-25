@@ -266,7 +266,8 @@ MonoBehaviour:
   formsList:
   - {fileID: 2309706925742343359}
   - {fileID: 4919788628914199563}
-  _positionForBuildFirst: []
+  _positionForBuildFirst:
+  - {fileID: 374552866626399894}
   _positionForBuildSecond: []
   _positionForBuildThird: []
   _positionForBuildFourth: []
@@ -287,4 +288,4 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 6.21, y: 0.58, z: 6.51}
-  m_Center: {x: 0, y: 0.7350879, z: 0}
+  m_Center: {x: 0, y: 0.19, z: 0}

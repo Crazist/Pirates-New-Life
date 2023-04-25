@@ -27,6 +27,11 @@ namespace GameInit.RandomWalk
             _randomTime = Random.Range(5, 15);
             _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(CheckForStartRandomWallk());
         }
+        public void ChangeOnlyPositionAndStartMove(Vector3 pos, float radius)
+        {
+            _spawnPoint = pos;
+            Move();
+        }
         public void Move()
         {
             if (!_work.InWork)

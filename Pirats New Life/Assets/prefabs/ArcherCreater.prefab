@@ -68,7 +68,8 @@ MonoBehaviour:
   formsList:
   - {fileID: 5100492613331714305}
   - {fileID: 1194623381972092740}
-  _positionForBuildFirst: []
+  _positionForBuildFirst:
+  - {fileID: 8817342967958234384}
   _positionForBuildSecond: []
   _positionForBuildThird: []
   _positionForBuildFourth: []

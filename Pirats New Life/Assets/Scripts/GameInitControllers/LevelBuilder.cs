@@ -41,7 +41,7 @@ namespace GameInit.Builders
 
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
-            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors, _builderConnectors, _uiBuilder);
+            HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors, _builderConnectors, _uiBuilder, _coinDropAnimation, _resourceManager);
             _builderConnectors.GetAiConnector().GetHeroComponent(_heroBuilder.GetHeroComponent());
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);

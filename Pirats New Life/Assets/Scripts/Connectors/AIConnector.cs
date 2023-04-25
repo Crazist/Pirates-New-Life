@@ -75,10 +75,12 @@ namespace GameInit.Connector
 
         public void MoveToClosest()
         {
-            for (int i = 0; i < lateMove.Count; i++)
+            List<Action> lateMoveCopy = new List<Action>(lateMove);
+            lateMove.Clear();
+
+            for (int i = 0; i < lateMoveCopy.Count; i++)
             {
-                lateMove[i].Invoke();
-                lateMove.Remove(lateMove[i]);
+                lateMoveCopy[i].Invoke();
             }
         }
         public void MoveToClosestAICitizen(Vector3 targetPosition, Action callback, ItemsType type)
@@ -137,13 +139,13 @@ namespace GameInit.Connector
 
             if (_stray != null && _gameCyrcle.ChekIfDay())
             {
+                building.SetBuilder(_stray);
                 _stray.Move(targetPosition, callback);
             }
             else
             {
                 lateMove.Add(() =>
                 {
-                    building.SetBuilder(_stray);
                     MoveToClosestAIBuilder(targetPosition, callback, building);
                 });
             }

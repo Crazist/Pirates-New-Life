@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using GameInit.Connector;
+using GameInit.Animation;
+using GameInit.Pool;
 
 namespace GameInit.Building
 {
@@ -13,16 +15,29 @@ namespace GameInit.Building
         private int curCount = 0;
         private List<GameObject> items;
         private bool canProduce = false;
-        AIConnector _AIConnector;
+        private Action<int> DropBeforePickUp;
+        private AIConnector _AIConnector;
+        private CoinDropAnimation _coinDropAnimation;
+        private Pools _coinPool;
+        private BuildingComponent _buildingComponent;
 
-        public Produce(ProduceComponent produceComponent, AIConnector AIConnector)
+        private const bool canPickUp = false;
+        public Produce(ProduceComponent produceComponent, AIConnector AIConnector, Pools coinPool, CoinDropAnimation coinDropAnimation, BuildingComponent buildingComponent)
         {
+            _buildingComponent = buildingComponent;
+            _coinDropAnimation = coinDropAnimation;
+            _coinPool = coinPool;
             _AIConnector = AIConnector;
             _produceComponent = produceComponent;
             items = new List<GameObject>();
             _produceComponent.SetCanProduce(canProduce);
+            DropBeforePickUp += DropBeforePickUpCoin;
             _action += BuidItem;
-            produceComponent.SetAction(_action);
+            produceComponent.SetAction(_action, DropBeforePickUp);
+        }
+        private void DropBeforePickUpCoin(int count)
+        {
+            _coinDropAnimation.RandomCoinJump(_buildingComponent.GetBuildPositions()[0].position, count, _buildingComponent.GetBuildPositions()[0].position, _coinPool, canPickUp);
         }
 
         private void BuidItem()
@@ -44,6 +59,7 @@ namespace GameInit.Building
                 items.Remove(instance);
                 GameObject.Destroy(instance);
                 _produceComponent.SetCanProduce(CheckCountOfItems());
+                _AIConnector.MoveToClosest();
                 // Add any additional code you want to execute here
             }, _produceComponent.GetItemType());
         }
