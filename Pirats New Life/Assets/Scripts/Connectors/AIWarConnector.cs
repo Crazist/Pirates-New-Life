@@ -151,11 +151,11 @@ namespace GameInit.Connector
                 Vector3 targetWall = Vector3.zero;
                 if (i % 2 == 0 && lastRightWall != null)  // Четные SwordMan передвигаются к lastRightWall, нечетные - к lastLeftWall
                 {
-                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offset, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x + offset, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
                 }
                 else if(lastLeftWall != null)
                 {
-                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x - offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
                 }
 
                 if (targetWall != Vector3.zero)

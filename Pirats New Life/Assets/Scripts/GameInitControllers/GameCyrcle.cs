@@ -119,7 +119,7 @@ namespace GameInit.GameCyrcleModule
         }
         public bool ChekIfDay()
         {
-            return true;
+            return isDay;
         }
        
     }

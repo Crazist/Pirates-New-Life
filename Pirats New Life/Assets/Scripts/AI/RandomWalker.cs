@@ -34,7 +34,7 @@ namespace GameInit.RandomWalk
         }
         public void Move()
         {
-            if (!_work.InWork)
+            if (!_work.InWork && !_work.InMove)
             {
                 Vector3 randomDirection = Random.insideUnitSphere * (_radius);
                 randomDirection += _spawnPoint;

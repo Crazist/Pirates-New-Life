@@ -124,7 +124,7 @@ namespace GameInit.Connector
 
             foreach (var builder in BuilderList)
             {
-                if (builder.InWork != true)
+                if (!builder.InWork)
                 {
                     float distance = Distance.Manhattan(builder.getTransform().position, targetPosition);
 
@@ -139,8 +139,15 @@ namespace GameInit.Connector
 
             if (_stray != null && _gameCyrcle.ChekIfDay())
             {
-                building.SetBuilder(_stray);
-                _stray.Move(targetPosition, callback);
+               building.SetBuilder(_stray);
+               if(!_stray.Move(targetPosition, callback))
+                {
+                    building.SetBuilder(null);
+                    lateMove.Add(() =>
+                    {
+                        MoveToClosestAIBuilder(targetPosition, callback, building);
+                    });
+                }
             }
             else
             {

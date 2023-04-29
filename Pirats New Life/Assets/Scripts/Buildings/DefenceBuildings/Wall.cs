@@ -31,6 +31,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private Action<int> DropBeforePickUp;
     private CoinDropAnimation _coinDropAnimation;
     private Pools _coinPool;
+    private Coroutine _curCoroutineWaitMove;
     public int CirclePosition { get; set; }
     public bool IsRight { get; set; }
 
@@ -62,6 +63,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
     public void SetBuilder(IWork worker)
     {
+        worker.InWork = true;
         _curentlyWorker = worker;
     }
     public void Build()
@@ -127,7 +129,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     {
         while (_isDay && progress < timeToBuild && _curentlyWorker != null)
         {
-            yield return new WaitForSeconds(10.0f); // wait for 1 second before checking progress again
+            yield return new WaitForSeconds(10.0f); // chek for build and randomPosition time, it will not work if it to similary
             if(_curentlyWorker != null)
             _curentlyWorker.Move(RandomBuildPosition(), null);
         }
@@ -135,14 +137,14 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private IEnumerator BuildingInProgress()
     {
         _coroutineInPlay = true;
-        _wallComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
+        _curCoroutineWaitMove = _wallComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
         while (_isDay && progress < timeToBuild)
         {
             yield return new WaitForSeconds(1.0f); // wait for 1 second before checking progress again
             progress += 1.0f;
         }
 
-        _wallComponent.GetMonoBehaviour().StopCoroutine(RandomBuildPositionCoroutine());
+        _wallComponent.GetMonoBehaviour().StopCoroutine(_curCoroutineWaitMove);
 
         if (progress >= timeToBuild)
         {
@@ -159,14 +161,14 @@ public class Wall : IBuilding, IDayChange, IKDTree
             // wall is built
             HP = HP + _hpPerLvl;
             _curentlyWorker.InWork = false;
-            _curentlyWorker.GetRandomWalker().Move();
             isBuilded = true;
             inBuildProgress = false;
             _wallComponent.UpdateBuild();
             _wallComponent.SetInBuild(false);
             Debug.Log("Wall built!");
-            _curentlyWorker = null;
             _AIConnector.MoveToClosest();
+            _curentlyWorker.GetRandomWalker().Move();
+            _curentlyWorker = null;
             _AIWarConnector.SetSwordManToNewPosition();
         }
         else

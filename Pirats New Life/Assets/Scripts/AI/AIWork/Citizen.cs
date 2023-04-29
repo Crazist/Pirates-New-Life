@@ -107,50 +107,55 @@ namespace GameInit.AI
         {
             if (InMove == false)
             {
-                _AIComponent.GeNavMeshAgent().SetDestination(position);
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
+                _AIComponent.GeNavMeshAgent().destination = position;
             }
         }
-        public void Move(Vector3 position, Action action)
+        public bool Move(Vector3 position, Action action)
         {
-            if (InMove == false)
+            if (!InMove)
             {
                 GoingForCoin = true;
                 InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
-                _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
+                return true;
             }
+            return false;
         }
         private IEnumerator Waiter(Action action)
         {
+            yield return new WaitForEndOfFrame();
+
             var agent = _AIComponent.GeNavMeshAgent();
 
-            while (agent.velocity == Vector3.zero)
+            while (agent.remainingDistance == 0 || !agent.hasPath)
             {
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
 
-            while (agent.velocity != Vector3.zero && _AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+            while (agent.remainingDistance > agent.stoppingDistance)
             {
                 yield return null;
             }
 
             action?.Invoke();
-            
+
             GoingForCoin = false;
             InMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {
-            InMove = true;
+            yield return new WaitForEndOfFrame();
+
             var agent = _AIComponent.GeNavMeshAgent();
 
-            while (agent.velocity == Vector3.zero)
+            while (agent.remainingDistance == 0 || !agent.hasPath)
             {
                 yield return null;
             }
-            while (_AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+
+            while (agent.remainingDistance > agent.stoppingDistance)
             {
                 yield return null;
             }

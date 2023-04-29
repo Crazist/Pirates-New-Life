@@ -101,32 +101,34 @@ namespace GameInit.AI
         {
             return; //Will not move to position never;
         }
-        public void Move(Vector3 position, Action action)
+        public bool Move(Vector3 position, Action action)
         {
-            if(InMove == false)
+            if (!InMove)
             {
                 GoingForCoin = true;
                 InMove = true;
-
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
-                _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
+                return true;
             }
+            return false;
         }
         private IEnumerator Waiter(Action action)
         {
+            yield return new WaitForEndOfFrame();
+
             var agent = _AIComponent.GeNavMeshAgent();
 
-            while (agent.velocity == Vector3.zero)
-            {
-                yield return new WaitForEndOfFrame();
-            }
-
-            while (agent.velocity != Vector3.zero && _AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+            while (agent.remainingDistance == 0 || !agent.hasPath)
             {
                 yield return null;
             }
-            
+
+            while (agent.remainingDistance > agent.stoppingDistance)
+            {
+                yield return null;
+            }
+
             action?.Invoke();
 
             CollectGold();

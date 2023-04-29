@@ -65,6 +65,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
     }
     public void SetBuilder(IWork worker)
     {
+        worker.InWork = true;
         _curentlyWorker = worker;
     }
     public void Build()
@@ -159,14 +160,14 @@ public class Farm : IBuilding, IDayChange, IUpdate
     private IEnumerator BuildingInProgress()
     {
         _coroutineInPlay = true;
-        _farmComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
+        var _curCoroutineWaitMove = _farmComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
         while (_isDay && progress < timeToBuild)
         {
             yield return new WaitForSeconds(1.0f); // wait for 1 second before checking progress again
             progress += 1.0f;
         }
 
-        _farmComponent.GetMonoBehaviour().StopCoroutine(RandomBuildPositionCoroutine());
+        _farmComponent.GetMonoBehaviour().StopCoroutine(_curCoroutineWaitMove);
 
         if (progress >= timeToBuild)
         {
@@ -176,11 +177,10 @@ public class Farm : IBuilding, IDayChange, IUpdate
             inBuildProgress = false;
             _farmComponent.UpdateBuild();
             _farmComponent.SetInBuild(false);
+            _farmComponent.IncreaseForm();
+            _AIConnector.MoveToClosest();
             _curentlyWorker.GetRandomWalker().Move();
             _curentlyWorker = null;
-            _farmComponent.IncreaseForm();
-            MoveBuilder();
-            _AIConnector.MoveToClosest();
             Debug.Log("Wall built!");
         }
         else

@@ -105,34 +105,31 @@ public class Builder : IWork, IKDTree
     {
         return; //Will not move to position never;
     }
-    public void Move(Vector3 position, Action action)
+    public bool Move(Vector3 position, Action action)
     {
-            InWork = true;
+        if (!InMove)
+        {
             GoingForCoin = true;
             InMove = true;
-            _AIComponent.GeNavMeshAgent().destination = position;
             _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
+            _AIComponent.GeNavMeshAgent().destination = position;
+            return true;
+        }
+        return false;
     }
     private IEnumerator Waiter(Action action)
     {
         var agent = _AIComponent.GeNavMeshAgent();
 
-        while (agent.velocity == Vector3.zero)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
-        while (agent.velocity != Vector3.zero && _AIComponent.GeNavMeshAgent().remainingDistance > _AIComponent.GeNavMeshAgent().stoppingDistance)
+        while (!agent.hasPath && (agent.remainingDistance > agent.stoppingDistance || agent.velocity != Vector3.zero))
         {
             yield return null;
         }
 
         action?.Invoke();
-        
+
         GoingForCoin = false;
-        InWork = true;
         InMove = false;
-        _RandomWalker.Move();
     }
 
     private IEnumerator Waiter()
