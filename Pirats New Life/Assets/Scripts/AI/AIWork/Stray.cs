@@ -97,9 +97,9 @@ namespace GameInit.AI
                 _coinsCount = 1;
             }
         }
-        public void Move(Vector3 position, Action action, ItemsType type)
+        public bool Move(Vector3 position, Action action, ItemsType type)
         {
-            return; //Will not move to position never;
+            return false; //Will not move to position never;
         }
         public bool Move(Vector3 position, Action action)
         {

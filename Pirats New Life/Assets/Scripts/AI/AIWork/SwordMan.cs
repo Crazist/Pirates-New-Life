@@ -102,10 +102,9 @@ public class SwordMan :  IWork, IKDTree
             _coinsCount = 1;
         }
     }
-    public void Move(Vector3 position, Action action, ItemsType type)
+    public bool Move(Vector3 position, Action action, ItemsType type)
     {
-        InMove = false;
-        _AIComponent.GeNavMeshAgent().destination = position;
+        return false;
     }
     public bool Move(Vector3 position, Action action)
     {

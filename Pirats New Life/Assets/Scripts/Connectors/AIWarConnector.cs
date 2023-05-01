@@ -103,7 +103,7 @@ namespace GameInit.Connector
                         target.z = PointsInWorld[index[0]].GetPositionVector2().y;
                         target.y = _heightPosition;
 
-                        SwordManList[i].Move(target, null, ItemsType.None);
+                        SwordManList[i].Move(target, null);
                     }
                 }
                 

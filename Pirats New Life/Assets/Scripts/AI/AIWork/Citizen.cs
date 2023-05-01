@@ -103,19 +103,21 @@ namespace GameInit.AI
                 _coinsCount = 1;
             }
         }
-        public void Move(Vector3 position, Action action, ItemsType type)
+        public bool Move(Vector3 position, Action action, ItemsType type)
         {
             if (InMove == false)
             {
+                InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
                 _AIComponent.GeNavMeshAgent().destination = position;
+                return true;
             }
+            return false;
         }
         public bool Move(Vector3 position, Action action)
         {
             if (!InMove)
             {
-                GoingForCoin = true;
                 InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
@@ -125,6 +127,7 @@ namespace GameInit.AI
         }
         private IEnumerator Waiter(Action action)
         {
+            GoingForCoin = true;
             yield return new WaitForEndOfFrame();
 
             var agent = _AIComponent.GeNavMeshAgent();
@@ -139,10 +142,10 @@ namespace GameInit.AI
                 yield return null;
             }
 
+            InMove = false;
             action?.Invoke();
 
             GoingForCoin = false;
-            InMove = false;
         }
         private IEnumerator Waiter(Action action, ItemsType type)
         {

@@ -101,9 +101,9 @@ public class Builder : IWork, IKDTree
             _coinsCount = 1;
         }
     }
-    public void Move(Vector3 position, Action action, ItemsType type)
+    public bool Move(Vector3 position, Action action, ItemsType type)
     {
-        return; //Will not move to position never;
+        return false; ; //Will not move to position never;
     }
     public bool Move(Vector3 position, Action action)
     {
@@ -121,15 +121,20 @@ public class Builder : IWork, IKDTree
     {
         var agent = _AIComponent.GeNavMeshAgent();
 
-        while (!agent.hasPath && (agent.remainingDistance > agent.stoppingDistance || agent.velocity != Vector3.zero))
+        while (agent.remainingDistance == 0 || !agent.hasPath)
         {
             yield return null;
         }
 
+        while (agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        InMove = false;
         action?.Invoke();
 
         GoingForCoin = false;
-        InMove = false;
     }
 
     private IEnumerator Waiter()

@@ -18,7 +18,8 @@ namespace GameInit.TraderLogic
         private int _curDay = 0;
         private bool _atHome = true;
         private float _money = 0;
-        
+        private bool _canDrop = true;
+
         private const bool canPickUp = false;
         public Trader(GameCyrcle cyrcle, CoinDropAnimation coinDropAnimation, Pools poolCoin)
         {
@@ -38,7 +39,7 @@ namespace GameInit.TraderLogic
         }
         private void DropCoins()
         {
-            if(_money >= _TraderComponent.GoldCount)
+            if(_canDrop && _money >= _TraderComponent.GoldCount)
             {
                 _coinDropAnimation.RandomCoinJump(_TraderComponent.transform.position, (int)_money, _TraderComponent.transform.position, _coinPool, canPickUp);
                 _money = 0;
@@ -47,7 +48,8 @@ namespace GameInit.TraderLogic
         }
         private void MoveBack()
         {
-            _TraderComponent.Agent.SetDestination(_TraderComponent.EndPoint.position);
+            _canDrop = false;
+            _TraderComponent.Agent.SetDestination(_TraderComponent.StartPoint.position);
             _money = _TraderComponent.GoldCount;
             _money = (int)_money * _TraderComponent.Modificator;
         }
@@ -67,6 +69,10 @@ namespace GameInit.TraderLogic
                     if(_money == 0)
                     {
                         _TraderComponent.CanPick(true);
+                    }
+                    else
+                    {
+                        _canDrop = true;
                     }
                     _atHome = false;
                     _TraderComponent.Agent.SetDestination(_TraderComponent.EndPoint.position);

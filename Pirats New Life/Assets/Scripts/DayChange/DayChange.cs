@@ -19,7 +19,7 @@ public class DayChange : MonoBehaviour
 
     private float cycleProgress = 5.3f / 24f;
 
-    private const int StartDay = 9;
+    private const int StartDay = 5;
 
     private const int StartNight = 22;
     private void OnValidate()

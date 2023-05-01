@@ -106,7 +106,13 @@ namespace GameInit.Connector
 
             if(_stray != null)
             {
-                _stray.Move(targetPosition, callback, type);
+                if (!_stray.Move(targetPosition, callback, type))
+                {
+                    lateMove.Add(() =>
+                    {
+                        MoveToClosestAICitizen(targetPosition, callback, type);
+                    });
+                }
             }
             else
             {
@@ -142,7 +148,7 @@ namespace GameInit.Connector
                building.SetBuilder(_stray);
                if(!_stray.Move(targetPosition, callback))
                 {
-                    building.SetBuilder(null);
+                    building.SetBuilder(_stray);
                     lateMove.Add(() =>
                     {
                         MoveToClosestAIBuilder(targetPosition, callback, building);
@@ -187,7 +193,6 @@ namespace GameInit.Connector
             {
                 lateMove.Add(() =>
                 {
-                    building.SetBuilder(_farmer);
                     MoveToClosestAIBuilder(targetPosition, callback, building);
                 });
             }
@@ -220,7 +225,7 @@ namespace GameInit.Connector
             {
                 foreach (var stray in listOfWorks)
                 {
-                    if (!stray.InMove || stray.GoingForCoin)
+                    if (!stray.InMove || stray.GoingForCoin || !stray.InWork)
                     {
 
                         Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
@@ -244,7 +249,7 @@ namespace GameInit.Connector
             }
                 if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
                 {
-                    _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); });
+                    _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); MoveToClosest(); });
                     _stray = null;
                 }
         }

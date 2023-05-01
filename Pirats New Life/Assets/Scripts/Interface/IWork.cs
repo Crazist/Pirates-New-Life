@@ -10,7 +10,7 @@ namespace GameInit.AI
         public bool InWork { get; set; }
         public bool GoingForCoin { get; set; }
         public Transform getTransform();
-        public void Move(Vector3 position, Action action, ItemsType type);
+        public bool Move(Vector3 position, Action action, ItemsType type);
         public bool Move(Vector3 position, Action action);
         public ItemsType GetItemType();
         public AIComponent GetAiComponent();

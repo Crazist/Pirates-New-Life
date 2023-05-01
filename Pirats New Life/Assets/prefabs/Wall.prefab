@@ -612,7 +612,7 @@ MonoBehaviour:
   - {fileID: 7785253575521588283}
   - {fileID: 4223146634569471513}
   countOfGold: 1
-  maxLevel: 4
+  maxLevel: 3
   type: 1
   _currentlyBuilding: 0
   _momentalBuild: 0

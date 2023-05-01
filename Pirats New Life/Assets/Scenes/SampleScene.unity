@@ -254,7 +254,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1678788303248505315, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: countOfGold
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2354609798707854611, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: m_RootOrder
@@ -318,53 +318,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
---- !u!1 &167526921 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 375009508745046952, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 167526920}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &167526922 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7961959874866049620, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 167526920}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &167526923 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7118279840615031383, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
   m_PrefabInstance: {fileID: 167526920}
   m_PrefabAsset: {fileID: 0}
---- !u!208 &167526924
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 167526921}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
---- !u!208 &167526925
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 167526922}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!208 &167526926
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -469,27 +427,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 480ea1d213604b04f822227167da95e6, type: 3}
---- !u!1 &218484976 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 375009508745046952, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 6070414566466309797}
-  m_PrefabAsset: {fileID: 0}
---- !u!208 &218484981
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 218484976}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &362390095 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6654342253080508037, guid: 81169b230154b42af863f9d711b5c566, type: 3}
@@ -848,7 +785,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 634944641240757438, guid: 5d1b0f53facb86747a21079050aff993, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -18.773552
+      value: -19
       objectReference: {fileID: 0}
     - target: {fileID: 634944641240757438, guid: 5d1b0f53facb86747a21079050aff993, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1137,27 +1074,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5262220701919964406, guid: 81169b230154b42af863f9d711b5c566, type: 3}
   m_PrefabInstance: {fileID: 7464527481600765633}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1095961449 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7961959874866049620, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 6070414566466309797}
-  m_PrefabAsset: {fileID: 0}
---- !u!208 &1095961454
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1095961449}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1001 &1099715098
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1409,7 +1325,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1678788303248505315, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: countOfGold
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2354609798707854611, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: m_RootOrder
@@ -1473,53 +1389,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
---- !u!1 &1713598724 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 375009508745046952, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 1713598723}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1713598725 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7961959874866049620, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 1713598723}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1713598726 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7118279840615031383, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
   m_PrefabInstance: {fileID: 1713598723}
   m_PrefabAsset: {fileID: 0}
---- !u!208 &1713598727
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1713598724}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
---- !u!208 &1713598728
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1713598725}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!208 &1713598729
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -1554,7 +1428,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1678788303248505315, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: countOfGold
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2354609798707854611, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: m_RootOrder
@@ -1618,53 +1492,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
---- !u!1 &1886623219 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 375009508745046952, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 1886623218}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1886623220 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7961959874866049620, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
-  m_PrefabInstance: {fileID: 1886623218}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1886623221 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7118279840615031383, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
   m_PrefabInstance: {fileID: 1886623218}
   m_PrefabAsset: {fileID: 0}
---- !u!208 &1886623222
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1886623219}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
---- !u!208 &1886623223
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1886623220}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!208 &1886623224
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -2229,7 +2061,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3240706165451200190, guid: 13d59d36dd3cef5499d0e78671348d96, type: 3}
       propertyPath: _dayToWait
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3240706165451200190, guid: 13d59d36dd3cef5499d0e78671348d96, type: 3}
       propertyPath: _goldCount
@@ -2298,7 +2130,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2796394769829467185, guid: 016e97d97aa3242d18ef65538cbe6007, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6
+      value: -19
       objectReference: {fileID: 0}
     - target: {fileID: 2796394769829467185, guid: 016e97d97aa3242d18ef65538cbe6007, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2558,7 +2390,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4401177362346168053, guid: b13e86b3342d9f84d890b70070c3f7c6, type: 3}
       propertyPath: cycleDuration
-      value: 100
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 5413548742667659345, guid: b13e86b3342d9f84d890b70070c3f7c6, type: 3}
       propertyPath: m_Name
@@ -2751,11 +2583,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1678788303248505315, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: maxLevel
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1678788303248505315, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: countOfGold
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2354609798707854611, guid: 85574ede5dfb876408e37b4002fa4a11, type: 3}
       propertyPath: m_RootOrder

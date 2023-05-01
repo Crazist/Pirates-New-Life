@@ -82,7 +82,6 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Remove(work);
             _AIWarConnector.PointsInWorld.Add(builder);
             _AIConnector.MoveToClosest();
-            _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
             return builder;
         }
@@ -92,7 +91,6 @@ namespace GameInit.AI
             _AIConnector.FarmerList.Add(farmer);
             _AIConnector.CitizenList.Remove(work);
             _AIWarConnector.PointsInWorld.Add(farmer);
-            _AIConnector.MoveToClosest();
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
             return farmer;
@@ -105,7 +103,6 @@ namespace GameInit.AI
             _AIConnector.SwordManList.Add(swordMan);
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
-            _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
         }
         private void CreateArcher(IWork work)
@@ -115,7 +112,6 @@ namespace GameInit.AI
             _AIWarConnector.PointsInWorld.Add(archer);
             _AIConnector.ArcherList.Add(archer);
             _AIConnector.CitizenList.Remove(work);
-            _AIConnector.MoveToClosest();
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
         }

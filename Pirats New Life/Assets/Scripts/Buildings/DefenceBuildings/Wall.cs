@@ -68,13 +68,12 @@ public class Wall : IBuilding, IDayChange, IKDTree
     }
     public void Build()
     {
-        if (!_wallComponent.ChekMaxLvl())
-        {
+        progress = 0;
             inBuildProgress = true;
             _wallComponent.SetInBuild(inBuildProgress);
             MoveBuilder();
             _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
-        }
+        
     }
 
     public bool GetBuildingState()
@@ -158,7 +157,9 @@ public class Wall : IBuilding, IDayChange, IKDTree
                     }
                 }
             }
-            // wall is built
+            if (_wallComponent.ChekMaxLvl())
+                _wallComponent.SetCanProduce(false);
+                // wall is built
             HP = HP + _hpPerLvl;
             _curentlyWorker.InWork = false;
             isBuilded = true;
