@@ -65,7 +65,8 @@ public class Farm : IBuilding, IDayChange, IUpdate
     }
     public void SetBuilder(IWork worker)
     {
-        worker.InWork = true;
+        if (worker != null)
+            worker.InWork = true;
         _curentlyWorker = worker;
     }
     public void Build()
@@ -119,7 +120,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
 
         if (_isDay && inBuildProgress)
         {
-            _curentlyWorker = _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
+            _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
             if (_curentlyWorker != null)
                 _curentlyWorker.InWork = true;
         }
@@ -209,6 +210,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             }
         }
 
+        _AIConnector.MoveToClosest();
         _curCountOfWorkers = 0;
         _isWorking = false;
     }

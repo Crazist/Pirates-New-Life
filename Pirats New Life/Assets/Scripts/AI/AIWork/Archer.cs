@@ -21,8 +21,8 @@ public class Archer : IWork, IKDTree
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
     private bool _canDamage = true;
-    private int _damage = 1;
-    private float _delayForAttack = 3f;
+    private int _damage = 0;
+    private float _delayForAttack = 6f;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;
@@ -32,6 +32,7 @@ public class Archer : IWork, IKDTree
     private const bool _isEnemy = false;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
+    public EntityType Type { get; } = EntityType.Ally;
     public bool GoingForCoin { get; set; } = false;
     public int HP { get; set; } = 1;
 
@@ -101,15 +102,50 @@ public class Archer : IWork, IKDTree
             _coinsCount = 1;
         }
     }
-    public bool Move(Vector3 position, Action action, ItemsType type)
+    public bool Move(Vector3 position, Func<bool> action, ItemsType type)
     {
-        return false; ; //Will not move to position never;
+        if (InMove == false)
+        {
+            InMove = true;
+            _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
+            _AIComponent.GeNavMeshAgent().destination = position;
+            return true;
+        }
+        return false;
+    }
+    private IEnumerator Waiter(Func<bool> action, ItemsType type)
+    {
+        GoingForCoin = true;
+
+        yield return new WaitForEndOfFrame();
+
+        var agent = _AIComponent.GeNavMeshAgent();
+
+        while (agent.remainingDistance == 0 || !agent.hasPath)
+        {
+            yield return null;
+        }
+
+        while (agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        if (type != ItemsType.None)
+            _type = type;
+        InMove = false;
+
+        bool result = (bool)action?.Invoke();
+
+        GoingForCoin = false;
+
+        if (result) // если result не null, то используем его, иначе значение по умолчанию - false
+            CollectGold();
     }
     public bool Move(Vector3 position, Action action)
     {
         if (!InMove)
         {
-            GoingForCoin = true;
             InMove = true;
             _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
             _AIComponent.GeNavMeshAgent().destination = position;
@@ -135,7 +171,6 @@ public class Archer : IWork, IKDTree
 
         action?.Invoke();
 
-        GoingForCoin = false;
         InMove = false;
     }
     private IEnumerator Waiter()

@@ -97,21 +97,57 @@ namespace GameInit.AI
                 _coinsCount = 1;
             }
         }
-        public bool Move(Vector3 position, Action action, ItemsType type)
+        public bool Move(Vector3 position, Func<bool> action, ItemsType type)
         {
-            return false; //Will not move to position never;
+            if (InMove == false)
+            {
+                GoingForCoin = true;
+                InMove = true;
+                _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
+                _AIComponent.GeNavMeshAgent().destination = position;
+                return true;
+            }
+            return false;
         }
         public bool Move(Vector3 position, Action action)
         {
             if (!InMove)
             {
-                GoingForCoin = true;
                 InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
                 _AIComponent.GeNavMeshAgent().destination = position;
                 return true;
             }
             return false;
+        }
+        private IEnumerator Waiter(Func<bool> action, ItemsType type)
+        {
+            GoingForCoin = true;
+
+            yield return new WaitForEndOfFrame();
+
+            var agent = _AIComponent.GeNavMeshAgent();
+
+            while (agent.remainingDistance == 0 || !agent.hasPath)
+            {
+                yield return null;
+            }
+
+            while (agent.remainingDistance > agent.stoppingDistance)
+            {
+                yield return null;
+            }
+
+            if (type != ItemsType.None)
+                _type = type;
+            InMove = false;
+
+            bool result = (bool)action?.Invoke();
+
+            GoingForCoin = false;
+
+            if (result) // если result не null, то используем его, иначе значение по умолчанию - false
+                CollectGold();
         }
         private IEnumerator Waiter(Action action)
         {
@@ -135,6 +171,33 @@ namespace GameInit.AI
 
             GoingForCoin = false;
             InMove = false;
+        }
+        private IEnumerator Waiter(Func<Coin> action)
+        {
+            yield return new WaitForEndOfFrame();
+
+            var agent = _AIComponent.GeNavMeshAgent();
+
+            while (agent.remainingDistance == 0 || !agent.hasPath)
+            {
+                yield return null;
+            }
+
+            while (agent.remainingDistance > agent.stoppingDistance)
+            {
+                yield return null;
+            }
+
+            action?.Invoke();
+
+            InMove = false;
+            Coin result = action?.Invoke();
+
+            GoingForCoin = false;
+
+            if (result != null && result.gameObject.activeSelf) // если result не null, то используем его, иначе значение по умолчанию - false
+                CollectGold();
+            result.Hide();
         }
 
         private IEnumerator Waiter()

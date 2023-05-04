@@ -12,9 +12,9 @@ public class HeroComponent : MonoBehaviour
 
     public float maxStamina = 100f;
     public float staminaDepletionRate = 15f;
-    public float staminaRecoveryRate = 5f;
+    public float staminaRecoveryRate = 6f;
     public float speed = 3.5f;
-    public float sprintSpeed = 5f;
+    public float sprintSpeed = 7f;
     private float currentStamina;
     private bool isSprinting;
 

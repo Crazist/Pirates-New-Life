@@ -7,6 +7,7 @@ using GameInit.Pool;
 using GameInit.Animation;
 using System.Linq;
 using GameInit.RandomWalk;
+using GameInit.Connector;
 
 namespace GameInit.AI
 {
@@ -23,7 +24,11 @@ namespace GameInit.AI
         private HeroComponent _heroComponent;
         private bool _waitCoins = false;
         private RandomWalker _RandomWalker;
-        
+        private Func<bool> _interruptedAction;
+        private ItemsType _item;
+        private AIConnector _aIConnector;
+        private Vector3 _lastPosition = Vector3.zero;
+
         private const float _minimalDistanceToHero = 1f;
         private const float _coefDistance = 0.5f;
         private const bool canPickUp = true;
@@ -34,9 +39,11 @@ namespace GameInit.AI
         public bool InMove { get; set; } = false;
         public bool InWork { get; set; } = false;
         public bool GoingForCoin { get; set; } = false;
+        public EntityType Type { get; } = EntityType.Ally;
         public int HP { get; set; } = 1;
-        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
+        public Citizen(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition, AIConnector _connector)
         {
+            _aIConnector = _connector;
             _heroComponent = heroComponent;
             _coinDropAnimation = coinDropAnimation;
             _pool = pool;
@@ -45,6 +52,7 @@ namespace GameInit.AI
 
             _RandomWalker = randomWalker;
             _RandomWalker.Init(_AIComponent.GeNavMeshAgent(), mainPosition, this, radiusRandomWalk);
+            _RandomWalker.Move();
             CollectGold();
             SetStrayModel();
         }
@@ -103,10 +111,13 @@ namespace GameInit.AI
                 _coinsCount = 1;
             }
         }
-        public bool Move(Vector3 position, Action action, ItemsType type)
+        public bool Move(Vector3 position, Func<bool> action, ItemsType type)
         {
             if (InMove == false)
             {
+                _interruptedAction = action;
+                _item = type;
+                _lastPosition = position;
                 InMove = true;
                 _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
                 _AIComponent.GeNavMeshAgent().destination = position;
@@ -147,8 +158,10 @@ namespace GameInit.AI
 
             GoingForCoin = false;
         }
-        private IEnumerator Waiter(Action action, ItemsType type)
+        private IEnumerator Waiter(Func<bool> action, ItemsType type)
         {
+            GoingForCoin = true;
+
             yield return new WaitForEndOfFrame();
 
             var agent = _AIComponent.GeNavMeshAgent();
@@ -163,9 +176,24 @@ namespace GameInit.AI
                 yield return null;
             }
 
-            action?.Invoke();
-            _type = type;
+            
             InMove = false;
+
+            bool result = (bool)action?.Invoke();
+
+            GoingForCoin = false;
+
+            if (result) // если result не null, то используем его, иначе значение по умолчанию - false
+                CollectGold();
+
+            if (type != ItemsType.None)
+            {
+                _type = type;
+                _RandomWalker.Move();
+            }
+            _item = ItemsType.None;
+            _interruptedAction = null;
+            _lastPosition = Vector3.zero;
         }
         private IEnumerator Waiter()
         {
@@ -179,6 +207,13 @@ namespace GameInit.AI
         }
         public void RemoveAllEveants()
         {
+            if (_item != ItemsType.None && _interruptedAction != null && _lastPosition != Vector3.zero)
+            {
+                _aIConnector.MoveToClosestAICitizen(_lastPosition, _interruptedAction, _item);
+                _item = ItemsType.None;
+                _interruptedAction = null;
+                _lastPosition = Vector3.zero;
+            }
             _AIComponent.GetMonoBehaviour().StopAllCoroutines();
         }
 

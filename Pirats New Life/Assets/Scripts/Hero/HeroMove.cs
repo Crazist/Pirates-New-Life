@@ -24,6 +24,7 @@ namespace GameInit.Hero
         private const int _damage = 0;
         //  private ParticleSystem _particleSystemMoveTo;
         public int HP { get; set; } = 1;
+        public EntityType Type { get; } = EntityType.Hero;
 
         public HeroMove(HeroComponent heroComponent, UIBuilder UIBuilder, CoinDropAnimation CoinDropAnimation, ResourceManager ResourceManager, Pools coinPool)
         {

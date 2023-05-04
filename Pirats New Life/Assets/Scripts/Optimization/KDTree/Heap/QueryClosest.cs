@@ -6,9 +6,14 @@ namespace GameInit.Optimization.KDTree
 {
     public partial class KDQuery
     {
-        private const float _earthY = 0.46f;
-        public void ClosestPoint(KDTree tree, IKDTree queryPosition, List<int> resultIndices, List<float> resultDistances = null)
+        private const float _offsetToAttackEnemy = 2.2f;
+        private const float _spellOffset = 1.2f;
+        private const float _heightPosition = 0.46f;
+        private const float _minDistanceForEndSpell = 40;
+
+        public void EnemyRunForAttack(KDTree tree, IEnemy _queryPosition, float minDist = 0)
         {
+            IKDTree queryPosition = (IKDTree)_queryPosition;
 
             Reset();
 
@@ -20,7 +25,11 @@ namespace GameInit.Optimization.KDTree
             {
                 return;
             }
-
+            float _minDist = 0;
+            if (minDist != 0)
+            {
+                _minDist = minDist;
+            }
             int smallestIndex = -1;
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
@@ -104,11 +113,11 @@ namespace GameInit.Optimization.KDTree
                     for (int i = node.start; i < node.end; i++)
                     {
                         int index = permutation[i];
-                        var attacker = points[index];
+                        var defender = points[index];
 
-                        if (attacker.CheckIfEnemy() != _isEnemy && attacker.HP > 0)
+                        if (defender.CheckIfEnemy() != _isEnemy && defender.HP > 0 && queryPosition.CheckIfCanDamage() && queryPosition.HP > 0)
                         {
-                            sqrDist = Vector2.SqrMagnitude(attacker.GetPositionVector2() - queryPosition.GetPositionVector2());
+                            sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 
                             if (sqrDist <= SSR)
                             {
@@ -118,18 +127,87 @@ namespace GameInit.Optimization.KDTree
                         }
                     }
 
+                    if (smallestIndex != -1)
+                    {
+
+                        var _defender = points[smallestIndex];
+
+                        IEnemy _enemy = (IEnemy)queryPosition;
+                        _minDist = _enemy.DistanceForStartSpell;
+
+                        if (_minDist != 0 && (SSR >= _minDist || SSR <= _minDistanceForEndSpell) && _defender.Type != EntityType.Wall && !_enemy.RefreshSkill)
+                        {
+                            Vector3 target = new Vector3();
+
+                            target.x = _defender.GetPositionVector2().x;
+                            target.z = _defender.GetPositionVector2().y;
+                            target.y = _heightPosition;
+
+                            _enemy.StopSpell();
+                            _enemy.Move(target);
+                        }
+                        else if (_minDist != 0 && SSR >= _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
+                        {
+                            Vector3 target = new Vector3();
+
+                            if (_defender.GetPositionVector2().x > 0)
+                            {
+                                target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
+                                target.z = _defender.GetPositionVector2().y;
+                            }
+                            else if (_defender.GetPositionVector2().x < 0)
+                            {
+                                target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
+                                target.z = _defender.GetPositionVector2().y;
+                            }
+
+                            target.y = _heightPosition;
+
+                            _enemy.StopSpell();
+                            _enemy.Move(target);
+                        }
+                        else if (_minDist != 0 && SSR < _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
+                        {
+                            Vector3 target = new Vector3();
+
+                            if (_defender.GetPositionVector2().x > 0)
+                            {
+                                target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
+                                target.z = _defender.GetPositionVector2().y;
+                            }
+                            else if (_defender.GetPositionVector2().x < 0)
+                            {
+                                target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
+                                target.z = _defender.GetPositionVector2().y;
+                            }
+
+                            target.y = _heightPosition;
+
+                            _enemy.UseSpell(target, true);
+                        }
+                        else if (!_enemy.RefreshSkill)
+                        {
+                            Vector3 target = new Vector3();
+
+                            if (_defender.GetPositionVector2().x > 0)
+                            {
+                                target.x = _defender.GetPositionVector2().x + _spellOffset;
+                            }
+                            else
+                            {
+                                target.x = _defender.GetPositionVector2().x - _spellOffset;
+                            }
+
+                            target.z = _defender.GetPositionVector2().y;
+                            target.y = _heightPosition;
+
+                            _enemy.UseSpell(target, false);
+                        }
+                    }
                 }
             }
-
-            if(smallestIndex != -1)
-            resultIndices.Add(smallestIndex);
-
-            if (resultDistances != null)
-            {
-                resultDistances.Add(SSR);
-            }
-
         }
+
         public void DamageClosest(KDTree tree, IKDTree queryPosition, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList)
         {
 
@@ -144,10 +222,10 @@ namespace GameInit.Optimization.KDTree
                 return;
             }
 
-            int smallestIndex = 0;
+            int smallestIndex = -1;
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
-            float _minDistForDamage = 1f;
+            float _minDistForDamage = 6f;
             float _minDistForDamageArrow = 2f;
 
             var rootNode = tree.rootNode;
@@ -222,55 +300,56 @@ namespace GameInit.Optimization.KDTree
                 }
                 else
                 {
-
                     float sqrDist;
                     // LEAF
                     for (int i = node.start; i < node.end; i++)
                     {
                         int index = permutation[i];
-                        var attacker = points[index];
+                        var defender = points[index];
 
-                        if(queryPosition.HP == -1)
+                        if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.HP > 0 || queryPosition.Type == EntityType.Arrow)
                         {
-                            if (attacker.CheckIfEnemy() != _isEnemy && attacker.HP > 0)
-                            {
-                                sqrDist = Vector2.SqrMagnitude(attacker.GetPositionVector2() - queryPosition.GetPositionVector2());
+                            sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 
-                                if (sqrDist <= _minDistForDamageArrow)
+                            float _distanceAttack = queryPosition.Type == EntityType.Arrow ? _minDistForDamageArrow : _minDistForDamage;
+
+                            if (sqrDist <= SSR && sqrDist <= _distanceAttack)
+                            {
+                                SSR = sqrDist;
+                                smallestIndex = index;
+                            }
+                        }
+                    }
+
+                    if (smallestIndex != -1)
+                    {
+                        var defender = points[smallestIndex];
+                        
+                        if (queryPosition.HP == -1)
+                        {
+                            defender.GetDamage(queryPosition.CountOFDamage());
+                            if (defender.HP <= 0)
+                            {
+                                PointsInWorld.Remove(defender);
+                                if (defender.CheckIfEnemy())
                                 {
-                                    attacker.GetDamage(queryPosition.CountOFDamage());
-                                    if (attacker.HP <= 0)
-                                    {
-                                        PointsInWorld.Remove(attacker);
-                                        if (attacker.CheckIfEnemy())
-                                        {
-                                            EnemyList.Remove((IEnemy)attacker);
-                                        }
-                                        tree.Build(PointsInWorld, 3);
-                                    }
+                                    EnemyList.Remove((IEnemy)defender);
                                 }
+                                tree.Build(PointsInWorld, 3);
                             }
                         }
                         else
                         {
-                            if (attacker.CheckIfEnemy() != _isEnemy && attacker.CheckIfCanDamage() && attacker.HP > 0 && queryPosition.HP > 0)
+                            queryPosition.Attack();
+                            defender.GetDamage(queryPosition.CountOFDamage());
+                            if (defender.HP <= 0)
                             {
-                                sqrDist = Vector2.SqrMagnitude(attacker.GetPositionVector2() - queryPosition.GetPositionVector2());
-
-                                if (sqrDist <= _minDistForDamage)
+                                PointsInWorld.Remove(defender);
+                                if (defender.CheckIfEnemy())
                                 {
-                                    attacker.Attack();
-                                    queryPosition.GetDamage(attacker.CountOFDamage());
-                                    if (queryPosition.HP <= 0)
-                                    {
-                                        PointsInWorld.Remove(queryPosition);
-                                        if (queryPosition.CheckIfEnemy())
-                                        {
-                                            EnemyList.Remove((IEnemy)queryPosition);
-                                        }
-                                        tree.Build(PointsInWorld, 3);
-                                    }
+                                    EnemyList.Remove((IEnemy)defender);
                                 }
+                                tree.Build(PointsInWorld, 3);
                             }
                         }
                     }
@@ -291,7 +370,7 @@ namespace GameInit.Optimization.KDTree
                 return;
             }
 
-            int smallestIndex = 0;
+            int smallestIndex = -1;
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
             float _minDistForDamage = 400f;
@@ -375,34 +454,41 @@ namespace GameInit.Optimization.KDTree
                     for (int i = node.start; i < node.end; i++)
                     {
                         int index = permutation[i];
-                        var attacker = points[index];
+                        var defender = points[index];
 
-                        if (attacker.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && attacker.HP > 0 && queryPosition.HP > 0)
+                        if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.HP > 0)
                         {
-                            sqrDist = Vector2.SqrMagnitude(attacker.GetPositionVector2() - queryPosition.GetPositionVector2());
+                            sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 
-                            if (sqrDist <= _minDistForDamage && sqrDist > _minCloseDistForDamage)
+                            if (sqrDist <= SSR && sqrDist <= _minDistForDamage && sqrDist > _minCloseDistForDamage)
                             {
-                                queryPosition.Attack();
-                                
-                                Vector3 endPosition = new Vector3(attacker.GetPositionVector2().x, _earthY, attacker.GetPositionVector2().y);
-
-                                Vector3 startPosition = new Vector3(queryPosition.GetPositionVector2().x, _earthY, queryPosition.GetPositionVector2().y);
-
-                                var arrow = _arrowPool.GetFreeElements(startPosition);
-
-                                arrow.Shoot(queryPosition, endPosition, tree, PointsInWorld, EnemyList, _treeQuery);
-
-                                if (queryPosition.HP <= 0)
-                                {
-                                    PointsInWorld.Remove(queryPosition);
-                                    if (queryPosition.CheckIfEnemy())
-                                    {
-                                        EnemyList.Remove((IEnemy)queryPosition);
-                                    }
-                                    tree.Build(PointsInWorld, 3);
-                                }
+                                SSR = sqrDist;
+                                smallestIndex = index;
                             }
+                        }
+                    }
+
+                    if (smallestIndex != -1)
+                    {
+                        var defender = points[smallestIndex];
+                        queryPosition.Attack();
+
+                        Vector3 endPosition = new Vector3(defender.GetPositionVector2().x, _heightPosition, defender.GetPositionVector2().y);
+
+                        Vector3 startPosition = new Vector3(queryPosition.GetPositionVector2().x, _heightPosition, queryPosition.GetPositionVector2().y);
+
+                        var arrow = _arrowPool.GetFreeElements(startPosition);
+
+                        arrow.Shoot(queryPosition, endPosition, tree, PointsInWorld, EnemyList, _treeQuery);
+
+                        if (queryPosition.HP <= 0)
+                        {
+                            PointsInWorld.Remove(queryPosition);
+                            if (queryPosition.CheckIfEnemy())
+                            {
+                                EnemyList.Remove((IEnemy)queryPosition);
+                            }
+                            tree.Build(PointsInWorld, 3);
                         }
                     }
                 }

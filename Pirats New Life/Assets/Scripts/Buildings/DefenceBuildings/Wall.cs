@@ -34,6 +34,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private Coroutine _curCoroutineWaitMove;
     public int CirclePosition { get; set; }
     public bool IsRight { get; set; }
+    public EntityType Type { get; } = EntityType.Wall;
 
     private const bool canPickUp = false;
     private const int _firstForm = 1;
@@ -63,6 +64,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
     public void SetBuilder(IWork worker)
     {
+        if(worker != null)
         worker.InWork = true;
         _curentlyWorker = worker;
     }
@@ -110,7 +112,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
 
         if (_isDay && inBuildProgress)
         {
-            _curentlyWorker = _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
+            _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
             if(_curentlyWorker != null)
             _curentlyWorker.InWork = true;
         }

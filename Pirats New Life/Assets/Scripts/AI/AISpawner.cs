@@ -23,7 +23,7 @@ namespace GameInit.AI
         private GameCyrcle _cyrcle;
         private EnemyPool _EnemyPool;
         private float heightPosition = 0.46f;
-        private int maxEnemies = 100; // максимальное количество врагов
+        private int maxEnemies = 50; // максимальное количество врагов
         private int currentEnemies = 0; // изначальное количество врагов
         private int multiplier = 1; // количество умножений на 2\
         private int _countOfDays = 0;
@@ -150,9 +150,14 @@ namespace GameInit.AI
         private void Spawnenemy()
         {
             // Проверяем, можем ли мы создать еще врага
-            if (currentEnemies < maxEnemies && currentEnemies + multiplier <= maxEnemies)
+            if (_AIWarConnector.EnemyList.Count < maxEnemies && _AIWarConnector.EnemyList.Count + multiplier <= maxEnemies)
             {
                 currentEnemies = currentEnemies + multiplier; // умножаем количество врагов на значение valueToMultiply
+                
+                if(multiplier > maxEnemies)
+                {
+                    multiplier = maxEnemies;
+                }
             }
 
             foreach (var camp in _EnemySpawnComponents)

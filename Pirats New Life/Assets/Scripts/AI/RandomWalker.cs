@@ -30,6 +30,7 @@ namespace GameInit.RandomWalk
         public void ChangeOnlyPositionAndStartMove(Vector3 pos, float radius)
         {
             _spawnPoint = pos;
+            _radius = radius;
             Move();
         }
         public void Move()

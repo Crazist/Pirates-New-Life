@@ -66,7 +66,7 @@ namespace GameInit.AI
 
         private IWork CreateCitizen(IWork work)
         {
-            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position, _AIConnector);
             _AIWarConnector.PointsInWorld.Add(citizen);
             _AIWarConnector.UpdateTree();
             _AIConnector.CitizenList.Add(citizen);
@@ -77,7 +77,7 @@ namespace GameInit.AI
         }
         private IWork CreateBuilder(IWork work)
         {
-            var builder = new Builder(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position);
+            var builder = new Builder(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetTransform().position, _AIConnector);
             _AIConnector.BuilderList.Add(builder);
             _AIConnector.CitizenList.Remove(work);
             _AIWarConnector.PointsInWorld.Add(builder);
@@ -104,6 +104,7 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
+            _AIWarConnector.SetSwordManToNewPosition();
         }
         private void CreateArcher(IWork work)
         {

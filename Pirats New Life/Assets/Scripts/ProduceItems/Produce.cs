@@ -59,6 +59,8 @@ namespace GameInit.Building
                 items.Remove(instance);
                 GameObject.Destroy(instance);
                 _produceComponent.SetCanProduce(CheckCountOfItems());
+                _AIConnector.MoveToClosest();
+                return false;
                 // Add any additional code you want to execute here
             }, _produceComponent.GetItemType());
         }

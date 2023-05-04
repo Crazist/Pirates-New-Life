@@ -14,6 +14,7 @@ namespace GameInit.Projectiles
         private MonoBehaviour _mono;
         private int _damage = 1;
         private ArrowComponent _component;
+        private Coroutine _coroutine;
 
         private const float _earthY = 0.46f;
 
@@ -21,6 +22,7 @@ namespace GameInit.Projectiles
         private int currentPoint = 0;
 
         public int HP { get; set; } = -1;
+        public EntityType Type { get; } = EntityType.Arrow;
 
         public Arrow(ArrowComponent component)
         {
@@ -35,7 +37,8 @@ namespace GameInit.Projectiles
             ProjectileMotionCalculator _projectileMotionCalculator = new ProjectileMotionCalculator();
             path = _projectileMotionCalculator.CalculateParabola(startPosition, endPoint);
 
-            _mono.StartCoroutine(ArrowFly(tree, PointsInWorld, EnemyList,  _KDQuery));
+            if(_coroutine == null)
+            _coroutine = _mono.StartCoroutine(ArrowFly(tree, PointsInWorld, EnemyList,  _KDQuery));
         }
         private IEnumerator ArrowFly(KDTree tree, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, KDQuery _KDQuery)
         {
@@ -60,6 +63,7 @@ namespace GameInit.Projectiles
             tree.Build(PointsInWorld);
 
             _component.GetGameObj().SetActive(false);
+            _coroutine = null;
         }
        
         public ArrowComponent GetGm()

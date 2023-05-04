@@ -20,7 +20,7 @@ public class SwordMan :  IWork, IKDTree
     private bool _waitCoins = false;
     private RandomWalker _RandomWalker;
     private bool _inWork = false;
-    private float _delayForAttack = 0.5f;
+    private float _delayForAttack = 4f;
     private bool _canDamage = true;
     private int _damage = 1;
 
@@ -34,6 +34,7 @@ public class SwordMan :  IWork, IKDTree
     public int HP { get; set; } = 10;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
+    public EntityType Type { get; } = EntityType.Ally;
     public bool GoingForCoin { get; set; } = false;
     
     public SwordMan(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker, Vector3 mainPosition)
@@ -102,15 +103,50 @@ public class SwordMan :  IWork, IKDTree
             _coinsCount = 1;
         }
     }
-    public bool Move(Vector3 position, Action action, ItemsType type)
+    public bool Move(Vector3 position, Func<bool> action, ItemsType type)
     {
+        if (InMove == false)
+        {
+            InMove = true;
+            _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action, type));
+            _AIComponent.GeNavMeshAgent().destination = position;
+            return true;
+        }
         return false;
+    }
+    private IEnumerator Waiter(Func<bool> action, ItemsType type)
+    {
+        GoingForCoin = true;
+
+        yield return new WaitForEndOfFrame();
+
+        var agent = _AIComponent.GeNavMeshAgent();
+
+        while (agent.remainingDistance == 0 || !agent.hasPath)
+        {
+            yield return null;
+        }
+
+        while (agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        if (type != ItemsType.None)
+            _type = type;
+        InMove = false;
+
+        bool result = (bool)action?.Invoke();
+
+        GoingForCoin = false;
+
+        if (result) // если result не null, то используем его, иначе значение по умолчанию - false
+            CollectGold();
     }
     public bool Move(Vector3 position, Action action)
     {
         if (!InMove)
         {
-            GoingForCoin = true;
             InMove = true;
             _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(action));
             _AIComponent.GeNavMeshAgent().destination = position;
@@ -135,7 +171,6 @@ public class SwordMan :  IWork, IKDTree
         }
         action?.Invoke();
 
-        GoingForCoin = false;
         InMove = false;
     }
 
@@ -220,7 +255,8 @@ public class SwordMan :  IWork, IKDTree
 
     public void Attack()
     {
-        _AIComponent.StartCoroutine(AttackDelay());
+        if (_canDamage)
+            _AIComponent.StartCoroutine(AttackDelay());
         //animation
     }
 }

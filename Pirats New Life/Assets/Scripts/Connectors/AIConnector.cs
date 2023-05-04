@@ -19,12 +19,12 @@ namespace GameInit.Connector
         public List<IWork> ArcherList { get; set; }
         public List<IWork> FarmerList { get; set; }
         public List<IWork> SwordManList { get; set; }
+        public List<Action> LateMove { get; set; }
 
         public List<List<IWork>> ListOfLists { get; set; }
 
         private Pools _pool;
         private HeroComponent _heroComponent;
-        private List<Action> lateMove;
         private GameCyrcle _gameCyrcle;
         private List<IWork> stillInMove;
 
@@ -35,7 +35,7 @@ namespace GameInit.Connector
         {
             stillInMove = new List<IWork>();
             ListOfLists = new List<List<IWork>>();
-            lateMove = new List<Action>();
+            LateMove = new List<Action>();
 
             ListOfLists.Add(StrayList = new List<IWork>());
             ListOfLists.Add(CitizenList = new List<IWork>());
@@ -75,15 +75,15 @@ namespace GameInit.Connector
 
         public void MoveToClosest()
         {
-            List<Action> lateMoveCopy = new List<Action>(lateMove);
-            lateMove.Clear();
+            List<Action> lateMoveCopy = new List<Action>(LateMove);
+            LateMove.Clear();
 
             for (int i = 0; i < lateMoveCopy.Count; i++)
             {
                 lateMoveCopy[i].Invoke();
             }
         }
-        public void MoveToClosestAICitizen(Vector3 targetPosition, Action callback, ItemsType type)
+        public void MoveToClosestAICitizen(Vector3 targetPosition, Func<bool> callback, ItemsType type)
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
@@ -108,7 +108,7 @@ namespace GameInit.Connector
             {
                 if (!_stray.Move(targetPosition, callback, type))
                 {
-                    lateMove.Add(() =>
+                    LateMove.Add(() =>
                     {
                         MoveToClosestAICitizen(targetPosition, callback, type);
                     });
@@ -116,13 +116,13 @@ namespace GameInit.Connector
             }
             else
             {
-                lateMove.Add(() =>
+                LateMove.Add(() =>
                 {
                     MoveToClosestAICitizen(targetPosition, callback, type);
                 });
             }
         }
-        public IWork MoveToClosestAIBuilder(Vector3 targetPosition, Action callback, IBuilding building)
+        public void MoveToClosestAIBuilder(Vector3 targetPosition, Action callback, IBuilding building)
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
@@ -145,24 +145,27 @@ namespace GameInit.Connector
 
             if (_stray != null && _gameCyrcle.ChekIfDay())
             {
-               building.SetBuilder(_stray);
                if(!_stray.Move(targetPosition, callback))
                 {
-                    building.SetBuilder(_stray);
-                    lateMove.Add(() =>
+                    building.SetBuilder(null);
+                    LateMove.Add(() =>
                     {
                         MoveToClosestAIBuilder(targetPosition, callback, building);
                     });
                 }
+                else
+                {
+                    building.SetBuilder(_stray);
+                }
             }
             else
             {
-                lateMove.Add(() =>
+                building.SetBuilder(null);
+                LateMove.Add(() =>
                 {
                     MoveToClosestAIBuilder(targetPosition, callback, building);
                 });
             }
-            return _stray;
         }
         public IWork MoveToClosestAIFarmer(Vector3 targetPosition, Action callback, IBuilding building)
         {
@@ -187,16 +190,27 @@ namespace GameInit.Connector
 
             if (_farmer != null && _gameCyrcle.ChekIfDay())
             {
-                _farmer.Move(targetPosition, callback);
+                if (!_farmer.Move(targetPosition, callback))
+                {
+                    LateMove.Add(() =>
+                    {
+                        MoveToClosestAIBuilder(targetPosition, callback, building);
+                    });
+                    return null;
+                }
+                else
+                {
+                    return _farmer;
+                }
             }
             else
             {
-                lateMove.Add(() =>
+                LateMove.Add(() =>
                 {
                     MoveToClosestAIBuilder(targetPosition, callback, building);
                 });
             }
-            return _farmer;
+            return null;
         }
         public void CheckIfPlayerWaitForCoinsMain()
         {
@@ -225,7 +239,7 @@ namespace GameInit.Connector
             {
                 foreach (var stray in listOfWorks)
                 {
-                    if (!stray.InMove || stray.GoingForCoin || !stray.InWork)
+                    if (!stray.InMove || stray.GoingForCoin && !stray.InWork )
                     {
 
                         Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
@@ -247,13 +261,20 @@ namespace GameInit.Connector
                     }
                 }
             }
-                if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
-                {
-                    _stray.Move(_coin.transform.position, () => { _coin.Hide(); CheckAndGoToCoin(); MoveToClosest(); });
-                    _stray = null;
-                }
+            if (_stray != null && Distance.Manhattan(_stray.getTransform().position, _coin.GetTransform().position) < _minDistance)
+            {
+                _stray.Move(_coin.transform.position, () => {return CheckCoin(_coin); }, ItemsType.None);
+                _stray = null;
+            }
         }
-
+        private bool CheckCoin(Coin _coin)
+        {
+            bool _enable = _coin.gameObject.activeSelf;
+            _coin.Hide();
+            CheckAndGoToCoin();
+            MoveToClosest();
+            return _enable;
+        }
         public int GenerateId()
         {
             bool sameId = false;
@@ -306,6 +327,7 @@ namespace GameInit.Connector
                         if (!stray.InMove)
                         {
                             stray.GetRandomWalker().Move();
+                            stray.InWork = false;
                         }
                         else
                         {
@@ -327,6 +349,7 @@ namespace GameInit.Connector
         public void OnDayChange()
         {
             NightReturnAll();
+            MoveToClosest();
         }
 
         private IEnumerator WaitWhyleAllFinishMove()
@@ -335,12 +358,13 @@ namespace GameInit.Connector
             do
             {
                 waitMove = false;
-                yield return new WaitForEndOfFrame();
+                yield return new WaitForSeconds(0.1f);
                 for (int i = 0; i < stillInMove.Count; i++)
                 {
                     if(stillInMove[i].InMove == false)
                     {
                         stillInMove[i].GetRandomWalker().Move();
+                        stillInMove[i].InWork = false;
                     }
                     else
                     {
