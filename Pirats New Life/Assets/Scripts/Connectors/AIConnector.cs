@@ -167,7 +167,7 @@ namespace GameInit.Connector
                 });
             }
         }
-        public IWork MoveToClosestAIFarmer(Vector3 targetPosition, Action callback, IBuilding building)
+        public void MoveToClosestAIFarmer(Vector3 targetPosition, Action callback, IBuilding building)
         {
             float minDistance = Mathf.Infinity;
             Vector3 closestPosition = Vector3.zero;
@@ -192,25 +192,25 @@ namespace GameInit.Connector
             {
                 if (!_farmer.Move(targetPosition, callback))
                 {
+                    building.SetBuilder(null);
                     LateMove.Add(() =>
                     {
-                        MoveToClosestAIBuilder(targetPosition, callback, building);
+                        MoveToClosestAIFarmer(targetPosition, callback, building);
                     });
-                    return null;
                 }
                 else
                 {
-                    return _farmer;
+                    building.SetBuilder(_farmer);
                 }
             }
             else
             {
+                building.SetBuilder(null);
                 LateMove.Add(() =>
                 {
-                    MoveToClosestAIBuilder(targetPosition, callback, building);
+                    MoveToClosestAIFarmer(targetPosition, callback, building);
                 });
             }
-            return null;
         }
         public void CheckIfPlayerWaitForCoinsMain()
         {

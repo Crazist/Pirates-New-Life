@@ -182,6 +182,7 @@ public class BuildingComponent : MonoBehaviour
         yield return new WaitForSecondsRealtime(2);
         UpdateBuild();
         inBuild = false;
+        _currentlyBuilding = false;
     }
 
     private void OnDisable()

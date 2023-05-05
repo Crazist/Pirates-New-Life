@@ -214,6 +214,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     }
     private void Die()
     {
+        _wallComponent.SetCanProduce(true);
         _wallComponent.ResetForm();
     }
     public bool CheckIfEnemy()

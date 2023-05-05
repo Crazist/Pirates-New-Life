@@ -184,6 +184,8 @@ public class Farmer : IWork, IKDTree
     }
     public void RemoveAllEveants()
     {
+        InWork = false;
+        InMove = false;
         _AIComponent.GetMonoBehaviour().StopAllCoroutines();
     }
 

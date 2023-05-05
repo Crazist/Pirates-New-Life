@@ -21,6 +21,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
     private GameCyrcle _cyrcle;
     private AIConnector _AIConnector;
     private IWork _curentlyWorker;
+    private List<IWork> _curentlyWorkers;
     private float timeToBuild = 50.0f; // time to build in seconds
     private float progress = 0.0f; // current progress towards completing the wall
     private bool _coroutineInPlay = false;
@@ -54,6 +55,8 @@ public class Farm : IBuilding, IDayChange, IUpdate
         _cyrcle = cyrcle;
         _farmComponent = buildingComponent;
         _res = res;
+        _curentlyWorkers = new List<IWork>();
+
         DropBeforePickUp += DropBeforePickUpCoin;
         _startBuilding += Build;
 
@@ -68,6 +71,12 @@ public class Farm : IBuilding, IDayChange, IUpdate
         if (worker != null)
             worker.InWork = true;
         _curentlyWorker = worker;
+       
+        if (_curentlyWorker != null && isBuilded)
+        {
+            _curentlyWorker.InWork = true;
+            _curentlyWorkers.Add(_curentlyWorker);
+        }
     }
     public void Build()
     {
@@ -83,10 +92,13 @@ public class Farm : IBuilding, IDayChange, IUpdate
     {
         if (_curGold >= _minimalCountOfGoldToDrop)
         {
+            var formList = _farmComponent.GetFormList();
+
+            formList[_curForm - 1].SetActive(false);
             _curForm = _standartForm;
+            formList[_curForm - 1].SetActive(true);
             _coinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _curGold - 1, _heroComponent.transform.position, _pool, canPickUp);
             _curGold = 0;
-            UpdateWorking();
         }
     }
     public bool GetBuildingState()
@@ -121,21 +133,25 @@ public class Farm : IBuilding, IDayChange, IUpdate
         if (_isDay && inBuildProgress)
         {
             _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
-            if (_curentlyWorker != null)
-                _curentlyWorker.InWork = true;
         }
-        else if(_isDay && isBuilded)
+        CheckIfNeedGoWork();
+    }
+
+    private void CheckIfNeedGoWork()
+    {
+        if(_isDay && isBuilded)
         {
             for (int i = 0; i < _maxCountOfWorkers; i++)
             {
-                _curentlyWorker = _AIConnector.MoveToClosestAIFarmer(_farmComponent.GetBuildPositions()[i].position, StartWorking, this);
+                _AIConnector.MoveToClosestAIFarmer(_farmComponent.GetBuildPositions()[i].position, StartWorking, this);
                 if (_curentlyWorker != null)
+                {
                     _curentlyWorker.InWork = true;
-                _curCountOfWorkers++;
+                    _curentlyWorkers.Add(_curentlyWorker);
+                }
             }
         }
     }
-
     private void StartBuilding()
     {
         if (_isDay && inBuildProgress && _curentlyWorker != null && !_coroutineInPlay)
@@ -147,6 +163,18 @@ public class Farm : IBuilding, IDayChange, IUpdate
     {
         if (_isDay && isBuilded && !_isWorking)
         {
+            for (int i = 0; i < _curentlyWorkers.Count; i++)
+            {
+                if (_curentlyWorkers[i].InWork)
+                {
+                    _curCountOfWorkers++;
+                }
+                else
+                {
+                    _curentlyWorkers.Remove(_curentlyWorkers[i]);
+                }
+            }
+            
             _farmComponent.GetMonoBehaviour().StartCoroutine(WorkingInProgress());
         }
     }
@@ -182,6 +210,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             _AIConnector.MoveToClosest();
             _curentlyWorker.GetRandomWalker().Move();
             _curentlyWorker = null;
+            CheckIfNeedGoWork();
             Debug.Log("Wall built!");
         }
         else
@@ -190,6 +219,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             inBuildProgress = true;
             Debug.Log("Wall building interrupted.");
         }
+        _curentlyWorkers.Clear();
         _coroutineInPlay = false;
     }
     private IEnumerator WorkingInProgress()
@@ -211,6 +241,11 @@ public class Farm : IBuilding, IDayChange, IUpdate
         }
 
         _AIConnector.MoveToClosest();
+        foreach (var item in _curentlyWorkers)
+        {
+            item.GetRandomWalker().Move();
+        }
+        _curentlyWorkers.Clear();
         _curCountOfWorkers = 0;
         _isWorking = false;
     }
