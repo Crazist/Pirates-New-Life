@@ -342,7 +342,7 @@ namespace GameInit.Optimization.KDTree
                         {
                             queryPosition.Attack();
                             defender.GetDamage(queryPosition.CountOFDamage());
-                            if (defender.HP <= 0)
+                            if (defender.HP <= 0 && defender.Type != EntityType.Wall)
                             {
                                 PointsInWorld.Remove(defender);
                                 if (defender.CheckIfEnemy())

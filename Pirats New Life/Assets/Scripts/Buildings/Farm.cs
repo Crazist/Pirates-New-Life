@@ -230,6 +230,11 @@ public class Farm : IBuilding, IDayChange, IUpdate
         {
             yield return new WaitForSeconds(20.0f / _curCountOfWorkers); // wait for 1 second before checking progress again
            
+            if(_curentlyWorkers.Count > _curCountOfWorkers)
+            {
+                _curCountOfWorkers = _curentlyWorkers.Count;
+            }
+
             if(_curGold < 20)
             _curGold++;
             

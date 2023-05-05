@@ -16,7 +16,9 @@ public class BuildingComponent : MonoBehaviour
     [SerializeField] BuildingsType type;
     [SerializeField] private bool _currentlyBuilding = false;
     [SerializeField] private bool _momentalBuild = true;
-    
+
+    public int BaseCount { get; set; } = 1;
+
     private bool canProduce = true;
     private Coin coin;
     private int curForm = 0;
@@ -29,7 +31,12 @@ public class BuildingComponent : MonoBehaviour
     {
         return gameObject;
     }
-   
+
+    private void Start()
+    {
+        BaseCount = countOfGold;
+    }
+
     public List<Transform> GetBuildPositions()
     {
         switch (curForm - 1)

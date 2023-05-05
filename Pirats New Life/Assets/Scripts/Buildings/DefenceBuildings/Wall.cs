@@ -71,11 +71,10 @@ public class Wall : IBuilding, IDayChange, IKDTree
     public void Build()
     {
         progress = 0;
-            inBuildProgress = true;
-            _wallComponent.SetInBuild(inBuildProgress);
-            MoveBuilder();
-            _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
-        
+        inBuildProgress = true;
+        _wallComponent.SetInBuild(inBuildProgress);
+        MoveBuilder();
+        _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
     }
 
     public bool GetBuildingState()
@@ -216,6 +215,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
     {
         _wallComponent.SetCanProduce(true);
         _wallComponent.ResetForm();
+        _wallComponent.SetCountForGold(_wallComponent.BaseCount);
     }
     public bool CheckIfEnemy()
     {
