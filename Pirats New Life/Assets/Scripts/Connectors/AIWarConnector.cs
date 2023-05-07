@@ -11,6 +11,7 @@ using GameInit.Building;
 using GameInit.Builders;
 using GameInit.Connector;
 using System.Diagnostics;
+using GameInit.Enemy;
 
 namespace GameInit.Connector
 {
@@ -36,9 +37,11 @@ namespace GameInit.Connector
         private ArrowPool _arrowPool;
         private float lastUpdateTime = 0.0f;
         private const float updateInterval = 0.5f;
-        
+        private Transform[] _EnemySpawnerPsoition;
+
         private const float radiusRandomWalk = 1.5f;
-        private const int offset = 4;
+        private const int offsetSwordMan = 4;
+        private const int offsetArcher = 7;
         public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool)
         {
             PointsInWorld = new List<IKDTree>();
@@ -50,7 +53,6 @@ namespace GameInit.Connector
             RightWall = new List<Wall>();
             LeftWall = new List<Wall>();
 
-
             _AIConnector = AIConnector;
             _resourceManager = resourceManager;
             _gameCyrcle = cyrcle;
@@ -59,13 +61,27 @@ namespace GameInit.Connector
 
             _tree = new KDTree();
             _treeQuery = new KDQuery();
+
+            InitEnemySpawnerPosition();
+        }
+        
+        private void InitEnemySpawnerPosition()
+        {
+            var  _enemySpawnComponent = UnityEngine.Object.FindObjectsOfType<EnemySpawnComponent>();
+
+            _EnemySpawnerPsoition = new Transform[_enemySpawnComponent.Length];
+
+            for (int i = 0; i < _enemySpawnComponent.Length; i++)
+            {
+                _EnemySpawnerPsoition[i] = _enemySpawnComponent[i].transform;
+            }
+            _treeQuery.SetEnemySpawner(_gameCyrcle, _EnemySpawnerPsoition, PointsInWorld, EnemyList);
         }
 
         public void GetHeroComponent(HeroComponent heroComponent)
         {
             _heroComponent = heroComponent;
         }
-        private bool isFirst = true;
         public void OnUpdate()
         {
             if (Time.time - lastUpdateTime > updateInterval && PointsInWorld.Count != 0)
@@ -80,13 +96,13 @@ namespace GameInit.Connector
                 
                 for (int i = 0; i < ArcherList.Count; i++)
                 {
-                    _treeQuery.ShootClosest(_tree, (IKDTree)ArcherList[i], PointsInWorld, EnemyList, _arrowPool, _treeQuery);
+                    _treeQuery.ShootClosest(_tree, (IKDTree)ArcherList[i], _arrowPool, _treeQuery);
                 }
                
                 for (int i = 0; i < PointsInWorld.Count; i++)
                 {
                     if (PointsInWorld[i].HP > 0)
-                        _treeQuery.DamageClosest(_tree, PointsInWorld[i], PointsInWorld, EnemyList);
+                        _treeQuery.DamageClosest(_tree, PointsInWorld[i]);
                 }
 
                 stopwatch.Stop(); // останавливаем таймер
@@ -115,18 +131,22 @@ namespace GameInit.Connector
                     lastLeftWall = LeftWall[i];
                 }
             }
-
+            MoveSwordMans(lastRightWall, lastLeftWall);
+            MoveArcherMans(lastRightWall, lastLeftWall);
+        }
+        private void MoveSwordMans(Wall lastRightWall, Wall lastLeftWall)
+        {
             // ѕеремещаем SwordMan по последовательности стен
             for (int i = 0; i < SwordManList.Count; i++)
             {
                 Vector3 targetWall = Vector3.zero;
                 if (i % 2 == 0 && lastRightWall != null)  // „етные SwordMan передвигаютс€ к lastRightWall, нечетные - к lastLeftWall
                 {
-                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offset, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetSwordMan, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
                 }
-                else if(lastLeftWall != null)
+                else if (lastLeftWall != null)
                 {
-                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetSwordMan, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
                 }
 
                 if (targetWall != Vector3.zero)
@@ -138,8 +158,46 @@ namespace GameInit.Connector
             // ѕоследний SwordMan передвигаетс€ к lastLeftWall, если она есть
             if (SwordManList.Count > 0 && lastLeftWall != null)
             {
-                Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetSwordMan, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
                 SwordManList[SwordManList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+            }
+            else if (SwordManList.Count > 0 && lastRightWall != null)
+            {
+                Vector3 targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetSwordMan, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                SwordManList[SwordManList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+            }
+        }
+        private void MoveArcherMans(Wall lastRightWall, Wall lastLeftWall)
+        {
+            // ѕеремещаем Archer по последовательности стен
+            for (int i = 0; i < ArcherList.Count; i++)
+            {
+                Vector3 targetWall = Vector3.zero;
+                if (i % 2 == 0 && lastRightWall != null)  // „етные Archer передвигаютс€ к lastRightWall, нечетные - к lastLeftWall
+                {
+                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetArcher, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                }
+                else if (lastLeftWall != null)
+                {
+                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetArcher, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                }
+
+                if (targetWall != Vector3.zero)
+                {
+                    ArcherList[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+                }
+            }
+
+            // ѕоследний Archer передвигаетс€ к lastLeftWall, если она есть
+            if (ArcherList.Count > 0 && lastLeftWall != null)
+            {
+                Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetArcher, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
+                ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
+            }
+            else if (ArcherList.Count > 0 && lastRightWall != null)
+            {
+                Vector3 targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetArcher, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
+                ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalk);
             }
         }
         public void UpdateTree()

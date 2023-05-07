@@ -22,7 +22,7 @@ public class Archer : IWork, IKDTree
     private bool _inWork = false;
     private bool _canDamage = true;
     private int _damage = 0;
-    private float _delayForAttack = 6f;
+    private float _delayForAttack = 5f;
 
     private const float _coefDistance = 0.5f;
     private const bool canPickUp = true;

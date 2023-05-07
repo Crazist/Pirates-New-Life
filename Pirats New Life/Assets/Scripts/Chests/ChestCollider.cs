@@ -34,6 +34,7 @@ namespace GameInit.Chest
             if (_chestComponent.IsCollided)
             {
                 _chestComponent.GetAnimator().SetTrigger("Open");
+               _chestComponent.GetParticlePrefab().SetActive(true);
                  _coinDropAnimation.RandomCoinJump(_chestComponent.transform.localPosition, _chestComponent.GoldAmount, _chestComponent.transform.position, _pool, canPickUp);
                 //  _chestComponent.GetMono().StartCoroutine(MoveCoins());
                 _chestBuilder.RemoveChestCollider(this);

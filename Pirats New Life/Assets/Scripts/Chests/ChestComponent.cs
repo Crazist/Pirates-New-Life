@@ -7,6 +7,7 @@ namespace GameInit.Component
     {
         [field: SerializeField] public int GoldAmount { get; private set; }
         [SerializeField] private Animator _animator;
+        [SerializeField] private GameObject _particlePrefab;
 
         public bool IsCollided { get; private set; }
 
@@ -16,6 +17,10 @@ namespace GameInit.Component
             {
                 IsCollided = true;
             }
+        }
+        public GameObject GetParticlePrefab()
+        {
+            return _particlePrefab;
         }
         public MonoBehaviour GetMono()
         {

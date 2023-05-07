@@ -11,7 +11,12 @@ namespace GameInit.AI
         [SerializeField] private Transform _positiontransform;
         [SerializeField] private NavMeshAgent _navMeshAgent;
         [SerializeField] private List<GameObject> _models;
-        
+        [SerializeField] private ParticleSystem _bloodSplash;
+
+        public ParticleSystem GetBloodSplash()
+        {
+            return _bloodSplash;
+        }
         public Transform GetTransform()
         {
             return _positiontransform;

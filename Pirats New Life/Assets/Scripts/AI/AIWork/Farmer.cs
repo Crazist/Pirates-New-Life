@@ -153,8 +153,6 @@ public class Farmer : IWork, IKDTree
     }
     private IEnumerator Waiter(Action action)
     {
-        yield return new WaitForEndOfFrame();
-
         var agent = _AIComponent.GeNavMeshAgent();
 
         while (agent.remainingDistance == 0 || !agent.hasPath)

@@ -32,6 +32,8 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private CoinDropAnimation _coinDropAnimation;
     private Pools _coinPool;
     private Coroutine _curCoroutineWaitMove;
+    private bool _isDay = false;
+    private bool _needToRepear = false;
     public int CirclePosition { get; set; }
     public bool IsRight { get; set; }
     public EntityType Type { get; } = EntityType.Wall;
@@ -39,7 +41,6 @@ public class Wall : IBuilding, IDayChange, IKDTree
     private const bool canPickUp = false;
     private const int _firstForm = 1;
     private const bool _isEnemy = false;
-    private bool _isDay = false;
     private const bool _canDamage = false;
 
     public int HP { get; set; } = 0;
@@ -102,24 +103,37 @@ public class Wall : IBuilding, IDayChange, IKDTree
     public void OnDayChange()
     {
         _isDay = _cyrcle.ChekIfDay();
+        Reapear();
         MoveBuilder();
     }
 
+    private void Reapear()
+    {
+        if (_needToRepear && _isDay)
+        {
+            _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartRepear, this);
+        }
+    }
     private void MoveBuilder()
     {
         _isDay = _cyrcle.ChekIfDay();
 
-        if (_isDay && inBuildProgress)
+        if (_isDay && inBuildProgress && !_coroutineInPlay)
         {
             _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartBuilding, this);
-            if(_curentlyWorker != null)
-            _curentlyWorker.InWork = true;
         }
     }
-
+    private void StartRepear()
+    {
+        if (_isDay && !inBuildProgress && _curentlyWorker != null && !_coroutineInPlay)
+        {
+            _curentlyWorker.InWork = true;
+            _wallComponent.GetMonoBehaviour().StartCoroutine(Repearing());
+        }
+    }
     private void StartBuilding()
     {
-        if (_isDay && inBuildProgress && _curentlyWorker != null)
+        if (_isDay && inBuildProgress && _curentlyWorker != null && !_coroutineInPlay)
         {
             _curentlyWorker.InWork = true;
             _wallComponent.GetMonoBehaviour().StartCoroutine(BuildingInProgress());
@@ -127,12 +141,39 @@ public class Wall : IBuilding, IDayChange, IKDTree
     }
     private IEnumerator RandomBuildPositionCoroutine()
     {
-        while (_isDay && progress < timeToBuild && _curentlyWorker != null)
+        while (_isDay && (progress < timeToBuild || HP < _hpPerLvl * _wallComponent.GetCurForm()) && _curentlyWorker != null)
         {
             yield return new WaitForSeconds(10.0f); // chek for build and randomPosition time, it will not work if it to similary
             if(_curentlyWorker != null)
             _curentlyWorker.Move(RandomBuildPosition(), null);
         }
+    }
+    private IEnumerator Repearing()
+    {
+        _coroutineInPlay = true;
+        _curCoroutineWaitMove = _wallComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
+        while (_isDay && HP < _hpPerLvl * _wallComponent.GetCurForm())
+        {
+            yield return new WaitForSeconds(1.0f); // wait for 1 second before checking progress again
+           
+            if(HP < _hpPerLvl * _wallComponent.GetCurForm())
+            {
+                HP += 1;
+            }
+        }
+        
+        if(_curCoroutineWaitMove != null)
+        _wallComponent.GetMonoBehaviour().StopCoroutine(_curCoroutineWaitMove);
+
+        if(HP >= _hpPerLvl * _wallComponent.GetCurForm())
+        {
+            _wallComponent.SetCanProduce(true);
+        }
+
+        _curentlyWorker.InWork = false;
+        _AIConnector.MoveToClosest();
+        _curentlyWorker.GetRandomWalker().Move();
+        _coroutineInPlay = false;
     }
     private IEnumerator BuildingInProgress()
     {
@@ -176,10 +217,13 @@ public class Wall : IBuilding, IDayChange, IKDTree
         else
         {
             // wall building interrupted due to day/night cycle
+            _curentlyWorker.InWork = false;
             inBuildProgress = true;
+            _curentlyWorker = null;
             Debug.Log("Wall building interrupted.");
         }
-        _coroutineInPlay = false;
+
+       _coroutineInPlay = false;
     }
 
     public BuildingComponent GetWallComponent()
@@ -199,6 +243,14 @@ public class Wall : IBuilding, IDayChange, IKDTree
         return _wallComponent.GetBuildPositions()[0].position;
     }
 
+    private void CheckIfNeedRepear()
+    {
+        if (isBuilded && HP < _hpPerLvl * _wallComponent.GetCurForm() && !inBuildProgress && HP > 0)
+        {
+            _needToRepear = true;
+            _wallComponent.SetCanProduce(false);
+        }
+    }
     public void GetDamage(int damage)
     {
         if (HP - damage <= 0)
@@ -209,10 +261,21 @@ public class Wall : IBuilding, IDayChange, IKDTree
         else
         {
             HP = HP - damage;
+            CheckIfNeedRepear();
         }
     }
     private void Die()
     {
+        isBuilded = false;
+        foreach (var wall in _walls)
+        {
+            if (wall.CirclePosition == CirclePosition + 1 && IsRight == wall.IsRight)
+            {
+                wall.GetWallComponent().SetCanProduce(false);
+            }
+        }
+        _AIWarConnector.SetSwordManToNewPosition();
+        _wallComponent.StopAllCoroutines();
         _wallComponent.SetCanProduce(true);
         _wallComponent.ResetForm();
         _wallComponent.SetCountForGold(_wallComponent.BaseCount);

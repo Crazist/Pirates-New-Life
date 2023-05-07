@@ -1,4 +1,5 @@
 using GameInit.AI;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,6 +19,7 @@ namespace GameInit.Enemy
         private float _spellSpeed = 30f;
         private float _slowReturnSpeed= 2f;
         private float _standartSpeed;
+        private float _returnToBaseSpeed = 5;
         private float _returnOffset = 6f;
         private float _spellWaitForCast = 0.5f;
         private float _originalAcceleration;
@@ -27,9 +29,11 @@ namespace GameInit.Enemy
         private Vector3 _curTargetPosition;
         private float _maxOffset = 1;
         private float _runTime = 2.5f;
+        private float _returnTime = 3f;
         private bool _needToRunAway = false;
         private int _damageInRun = 2;
         private int _standartDamage = 1;
+        private bool _isDying = false;
         public int HP { get; set; } = 1;
         public EntityType Type { get; } = EntityType.Enemy;
 
@@ -80,8 +84,11 @@ namespace GameInit.Enemy
         {
             if (HP - damage <= 0)
             {
-                Die();
-                HP = 0;
+                if (!_isDying)
+                {
+                    _AIComponent.GetBloodSplash().Play();
+                    _AIComponent.GetMonoBehaviour().StartCoroutine(BeforeDie());
+                }
             }
             else
             {
@@ -89,6 +96,14 @@ namespace GameInit.Enemy
             }
         }
 
+        private IEnumerator BeforeDie()
+        {
+            _isDying = true;
+            HP = 0;
+            yield return new WaitForSeconds(0.2f);
+            Die();
+            _isDying = false;
+        }
         private void Die()
         {
             _AIComponent.GetGm().SetActive(false);
@@ -166,7 +181,7 @@ namespace GameInit.Enemy
         {
             if(Vector2.SqrMagnitude(_AIComponent.GeNavMeshAgent().transform.position - _curTargetPosition) < DistanceForStartSpell)
             {
-                Vector3 target = _curTargetPosition + new Vector3(Random.Range(-_maxOffset, _maxOffset), 0, Random.Range(-_maxOffset, _maxOffset));
+                Vector3 target = _curTargetPosition + new Vector3(UnityEngine.Random.Range(-_maxOffset, _maxOffset), 0, UnityEngine.Random.Range(-_maxOffset, _maxOffset));
 
                 if (_curTargetPosition.x > 0)
                 {
@@ -184,14 +199,32 @@ namespace GameInit.Enemy
 
                 Move(target);
 
-                yield return new WaitForSeconds(_runTime);
+                yield return new WaitForSeconds(_returnTime);
             }
            
             _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
 
             RefreshSkill = false;
         }
+        private IEnumerator Waiter(Action action, Vector3 position)
+        {
+            _AIComponent.GeNavMeshAgent().speed = _returnToBaseSpeed;
 
+            Move(position);
+
+           var agent = _AIComponent.GeNavMeshAgent();
+            
+            while (Vector2.SqrMagnitude(position - agent.transform.position) > 1)
+            {
+                yield return null;
+            }
+
+            _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
+
+            InMove = false;
+            action?.Invoke();
+            RefreshSkill = false;
+        }
         public void UseSpell(Vector3 position, bool runAway)
         {
             _needToRunAway = runAway;
@@ -212,6 +245,20 @@ namespace GameInit.Enemy
             _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
             _AIComponent.GeNavMeshAgent().acceleration = _originalAcceleration;
             _AIComponent.GeNavMeshAgent().stoppingDistance = _originalStopingDistance;
+        }
+
+        public void MoveToBase(Vector3 position, Action _action)
+        {
+            if (!RefreshSkill)
+            {
+                RefreshSkill = true;
+                _AIComponent.GetMonoBehaviour().StartCoroutine(Waiter(_action, position));
+            }
+        }
+
+        void IEnemy.Disable()
+        {
+            Die();
         }
     }
 }

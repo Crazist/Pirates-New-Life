@@ -20,6 +20,7 @@ namespace GameInit.Connector
         public List<IWork> FarmerList { get; set; }
         public List<IWork> SwordManList { get; set; }
         public List<Action> LateMove { get; set; }
+        public List<Action> LateMoveForDay { get; set; }
 
         public List<List<IWork>> ListOfLists { get; set; }
 
@@ -36,6 +37,7 @@ namespace GameInit.Connector
             stillInMove = new List<IWork>();
             ListOfLists = new List<List<IWork>>();
             LateMove = new List<Action>();
+            LateMoveForDay = new List<Action>();
 
             ListOfLists.Add(StrayList = new List<IWork>());
             ListOfLists.Add(CitizenList = new List<IWork>());
@@ -76,11 +78,17 @@ namespace GameInit.Connector
         public void MoveToClosest()
         {
             List<Action> lateMoveCopy = new List<Action>(LateMove);
+            List<Action> lateMoveForDayCopy = new List<Action>(LateMoveForDay);
             LateMove.Clear();
+            LateMoveForDay.Clear();
 
             for (int i = 0; i < lateMoveCopy.Count; i++)
             {
                 lateMoveCopy[i].Invoke();
+            }
+            for (int i = 0; i < lateMoveForDayCopy.Count; i++)
+            {
+                lateMoveForDayCopy[i].Invoke();
             }
         }
         public void MoveToClosestAICitizen(Vector3 targetPosition, Func<bool> callback, ItemsType type)
@@ -148,7 +156,7 @@ namespace GameInit.Connector
                if(!_stray.Move(targetPosition, callback))
                 {
                     building.SetBuilder(null);
-                    LateMove.Add(() =>
+                    LateMoveForDay.Add(() =>
                     {
                         MoveToClosestAIBuilder(targetPosition, callback, building);
                     });
@@ -161,7 +169,7 @@ namespace GameInit.Connector
             else
             {
                 building.SetBuilder(null);
-                LateMove.Add(() =>
+                LateMoveForDay.Add(() =>
                 {
                     MoveToClosestAIBuilder(targetPosition, callback, building);
                 });
@@ -175,7 +183,7 @@ namespace GameInit.Connector
 
             foreach (var farmer in FarmerList)
             {
-                if (farmer.InWork != true)
+                if (!farmer.InWork)
                 {
                     float distance = Distance.Manhattan(farmer.getTransform().position, targetPosition);
 
@@ -193,7 +201,7 @@ namespace GameInit.Connector
                 if (!_farmer.Move(targetPosition, callback))
                 {
                     building.SetBuilder(null);
-                    LateMove.Add(() =>
+                    LateMoveForDay.Add(() =>
                     {
                         MoveToClosestAIFarmer(targetPosition, callback, building);
                     });
@@ -206,7 +214,7 @@ namespace GameInit.Connector
             else
             {
                 building.SetBuilder(null);
-                LateMove.Add(() =>
+                LateMoveForDay.Add(() =>
                 {
                     MoveToClosestAIFarmer(targetPosition, callback, building);
                 });
@@ -239,7 +247,7 @@ namespace GameInit.Connector
             {
                 foreach (var stray in listOfWorks)
                 {
-                    if (!stray.InMove || stray.GoingForCoin && !stray.InWork )
+                    if ((!stray.InMove || stray.GoingForCoin) && !stray.InWork )
                     {
 
                         Coin coin = _pool.GetClosestEngagedElementsSecondTouch(stray.getTransform().position);
@@ -348,6 +356,7 @@ namespace GameInit.Connector
 
         public void OnDayChange()
         {
+            LateMoveForDay.Clear();
             NightReturnAll();
             MoveToClosest();
         }

@@ -105,6 +105,7 @@ public class BuildingComponent : MonoBehaviour
     public void SetCanProduce(bool canProd)
     {
         canProduce = canProd;
+        inBuild = false;
     }
     public bool CanProduce()
     {

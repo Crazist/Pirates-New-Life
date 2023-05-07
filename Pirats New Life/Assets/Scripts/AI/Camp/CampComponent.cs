@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace GameInit.AI
         [SerializeField] private Transform transformSpawnPosition;
 
         private List<IWork> _strays;
-
+        
         private void Start()
         {
             _strays = new List<IWork>();

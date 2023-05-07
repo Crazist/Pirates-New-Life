@@ -32,10 +32,13 @@ namespace GameInit.Projectiles
         }
         public void Shoot(IKDTree queryPosition, Vector3 endPoint, KDTree tree, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, KDQuery _KDQuery)
         {
+            float randomX = UnityEngine.Random.Range(-1f, 1f);
+            float randomZ = UnityEngine.Random.Range(-1f, 1f);
+            Vector3 offset = new Vector3(randomX, 0, randomZ);
             Vector3 startPosition = new Vector3(queryPosition.GetPositionVector2().x, _earthY, queryPosition.GetPositionVector2().y);
 
             ProjectileMotionCalculator _projectileMotionCalculator = new ProjectileMotionCalculator();
-            path = _projectileMotionCalculator.CalculateParabola(startPosition, endPoint);
+            path = _projectileMotionCalculator.CalculateParabola(startPosition, endPoint + offset);
 
             if(_coroutine == null)
             _coroutine = _mono.StartCoroutine(ArrowFly(tree, PointsInWorld, EnemyList,  _KDQuery));
@@ -58,7 +61,7 @@ namespace GameInit.Projectiles
                 yield return null;
             }
 
-            _KDQuery.DamageClosest(tree, this, PointsInWorld, EnemyList);
+            _KDQuery.DamageClosest(tree, this);
 
             tree.Build(PointsInWorld);
 

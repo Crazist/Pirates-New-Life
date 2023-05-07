@@ -1,3 +1,4 @@
+using GameInit.GameCyrcleModule;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,11 +7,23 @@ namespace GameInit.Optimization.KDTree
 {
     public partial class KDQuery
     {
+        private GameCyrcle _GameCyrcle;
+        private Transform[] _EnemySpawnerPsoition;
+        private List<IKDTree> PointsInWorld;
+        private List<IEnemy> EnemyList;
+
         private const float _offsetToAttackEnemy = 2.2f;
         private const float _spellOffset = 1.2f;
         private const float _heightPosition = 0.46f;
         private const float _minDistanceForEndSpell = 40;
 
+        public void SetEnemySpawner(GameCyrcle _cyrcle, Transform[] EnemySpawnerPsoition, List<IKDTree> _PointsInWorld, List<IEnemy> _EnemyList)
+        {
+            PointsInWorld = _PointsInWorld;
+            EnemyList = _EnemyList;
+            _GameCyrcle = _cyrcle;
+            _EnemySpawnerPsoition = EnemySpawnerPsoition;
+        }
         public void EnemyRunForAttack(KDTree tree, IEnemy _queryPosition, float minDist = 0)
         {
             IKDTree queryPosition = (IKDTree)_queryPosition;
@@ -129,86 +142,118 @@ namespace GameInit.Optimization.KDTree
 
                     if (smallestIndex != -1)
                     {
-
                         var _defender = points[smallestIndex];
 
                         IEnemy _enemy = (IEnemy)queryPosition;
                         _minDist = _enemy.DistanceForStartSpell;
 
-                        if (_minDist != 0 && (SSR >= _minDist || SSR <= _minDistanceForEndSpell) && _defender.Type != EntityType.Wall && !_enemy.RefreshSkill)
+                        if (!_GameCyrcle.ChekIfDay())
                         {
-                            Vector3 target = new Vector3();
+                            if (_minDist != 0 && (SSR >= _minDist || SSR <= _minDistanceForEndSpell) && _defender.Type != EntityType.Wall && !_enemy.RefreshSkill)
+                            {
+                                Vector3 target = new Vector3();
 
-                            target.x = _defender.GetPositionVector2().x;
-                            target.z = _defender.GetPositionVector2().y;
-                            target.y = _heightPosition;
+                                target.x = _defender.GetPositionVector2().x;
+                                target.z = _defender.GetPositionVector2().y;
+                                target.y = _heightPosition;
 
-                            _enemy.StopSpell();
-                            _enemy.Move(target);
+                                _enemy.StopSpell();
+                                _enemy.Move(target);
+                            }
+                            else if (_minDist != 0 && SSR >= _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
+                            {
+                                Vector3 target = new Vector3();
+
+                                if (_defender.GetPositionVector2().x > 0)
+                                {
+                                    target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
+                                    target.z = _defender.GetPositionVector2().y;
+                                }
+                                else if (_defender.GetPositionVector2().x < 0)
+                                {
+                                    target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
+                                    target.z = _defender.GetPositionVector2().y;
+                                }
+
+                                target.y = _heightPosition;
+
+                                _enemy.StopSpell();
+                                _enemy.Move(target);
+                            }
+                            else if (_minDist != 0 && SSR < _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
+                            {
+                                Vector3 target = new Vector3();
+
+                                if (_defender.GetPositionVector2().x > 0)
+                                {
+                                    target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
+                                    target.z = _defender.GetPositionVector2().y;
+                                }
+                                else if (_defender.GetPositionVector2().x < 0)
+                                {
+                                    target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
+                                    target.z = _defender.GetPositionVector2().y;
+                                }
+
+                                target.y = _heightPosition;
+
+                                _enemy.UseSpell(target, true);
+                            }
+                            else if (!_enemy.RefreshSkill)
+                            {
+                                Vector3 target = new Vector3();
+
+                                if (_defender.GetPositionVector2().x > 0)
+                                {
+                                    target.x = _defender.GetPositionVector2().x + _spellOffset;
+                                }
+                                else
+                                {
+                                    target.x = _defender.GetPositionVector2().x - _spellOffset;
+                                }
+
+                                target.z = _defender.GetPositionVector2().y;
+                                target.y = _heightPosition;
+
+                                _enemy.UseSpell(target, false);
+                            }
                         }
-                        else if (_minDist != 0 && SSR >= _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
+                        else
                         {
-                            Vector3 target = new Vector3();
+                            float minDistance = Mathf.Infinity;
+                            Transform nearestSpawner = null;
 
-                            if (_defender.GetPositionVector2().x > 0)
+                            for (int g = 0; g < _EnemySpawnerPsoition.Length; g++)
                             {
-                                target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
-                                target.z = _defender.GetPositionVector2().y;
-                            }
-                            else if (_defender.GetPositionVector2().x < 0)
-                            {
-                                target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
-                                target.z = _defender.GetPositionVector2().y;
-                            }
+                                Vector2 pos1 = new Vector2(_enemy.GetAiComponent().GetTransform().position.x, _enemy.GetAiComponent().GetTransform().position.z);
+                                Vector2 pos2 = new Vector2(_EnemySpawnerPsoition[g].position.x, _EnemySpawnerPsoition[g].position.z);
+                                float distance = Vector2.SqrMagnitude(pos1 - pos2);
 
-                            target.y = _heightPosition;
-
-                            _enemy.StopSpell();
-                            _enemy.Move(target);
-                        }
-                        else if (_minDist != 0 && SSR < _minDist && !_enemy.RefreshSkill && _defender.Type == EntityType.Wall)
-                        {
-                            Vector3 target = new Vector3();
-
-                            if (_defender.GetPositionVector2().x > 0)
-                            {
-                                target.x = _defender.GetPositionVector2().x + _offsetToAttackEnemy;
-                                target.z = _defender.GetPositionVector2().y;
-                            }
-                            else if (_defender.GetPositionVector2().x < 0)
-                            {
-                                target.x = _defender.GetPositionVector2().x - _offsetToAttackEnemy;
-                                target.z = _defender.GetPositionVector2().y;
+                                if (distance < minDistance)
+                                {
+                                    minDistance = distance;
+                                    nearestSpawner = _EnemySpawnerPsoition[g];
+                                }
                             }
 
-                            target.y = _heightPosition;
-
-                            _enemy.UseSpell(target, true);
-                        }
-                        else if (!_enemy.RefreshSkill)
-                        {
-                            Vector3 target = new Vector3();
-
-                            if (_defender.GetPositionVector2().x > 0)
+                            if (nearestSpawner != null)
                             {
-                                target.x = _defender.GetPositionVector2().x + _spellOffset;
+                                Vector3 pos = new Vector3(nearestSpawner.position.x, _heightPosition, nearestSpawner.position.z);
+                                _enemy.StopSpell();
+                                _enemy.MoveToBase(pos, () => { _enemy.Disable(); 
+                                        
+                                        PointsInWorld.Remove((IKDTree)_enemy);
+                                        EnemyList.Remove(_enemy);
+                                        tree.Build(PointsInWorld, 3);
+                                });
                             }
-                            else
-                            {
-                                target.x = _defender.GetPositionVector2().x - _spellOffset;
-                            }
-
-                            target.z = _defender.GetPositionVector2().y;
-                            target.y = _heightPosition;
-
-                            _enemy.UseSpell(target, false);
                         }
                     }
                 }
             }
         }
 
-        public void DamageClosest(KDTree tree, IKDTree queryPosition, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList)
+        public void DamageClosest(KDTree tree, IKDTree queryPosition)
         {
 
             Reset();
@@ -225,8 +270,8 @@ namespace GameInit.Optimization.KDTree
             int smallestIndex = -1;
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
-            float _minDistForDamage = 6f;
-            float _minDistForDamageArrow = 2f;
+            float _minDistForDamage = 5f;
+            float _minDistForDamageArrow = 1.5f;
 
             var rootNode = tree.rootNode;
 
@@ -356,7 +401,7 @@ namespace GameInit.Optimization.KDTree
                 }
             }
         }
-        public void ShootClosest(KDTree tree, IKDTree queryPosition, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, ArrowPool _arrowPool, KDQuery _treeQuery)
+        public void ShootClosest(KDTree tree, IKDTree queryPosition, ArrowPool _arrowPool, KDQuery _treeQuery)
         {
 
             Reset();
@@ -373,7 +418,7 @@ namespace GameInit.Optimization.KDTree
             int smallestIndex = -1;
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
-            float _minDistForDamage = 400f;
+            float _minDistForDamage = 150f;
             float _minCloseDistForDamage = 50f;
 
             var rootNode = tree.rootNode;

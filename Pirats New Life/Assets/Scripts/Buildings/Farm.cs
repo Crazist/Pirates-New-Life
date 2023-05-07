@@ -34,7 +34,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
     private int _maxCountOfWorkers = 3;
     private int _curCountOfWorkers = 0;
     private int _index = -1;
-    private int _curForm = 2;
+    private int _curForm = 0; //for as in list from zero
     private Action<int> DropBeforePickUp;
     
     private const bool canPickUp = false;
@@ -43,7 +43,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
     private const int _minimalCountOfGoldToDrop= 20;
     private const int _ChangeFormFirstTime = 10;
     private const int _ChangeFormSecndTime = 20;
-    private const int _standartForm = 2;
+    private const int _standartForm = 0;
 
     private bool _isDay = false;
     public Farm(BuildingComponent buildingComponent, ResourceManager res, AIConnector AIConnector, GameCyrcle cyrcle, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation)
@@ -69,11 +69,18 @@ public class Farm : IBuilding, IDayChange, IUpdate
     public void SetBuilder(IWork worker)
     {
         if (worker != null)
-            worker.InWork = true;
-        _curentlyWorker = worker;
-       
-        if (_curentlyWorker != null && isBuilded)
         {
+            worker.InWork = true;
+            _curentlyWorker = worker;
+        }
+         
+        if (worker != null && isBuilded)
+        {
+            if (_coroutineInPlay)
+            {
+                _curentlyWorkers.Clear();
+                _coroutineInPlay = false;
+            }
             _curentlyWorker.InWork = true;
             _curentlyWorkers.Add(_curentlyWorker);
         }
@@ -94,11 +101,12 @@ public class Farm : IBuilding, IDayChange, IUpdate
         {
             var formList = _farmComponent.GetFormList();
 
-            formList[_curForm - 1].SetActive(false);
-            _curForm = _standartForm;
-            formList[_curForm - 1].SetActive(true);
+            formList[_curForm].SetActive(false);
+            _curForm = _standartForm + 1;
+            formList[_curForm].SetActive(true);
             _coinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _curGold - 1, _heroComponent.transform.position, _pool, canPickUp);
             _curGold = 0;
+            CheckIfNeedGoWork();
         }
     }
     public bool GetBuildingState()
@@ -141,13 +149,13 @@ public class Farm : IBuilding, IDayChange, IUpdate
     {
         if(_isDay && isBuilded)
         {
-            for (int i = 0; i < _maxCountOfWorkers; i++)
+            int countIteretion = _maxCountOfWorkers > _AIConnector.FarmerList.Count ? _AIConnector.FarmerList.Count : _maxCountOfWorkers;
+            countIteretion -= _curCountOfWorkers;
+            if(countIteretion > 0)
             {
-                _AIConnector.MoveToClosestAIFarmer(_farmComponent.GetBuildPositions()[i].position, StartWorking, this);
-                if (_curentlyWorker != null)
+                for (int i = 0; i < countIteretion; i++)
                 {
-                    _curentlyWorker.InWork = true;
-                    _curentlyWorkers.Add(_curentlyWorker);
+                    _AIConnector.MoveToClosestAIFarmer(_farmComponent.GetBuildPositions()[i].position, StartWorking, this);
                 }
             }
         }
@@ -175,7 +183,10 @@ public class Farm : IBuilding, IDayChange, IUpdate
                 }
             }
             
-            _farmComponent.GetMonoBehaviour().StartCoroutine(WorkingInProgress());
+            if(_curCountOfWorkers != 0)
+            {
+                _farmComponent.GetMonoBehaviour().StartCoroutine(WorkingInProgress());
+            }
         }
     }
     private IEnumerator RandomBuildPositionCoroutine()
@@ -210,6 +221,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             _AIConnector.MoveToClosest();
             _curentlyWorker.GetRandomWalker().Move();
             _curentlyWorker = null;
+            _curForm++;
             CheckIfNeedGoWork();
             Debug.Log("Wall built!");
         }
@@ -219,6 +231,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             inBuildProgress = true;
             Debug.Log("Wall building interrupted.");
         }
+        if(_coroutineInPlay)
         _curentlyWorkers.Clear();
         _coroutineInPlay = false;
     }
@@ -234,20 +247,36 @@ public class Farm : IBuilding, IDayChange, IUpdate
             {
                 _curCountOfWorkers = _curentlyWorkers.Count;
             }
+            
+            if (_curCountOfWorkers == 0 || _curentlyWorkers.Count == 0) break;
 
-            if(_curGold < 20)
+            for (int i = 0; i < _curentlyWorkers.Count; i++)
+            {
+                if (!_curentlyWorkers[i].InWork)
+                {
+                    _curentlyWorkers.Remove(_curentlyWorkers[i]);
+                    _curCountOfWorkers--;
+                }
+            }
+
+            if (_curGold < 20)
             _curGold++;
             
-            if (_curGold == _ChangeFormFirstTime || _curGold == _ChangeFormSecndTime)
+            if ((_curGold == _ChangeFormFirstTime || _curGold == _ChangeFormSecndTime) && _curForm < _farmComponent.GetFormList().Count - 1)
             {
                 _curForm++;
                 UpdateWorking();
+                if(_curForm >= _farmComponent.GetFormList().Count - 1)
+                {
+                    break;
+                }
             }
         }
 
         _AIConnector.MoveToClosest();
         foreach (var item in _curentlyWorkers)
         {
+            item.InWork = false;
             item.GetRandomWalker().Move();
         }
         _curentlyWorkers.Clear();
@@ -266,8 +295,8 @@ public class Farm : IBuilding, IDayChange, IUpdate
     {
         var formList = _farmComponent.GetFormList();
 
-        formList[_curForm - 1].SetActive(true);
-        formList[_curForm - 2].SetActive(false);
+        formList[_curForm].SetActive(true);
+        formList[_curForm - 1].SetActive(false);
     }
     private IEnumerator Waiter()
     {

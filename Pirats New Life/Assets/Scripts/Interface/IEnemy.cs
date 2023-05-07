@@ -8,7 +8,9 @@ public interface IEnemy
     public bool RefreshSkill { get; set; }
     public float DistanceForStartSpell { get; }
     public void Move(Vector3 position);
+    public void MoveToBase(Vector3 position, Action action);
     public void UseSpell(Vector3 position, bool runAway);
     public void StopSpell();
+    public void Disable();
     public AIComponent GetAiComponent();
 }

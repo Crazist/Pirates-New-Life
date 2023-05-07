@@ -8,6 +8,7 @@ using GameInit.RandomWalk;
 using GameInit.Enemy;
 using GameInit.Builders;
 using GameInit.GameCyrcleModule;
+using System;
 
 namespace GameInit.AI
 {
@@ -26,8 +27,9 @@ namespace GameInit.AI
         private int maxEnemies = 50; // максимальное количество врагов
         private int currentEnemies = 0; // изначальное количество врагов
         private int multiplier = 1; // количество умножений на 2\
-        private int _countOfDays = 0;
+        private int _countOfDays = 1;
         private int _spawnCountOfStrayPerDays = 2;
+        private Action<EnemySpawnComponent> _closeToPortal;
 
         private const int _minDayToSpawnStray = 3;
 
@@ -43,12 +45,34 @@ namespace GameInit.AI
             _heroComponent = heroComponent;
             _coinDropAnimation = coinDropAnimation;
             _cyrcle = cyrcle;
+            _closeToPortal += SpawnEnemyIfToClose;
 
             multiplier = _EnemySpawnComponents[0].Multiplier;
 
+            SetActionInEnemys();
             SpawnStray();
         }
 
+        private void SpawnEnemyIfToClose(EnemySpawnComponent _enemySpawnPoint)
+        {
+            if (!_cyrcle.ChekIfDay())
+            {
+                var position = _enemySpawnPoint.GetTransformSpawn().position;
+
+                DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
+
+                _AIWarConnector.PointsInWorld.Add(enemy);
+                _AIWarConnector.EnemyList.Add(enemy);
+                _AIWarConnector.UpdateTree();
+            }
+        }
+        private void SetActionInEnemys()
+        {
+            foreach (var item in _EnemySpawnComponents)
+            {
+                item.SetAction(_closeToPortal);
+            }
+        }
         private void SpawnStrayPerDays()
         {
             if(_countOfDays < _minDayToSpawnStray)
@@ -85,14 +109,14 @@ namespace GameInit.AI
                         var diffmax = camp.GetSpawnDiffMax();
                         var diffmin = camp.GetSpawnDiffMin();
 
-                        var x = Random.Range(diffmin, diffmax);
-                        var z = Random.Range(diffmin, diffmax);
+                        var x = UnityEngine.Random.Range(diffmin, diffmax);
+                        var z = UnityEngine.Random.Range(diffmin, diffmax);
 
-                        if (Random.Range(0, 2) == 1)
+                        if (UnityEngine.Random.Range(0, 2) == 1)
                         {
                             x = -x;
                         }
-                        if (Random.Range(0, 2) == 1)
+                        if (UnityEngine.Random.Range(0, 2) == 1)
                         {
                             z = -z;
                         }
@@ -122,14 +146,14 @@ namespace GameInit.AI
                     var diffmax = camp.GetSpawnDiffMax();
                     var diffmin = camp.GetSpawnDiffMin();
 
-                    var x = Random.Range(diffmin, diffmax);
-                    var z = Random.Range(diffmin, diffmax);
+                    var x = UnityEngine.Random.Range(diffmin, diffmax);
+                    var z = UnityEngine.Random.Range(diffmin, diffmax);
 
-                    if (Random.Range(0, 2) == 1)
+                    if (UnityEngine.Random.Range(0, 2) == 1)
                     {
                         x = -x;
                     }
-                    if (Random.Range(0, 2) == 1)
+                    if (UnityEngine.Random.Range(0, 2) == 1)
                     {
                         z = -z;
                     }
@@ -169,14 +193,14 @@ namespace GameInit.AI
                     var diffmax = camp.GetSpawnDiffMax();
                     var diffmin = camp.GetSpawnDiffMin();
 
-                    var x = Random.Range(diffmin, diffmax);
-                    var z = Random.Range(diffmin, diffmax);
+                    var x = UnityEngine.Random.Range(diffmin, diffmax);
+                    var z = UnityEngine.Random.Range(diffmin, diffmax);
 
-                    if (Random.Range(0, 2) == 1)
+                    if (UnityEngine.Random.Range(0, 2) == 1)
                     {
                         x = -x;
                     }
-                    if (Random.Range(0, 2) == 1)
+                    if (UnityEngine.Random.Range(0, 2) == 1)
                     {
                         z = -z;
                     }

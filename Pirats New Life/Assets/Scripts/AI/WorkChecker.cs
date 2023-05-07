@@ -115,6 +115,7 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
+            _AIWarConnector.SetSwordManToNewPosition();
         }
       
         private void SwapWorkForCitizen()
