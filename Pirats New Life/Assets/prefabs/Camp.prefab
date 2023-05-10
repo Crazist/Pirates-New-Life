@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50fe86a3693463749af6f6e01e005750, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CitizenPrefab: {fileID: 7292829562450964068, guid: a901b8dd2854e374b90d50e27aaba6dc, type: 3}
+  CitizenPrefab: {fileID: 7964042037693619126, guid: a901b8dd2854e374b90d50e27aaba6dc, type: 3}
   count: 3
   spawnDiffMax: 3
   spawnDiffMin: 1

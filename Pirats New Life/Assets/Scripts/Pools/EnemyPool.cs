@@ -51,7 +51,7 @@ public class EnemyPool
             if (!item.GetAiComponent().GetGm().activeInHierarchy)
             {
                 gameobj = item;
-                item.GetAiComponent().GetGm().SetActive(true);
+                //item.GetAiComponent().GetGm().SetActive(true);
                 var _item = (IKDTree)item;
                 _item.HP = 1;
                 return true;
@@ -93,13 +93,16 @@ public class EnemyPool
     public IEnemy GetFreeElements(Vector3 pos, Quaternion rotation)
     {
         var obj = GetFreeElements(pos);
+        obj.GetAiComponent().GetTransform().position = pos;
         obj.GetAiComponent().GetTransform().rotation = rotation;
+        obj.GetAiComponent().GetGm().SetActive(true);
         return obj;
     }
     public IEnemy GetFreeElements(Vector3 pos)
     {
         var obj = GetFreeElements();
         obj.GetAiComponent().GetTransform().position = pos;
+        obj.GetAiComponent().GetGm().SetActive(true);
         return obj;
     }
     public IEnemy GetClosestEngagedElements(Vector3 pos)
@@ -147,12 +150,12 @@ public class EnemyPool
         }
         if (_isExpand)
         {
-            return CreateObj(true);
+            return CreateObj();
         }
 
         if (_pool.Count < _maxCapacity)
         {
-            return CreateObj(true);
+            return CreateObj();
         }
         throw new Exception("Pool is over!");
     }

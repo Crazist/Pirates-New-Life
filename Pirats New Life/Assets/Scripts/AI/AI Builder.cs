@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using GameInit.Connector;
 using GameInit.Animation;
 using GameInit.Pool;
 using GameInit.Builders;
@@ -17,6 +13,7 @@ namespace GameInit.AI
             var camps = UnityEngine.Object.FindObjectsOfType<CampComponent>();
             var enemySpawnComponent = UnityEngine.Object.FindObjectsOfType<EnemySpawnComponent>();
             cyrcle.AddDayChange(new AISpawner(camps, builderConnectors, pool, coinDropAnimation, _heroBuilder.GetHeroComponent(), enemySpawnComponent, cyrcle, _EnemyPool));
+            cyrcle.AddDayChange(new HuntingSpawner(coinDropAnimation, pool, builderConnectors, cyrcle));
         }
 
     }

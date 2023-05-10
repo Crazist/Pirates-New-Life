@@ -12,7 +12,12 @@ namespace GameInit.AI
         [SerializeField] private NavMeshAgent _navMeshAgent;
         [SerializeField] private List<GameObject> _models;
         [SerializeField] private ParticleSystem _bloodSplash;
+        [SerializeField] private Animator _animator;
 
+        public Animator GetAnimator()
+        {
+            return _animator;
+        }
         public ParticleSystem GetBloodSplash()
         {
             return _bloodSplash;

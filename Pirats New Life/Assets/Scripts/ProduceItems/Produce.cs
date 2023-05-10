@@ -20,6 +20,8 @@ namespace GameInit.Building
         private CoinDropAnimation _coinDropAnimation;
         private Pools _coinPool;
         private BuildingComponent _buildingComponent;
+       
+        private const float _heightPosition = 0.46f;
 
         private const bool canPickUp = false;
         public Produce(ProduceComponent produceComponent, AIConnector AIConnector, Pools coinPool, CoinDropAnimation coinDropAnimation, BuildingComponent buildingComponent)
@@ -50,7 +52,7 @@ namespace GameInit.Building
         {
             for (int i = 0; i < items.Count; i++)
             {
-                position = new Vector3(position.x, position.y, position.z + 1);
+                position = new Vector3(position.x, _heightPosition, position.z + 1);
             }
             GameObject instance = GameObject.Instantiate(prefab, position, Quaternion.identity);
             items.Add(instance);

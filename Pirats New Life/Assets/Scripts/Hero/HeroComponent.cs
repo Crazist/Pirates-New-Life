@@ -6,6 +6,7 @@ public class HeroComponent : MonoBehaviour
    // [field: SerializeField] public ParticleSystem ParticleSystemMoveTo { get; private set; }
 
     [SerializeField] private float _currentStamina;
+    [SerializeField] private Animator _Animator;
     public Transform Transform { get; private set; }
     public NavMeshAgent Agent { get; private set; }
     private Coin coin;
@@ -18,6 +19,10 @@ public class HeroComponent : MonoBehaviour
     private float currentStamina;
     private bool isSprinting;
 
+    public Animator GetAnimator()
+    {
+        return _Animator;
+    }
     private void Start()
     {
         currentStamina = maxStamina;
@@ -25,17 +30,23 @@ public class HeroComponent : MonoBehaviour
 
     private void Update()
     {
-        if (!gameObject.activeSelf)
-        {
-            StopAllCoroutines();
-        }
         if (Input.GetKey(KeyCode.LeftShift) && currentStamina > 0f)
         {
+            if (!isSprinting)
+            {
+                _Animator.SetBool("sprintStart", true);
+                _Animator.SetBool("sprintEnd", false);
+            }
             isSprinting = true;
             currentStamina -= staminaDepletionRate * Time.deltaTime;
         }
         else
         {
+            if (isSprinting)
+            {
+                _Animator.SetBool("sprintEnd", true);
+                _Animator.SetBool("sprintStart", false);
+            }
             isSprinting = false;
         }
 

@@ -6,4 +6,5 @@ public enum EntityType
     Obstacle,
     Hero,
     Arrow,
+    Animals,
 }

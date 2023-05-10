@@ -9,20 +9,20 @@ namespace GameInit.Enemy
     public class EnemySpawnComponent : MonoBehaviour
     {
         [SerializeField] private int _count = 2;
-        [SerializeField] private GameObject _enemyPrefab;
+        [SerializeField] private AIComponent _AIComponent;
         [SerializeField] private float spawnDiffMax = 3;
         [SerializeField] private float spawnDiffMin = 1;
         [SerializeField] private Transform transformSpawnPosition;
         [SerializeField] private int _multiplier = 1;
         [SerializeField] private ParticleSystem _paticle;
         [SerializeField] private float _delayForSpawnEnemyIfInZone = 3f;
-
+        
         private Action<EnemySpawnComponent> _closeToPortal;
         private bool _isPlaying = false;
         private bool _isPlayerInside = false;
         private Coroutine _coroutine;
         public int Multiplier { get { return _multiplier; } }
-        
+
         public void SetAction(Action<EnemySpawnComponent> _action)
         {
             _closeToPortal = _action;
@@ -40,9 +40,9 @@ namespace GameInit.Enemy
         {
             return _count;
         }
-        public GameObject GetEnemy()
+        public AIComponent GetEnemy()
         {
-            return _enemyPrefab;
+            return _AIComponent;
         }
 
         private void OnTriggerEnter(Collider other)

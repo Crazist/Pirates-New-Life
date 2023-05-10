@@ -81,29 +81,9 @@ namespace GameInit.AI
             }
             else
             {
-                _countOfDays = 0;
-
-
                 foreach (var camp in _CampComponents)
                 {
-                    int needToSpawn = 0;
-
-                    var strays = camp.GetStrayList();
-
-                    for (int i = strays.Count - 1; i >= 0; i--)
-                    {
-                        if (!strays[i].HasCoin())
-                        {
-                            strays.RemoveAt(i);
-                        }
-                    }
-
-                    if (strays.Count < 2)
-                    {
-                        needToSpawn = _spawnCountOfStrayPerDays;
-                    }
-
-                    for (int i = 0; i < needToSpawn; i++)
+                    for (int i = 0; i < _spawnCountOfStrayPerDays; i++)
                     {
                         var pos = camp.GetTransformSpawn().position;
                         var diffmax = camp.GetSpawnDiffMax();
@@ -123,13 +103,11 @@ namespace GameInit.AI
 
                         var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
 
-                        var obj = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
-                        var _AIComponent = obj.GetComponent<AIComponent>();
+                        var _AIComponent = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
 
                         var randomWalker = new RandomWalker();
                         Stray stray = new Stray(_AIComponent, _AIConnector.GenerateId(), _pool, _coinDropAnimation, _heroComponent, randomWalker);
 
-                        strays.Add(stray);
 
                         _AIConnector.StrayList.Add(stray);
                     }
@@ -160,9 +138,8 @@ namespace GameInit.AI
 
                     var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
 
-                    var obj = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
-                    var _AIComponent = obj.GetComponent<AIComponent>();
-
+                    var _AIComponent = GameObject.Instantiate(camp.GetCitizenPrefab(), position, Quaternion.identity);
+                    
                     var randomWalker = new RandomWalker();
                     Stray stray = new Stray(_AIComponent, _AIConnector.GenerateId(), _pool, _coinDropAnimation, _heroComponent, randomWalker);
 
@@ -186,32 +163,26 @@ namespace GameInit.AI
 
             foreach (var camp in _EnemySpawnComponents)
             {
-                camp.SetCount(currentEnemies);
-                for (int i = 0; i < camp.GetCount(); i++)
+                if (camp.isActiveAndEnabled)
                 {
-                    var pos = camp.GetTransformSpawn().position;
-                    var diffmax = camp.GetSpawnDiffMax();
-                    var diffmin = camp.GetSpawnDiffMin();
-
-                    var x = UnityEngine.Random.Range(diffmin, diffmax);
-                    var z = UnityEngine.Random.Range(diffmin, diffmax);
-
-                    if (UnityEngine.Random.Range(0, 2) == 1)
+                    camp.SetCount(currentEnemies);
+                    for (int i = 0; i < camp.GetCount(); i++)
                     {
-                        x = -x;
+                        var pos = camp.GetTransformSpawn().position;
+                        var diffmax = camp.GetSpawnDiffMax();
+                        var diffmin = camp.GetSpawnDiffMin();
+
+                        var x = UnityEngine.Random.Range(diffmin, diffmax);
+                        var z = UnityEngine.Random.Range(diffmin, diffmax);
+
+                        var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
+
+                        DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
+
+                        _AIWarConnector.PointsInWorld.Add(enemy);
+                        _AIWarConnector.EnemyList.Add(enemy);
+                        _AIWarConnector.UpdateTree();
                     }
-                    if (UnityEngine.Random.Range(0, 2) == 1)
-                    {
-                        z = -z;
-                    }
-
-                    var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
-
-                    DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
-
-                    _AIWarConnector.PointsInWorld.Add(enemy);
-                    _AIWarConnector.EnemyList.Add(enemy);
-                    _AIWarConnector.UpdateTree();
                 }
             }
         }

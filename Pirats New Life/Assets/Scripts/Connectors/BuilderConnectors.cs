@@ -4,6 +4,7 @@ using UnityEngine;
 using GameInit.Connector;
 using GameInit.Pool;
 using GameInit.GameCyrcleModule;
+using GameInit.Hero;
 
 namespace GameInit.Builders 
 {
@@ -27,6 +28,11 @@ namespace GameInit.Builders
         public AIWarConnector GetAIWarConnector()
         {
             return _AIWarConnector;
+        }
+        public void GetHeroComponent(HeroComponent heroComponent, HeroMove HeroMove)
+        {
+            _AIWarConnector.GetHeroComponent(HeroMove);
+            _AIConnector.GetHeroComponent(heroComponent);
         }
     }
 }

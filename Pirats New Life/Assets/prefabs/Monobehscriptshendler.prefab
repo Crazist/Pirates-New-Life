@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7778504022092878083}
   - component: {fileID: 4401177362346168053}
   - component: {fileID: 6176239413188185034}
+  - component: {fileID: 214590371546786440}
   m_Layer: 0
   m_Name: Monobehscriptshendler
   m_TagString: Untagged
@@ -161,6 +162,7 @@ MonoBehaviour:
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   DirectionalLight: {fileID: 0}
+  cycleDuration: 240
   TimeOfday: 0
 --- !u!114 &6176239413188185034
 MonoBehaviour:
@@ -175,3 +177,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coin: {fileID: 783989943504792734, guid: abc1e419465ef45e7a7f961546ac1c8b, type: 3}
+  enemy: {fileID: 0}
+  _arrow: {fileID: 0}
+--- !u!114 &214590371546786440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5413548742667659345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3086e84b8e3c44344ad72c9f7489f919, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _countRabbits: 3
+  _spawnDiffMaxX: 10
+  _spawnDiffMinX: -10
+  _spawnDiffMaxZ: 3
+  _spawnDiffMinZ: -1
+  _offsetFromTheWall: 20
+  _radius: 5
+  _AIComponent: {fileID: 706681399066928227, guid: 69a2c7225a44ded45a674ccce61159b9, type: 3}

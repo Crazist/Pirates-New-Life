@@ -7,7 +7,7 @@ namespace GameInit.AI
 {
     public class CampComponent : MonoBehaviour
     {
-        [SerializeField] private GameObject CitizenPrefab;
+        [SerializeField] private AIComponent CitizenPrefab;
         [SerializeField] private int count = 3;
         [SerializeField] private float spawnDiffMax = 3;
         [SerializeField] private float spawnDiffMin = 1;
@@ -24,7 +24,7 @@ namespace GameInit.AI
             return _strays;
         }
 
-        public GameObject GetCitizenPrefab()
+        public AIComponent GetCitizenPrefab()
         {
             return CitizenPrefab;
         }

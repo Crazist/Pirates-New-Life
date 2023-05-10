@@ -38,11 +38,11 @@ namespace GameInit.Builders
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
             BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager, _arrowPool);
-
+            
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             
             HeroBuilder _heroBuilder = new HeroBuilder(gameCyrcle, _coinPool, _resourceManager, _builderConnectors, _builderConnectors, _uiBuilder, _coinDropAnimation, _resourceManager);
-            _builderConnectors.GetAiConnector().GetHeroComponent(_heroBuilder.GetHeroComponent());
+            _builderConnectors.GetHeroComponent(_heroBuilder.GetHeroComponent(), _heroBuilder.GetHeroMove());
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);
 

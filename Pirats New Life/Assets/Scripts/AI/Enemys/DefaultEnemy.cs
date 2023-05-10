@@ -13,10 +13,11 @@ namespace GameInit.Enemy
         public float DistanceForStartSpell { get; } = 70;
 
         private AIComponent _AIComponent;
+        private Animator _Animator;
         private float _delayForAttack = 3;
         private bool _canDamage = true;
         private int _damage = 1;
-        private float _spellSpeed = 30f;
+        private float _spellSpeed = 40f;
         private float _slowReturnSpeed= 2f;
         private float _standartSpeed;
         private float _returnToBaseSpeed = 5;
@@ -40,8 +41,7 @@ namespace GameInit.Enemy
         private const float _heightPosition = 0.46f;
         private const float _zeroSpeed = 0f;
         private const bool _isEnemy = true;
-        private const float _minStopingDistanceForEnemy = 2.7f;
-
+        
         public DefaultEnemy(AIComponent AIComponent)
         {
             _AIComponent = AIComponent;
@@ -55,6 +55,7 @@ namespace GameInit.Enemy
             _standartSpeed = _AIComponent.GeNavMeshAgent().speed;
             _originalAcceleration = _AIComponent.GeNavMeshAgent().acceleration;
             _originalStopingDistance = _AIComponent.GeNavMeshAgent().stoppingDistance;
+            _Animator = _AIComponent.GetAnimator();
         }
 
         public int GetId()
@@ -138,8 +139,10 @@ namespace GameInit.Enemy
         public void Attack()
         {
             if (_canDamage)
+            {
+                _Animator.SetTrigger("attack");
                 _AIComponent.StartCoroutine(AttackDelay());
-            //animation
+            }
         }
 
         public AIComponent GetAiComponent()
@@ -150,8 +153,12 @@ namespace GameInit.Enemy
         private IEnumerator SpellDeley(Vector3 position)
         {
             RefreshSkill = true;
-            
+            _Animator.SetBool("iddle", true);
+
             yield return new WaitForSeconds(_spellWaitForCast);
+
+            _Animator.SetBool("iddle", false);
+            _Animator.SetBool("charge", true);
 
             _AIComponent.GeNavMeshAgent().speed = _zeroSpeed;
 
@@ -167,6 +174,9 @@ namespace GameInit.Enemy
             _AIComponent.GeNavMeshAgent().stoppingDistance = _originalStopingDistance;
             _damage = _standartDamage;
 
+            _Animator.SetBool("charge", false);
+            _Animator.SetBool("walk", true);
+            _Animator.Update(0f);
             if (_needToRunAway)
             {
                 _AIComponent.GetMonoBehaviour().StartCoroutine(ReturnDeley());
@@ -175,7 +185,6 @@ namespace GameInit.Enemy
             {
                 RefreshSkill = false;
             }
-            
         }
         private IEnumerator ReturnDeley()
         {

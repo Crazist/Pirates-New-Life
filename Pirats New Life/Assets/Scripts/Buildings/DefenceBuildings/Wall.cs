@@ -213,6 +213,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
             _curentlyWorker.GetRandomWalker().Move();
             _curentlyWorker = null;
             _AIWarConnector.SetSwordManToNewPosition();
+            _AIWarConnector.RandomAnimalPosition();
         }
         else
         {
@@ -275,6 +276,7 @@ public class Wall : IBuilding, IDayChange, IKDTree
             }
         }
         _AIWarConnector.SetSwordManToNewPosition();
+        _AIWarConnector.RandomAnimalPosition();
         _wallComponent.StopAllCoroutines();
         _wallComponent.SetCanProduce(true);
         _wallComponent.ResetForm();

@@ -47,12 +47,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _count: 2
-  _enemyPrefab: {fileID: 7292829562450964068, guid: 96f6825363f9b7c4f8b5a2492dcd30f6, type: 3}
+  _AIComponent: {fileID: 7964042037693619126, guid: 96f6825363f9b7c4f8b5a2492dcd30f6, type: 3}
   spawnDiffMax: 3
   spawnDiffMin: 1
   transformSpawnPosition: {fileID: 8842900714194565609}
   _multiplier: 1
   _paticle: {fileID: 5170091662355013111}
+  _delayForSpawnEnemyIfInZone: 3
 --- !u!65 &4832678867308980401
 BoxCollider:
   m_ObjectHideFlags: 0
