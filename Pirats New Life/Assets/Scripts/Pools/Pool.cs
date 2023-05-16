@@ -10,7 +10,7 @@ namespace GameInit.Pool
         [SerializeField] private Coin _prefab;
 
         private Transform _container;
-        private int _minCapacity = 10;
+        private int _minCapacity = 30;
         private int _maxCapacity = Int32.MaxValue;
         private bool _isExpand;
 
@@ -28,6 +28,8 @@ namespace GameInit.Pool
             _prefab = prefab;
             _pool = new List<Coin>();
 
+            _container = new GameObject("GoldContainer").transform;
+
             for (int i = 0; i < _minCapacity; i++)
             {
                 CreateObj();
@@ -39,6 +41,8 @@ namespace GameInit.Pool
             createdObj.gameObject.SetActive(isActibebydefault);
 
             _pool.Add(createdObj);
+
+            createdObj.transform.SetParent(_container);
 
             return createdObj;
         }

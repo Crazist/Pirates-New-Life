@@ -3,16 +3,13 @@ using UnityEngine;
 using GameInit.AI;
 using System;
 using GameInit.Pool;
-using GameInit.RandomWalk;
 using GameInit.Optimization.KDTree;
 using GameInit.GameCyrcleModule;
-using GameInit.Building;
 using GameInit.Builders;
-using GameInit.Connector;
 using System.Diagnostics;
 using GameInit.Enemy;
-using System.Linq;
 using GameInit.Hero;
+using GameInit.Building;
 
 namespace GameInit.Connector
 {
@@ -20,6 +17,7 @@ namespace GameInit.Connector
     {
         public List<IWork> SwordManList { get; set; }
         public List<IWork> ArcherList { get; set; }
+        public List<IKDTree> TowerList { get; set; }
         public List<IEnemy> EnemyList { get; set; }
         public List<IAnimal> AnimalList { get; set; }
         public List<Wall> RightWall { get; set; }
@@ -37,6 +35,7 @@ namespace GameInit.Connector
         private KDTree _tree;
         private KDQuery _treeQuery;
         private ArrowPool _arrowPool;
+        private ArrowPool _arrowRedPool;
         private float lastUpdateTime = 0.0f;
         private const float updateInterval = 0.5f;
         private Transform[] _EnemySpawnerPsoition;
@@ -51,7 +50,7 @@ namespace GameInit.Connector
         private const int offsetSwordMan = 4;
         private const int offsetArcher = 7;
         private const int offsetArcherInday = 10;
-        public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool)
+        public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool, ArrowPool arrowRedPool)
         {
             PointsInWorld = new List<IKDTree>();
 
@@ -59,6 +58,7 @@ namespace GameInit.Connector
             ArcherList = new List<IWork>();
             EnemyList = new List<IEnemy>();
             AnimalList = new List<IAnimal>();
+            TowerList = new List<IKDTree>();
 
             RightWall = new List<Wall>();
             LeftWall = new List<Wall>();
@@ -68,6 +68,7 @@ namespace GameInit.Connector
             _gameCyrcle = cyrcle;
             _pool = pool;
             _arrowPool = arrowPool;
+            _arrowRedPool = arrowRedPool;
 
             _tree = new KDTree();
             _treeQuery = new KDQuery();
@@ -187,6 +188,8 @@ namespace GameInit.Connector
 
                 UpdateEnemyRunForAttack();
                 UpdateArcherMoveAndShoot();
+                UpdateAllyRunForAttack();
+                TowerShoot();
                 UpdateDamageClosest();
                 UpdateEnimalsRunAway();
 
@@ -204,12 +207,27 @@ namespace GameInit.Connector
             }
         }
 
+        private void UpdateAllyRunForAttack()
+        {
+            for (int i = 0; i < SwordManList.Count; i++)
+            {
+                _treeQuery.ShildAllyRunForAttack(_tree, (IKDTree)SwordManList[i]);
+            }
+        }
+
         private void UpdateArcherMoveAndShoot()
         {
             for (int i = 0; i < ArcherList.Count; i++)
             {
                 _treeQuery.ArcherMove(_tree, (IKDTree)ArcherList[i]);
                 _treeQuery.ShootClosest(_tree, (IKDTree)ArcherList[i], _arrowPool, _treeQuery);
+            }
+        }
+        private void TowerShoot()
+        {
+            for (int i = 0; i < TowerList.Count; i++)
+            {
+                _treeQuery.ShootClosest(_tree, TowerList[i], _arrowRedPool, _treeQuery);
             }
         }
 

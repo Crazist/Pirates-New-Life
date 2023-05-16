@@ -8,7 +8,7 @@ namespace GameInit.Building
         FarmItemHolder,
         Farm,
         ArcherBuilding,
-        SwordManBuilding
+        SwordManBuilding,
     }
 }
 

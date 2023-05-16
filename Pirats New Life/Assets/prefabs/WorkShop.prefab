@@ -47,8 +47,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 11.582927, y: 0.58, z: 9.218197}
-  m_Center: {x: 0.947042, y: 0.09, z: 0.30228806}
+  m_Size: {x: 6.7780643, y: 4.11, z: 7.811722}
+  m_Center: {x: 0.23139787, y: 1.8500001, z: 0.40237617}
 --- !u!114 &3693129768310726713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74,6 +74,7 @@ MonoBehaviour:
   type: 0
   _currentlyBuilding: 0
   _momentalBuild: 1
+  _BuildNeedGoldShow: {fileID: 0}
 --- !u!114 &4655250240318134952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,6 +92,7 @@ MonoBehaviour:
   maxCount: 2
   itemPrefab: {fileID: 5111520151904295630, guid: 4652b4cbe90974e69ba88e5347a5ec88, type: 3}
   type: 1
+  _BuildNeedGoldShow: {fileID: 0}
 --- !u!1 &3325293822279073376
 GameObject:
   m_ObjectHideFlags: 0

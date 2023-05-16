@@ -4,6 +4,7 @@ using GameInit.Building;
 using UnityEngine;
 using System;
 using GameInit.DropAndCollectGold;
+using Cysharp.Threading.Tasks;
 
 namespace GameInit.Building
 {
@@ -14,12 +15,14 @@ namespace GameInit.Building
         [SerializeField] private int maxCount = 2;
         [SerializeField] private GameObject itemPrefab;
         [SerializeField] ItemsType type;
+        [SerializeField] private BuildNeedGoldShow _BuildNeedGoldShow;
 
         private int curGold = 0;
         private bool canProduce = false;
         private Action _action;
         private bool inBuild = false;
         private Action<int> _dropBeforePickUp;
+        private bool _checkOneTime = true;
 
         public int GetMaxCount()
         {
@@ -48,6 +51,10 @@ namespace GameInit.Building
 
         public void SetCanProduce(bool prod)
         {
+            if (!prod)
+            {
+                _BuildNeedGoldShow.DeactiveBuildingNeeds();
+            }
             canProduce = prod;
         }
 
@@ -60,6 +67,13 @@ namespace GameInit.Building
         {
             if (!canProduce || curGold == cost) return;
 
+            if (other.TryGetComponent(out HeroComponent hero))
+            {
+                _BuildNeedGoldShow.ActiveBuildingNeeds();
+                _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + cost.ToString());
+                _BuildNeedGoldShow.SetNameText(type.ToString());
+            }
+
             var _coin = other.gameObject.GetComponent<Coin>();
             if (_coin && !_coin.SecondTouch)
             {
@@ -67,11 +81,39 @@ namespace GameInit.Building
                 GoldCollects();
             }
         }
+        private void OnTriggerExit(Collider other)
+        {
+            if (!canProduce || curGold == cost) return;
 
+            if (other.TryGetComponent(out HeroComponent hero))
+            {
+                _BuildNeedGoldShow.DeactiveBuildingNeeds();
+            }
+        }
+        private void OnTriggerStay(Collider other)
+        {
+            if (_checkOneTime && canProduce)
+            {
+                if (other.TryGetComponent(out HeroComponent hero))
+                {
+                    WaitBeforeShow();
+                    _checkOneTime = false;
+                }
+            }
+        }
+
+        private async void WaitBeforeShow()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(2));
+            _BuildNeedGoldShow.ActiveBuildingNeeds();
+            _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + cost.ToString());
+            _BuildNeedGoldShow.SetNameText(type.ToString());
+        }
         private void GoldCollects()
         {
             curGold++;
-            if(!inBuild)
+            _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + cost.ToString());
+            if (!inBuild)
             StartCoroutine(Waiter());
         }
 
@@ -95,7 +137,7 @@ namespace GameInit.Building
             while (checkForGold);
             if (curGold == cost)
             {
-                _action.Invoke();
+              _action.Invoke();
             }
             else
             {
@@ -104,7 +146,7 @@ namespace GameInit.Building
             curGold = 0;
             checkForGold = false;
             inBuild = false;
-            StopCoroutine(Waiter());
+            _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + cost.ToString());
         }
     }
 }

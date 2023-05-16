@@ -90,9 +90,8 @@ public class Farm : IBuilding, IDayChange, IUpdate
         if (!_farmComponent.ChekMaxLvl())
         {
             inBuildProgress = true;
-            _farmComponent.SetInBuild(inBuildProgress);
             MoveBuilder();
-            _farmComponent.SetCountForGold(_farmComponent.GetCurCountOFGold() * 3);
+            _farmComponent.SetCanProduce(false);
         }
     }
     private void DropGold()

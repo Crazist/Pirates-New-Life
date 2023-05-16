@@ -12,10 +12,10 @@ namespace GameInit.Builders
     {
         private AIConnector _AIConnector;
         private AIWarConnector _AIWarConnector;
-        public BuilderConnectors(Pools coinPool, GameCyrcle cyrcle, ResourceManager resourceManager, ArrowPool arrowPool)
+        public BuilderConnectors(Pools coinPool, GameCyrcle cyrcle, ResourceManager resourceManager, ArrowPool arrowPool, ArrowPool arrowRedPool)
         {
             _AIConnector = new AIConnector(coinPool, cyrcle);
-            _AIWarConnector = new AIWarConnector(coinPool, cyrcle, resourceManager, _AIConnector, arrowPool);
+            _AIWarConnector = new AIWarConnector(coinPool, cyrcle, resourceManager, _AIConnector, arrowPool, arrowRedPool);
             cyrcle.Add(_AIConnector);
             cyrcle.AddDayChange(_AIConnector);
             cyrcle.Add(_AIWarConnector);

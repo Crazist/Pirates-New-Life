@@ -7,4 +7,5 @@ public enum EntityType
     Hero,
     Arrow,
     Animals,
+    Tower
 }

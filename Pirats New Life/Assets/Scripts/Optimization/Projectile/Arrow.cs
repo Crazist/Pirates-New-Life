@@ -17,6 +17,7 @@ namespace GameInit.Projectiles
         private Coroutine _coroutine;
 
         private const float _earthY = 0.46f;
+        private const float _towerHeight = 5f;
 
         private Vector3[] path;
         private int currentPoint = 0;
@@ -32,6 +33,8 @@ namespace GameInit.Projectiles
         }
         public void Shoot(IKDTree queryPosition, Vector3 endPoint, KDTree tree, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, KDQuery _KDQuery)
         {
+            arrowSpeed = 10f;
+
             float randomX = UnityEngine.Random.Range(-1f, 1f);
             float randomZ = UnityEngine.Random.Range(-1f, 1f);
             Vector3 offset = new Vector3(randomX, 0, randomZ);
@@ -42,6 +45,21 @@ namespace GameInit.Projectiles
 
             if(_coroutine == null)
             _coroutine = _mono.StartCoroutine(ArrowFly(tree, PointsInWorld, EnemyList,  _KDQuery));
+        }
+        public void ShootTower(IKDTree queryPosition, Vector3 endPoint, KDTree tree, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, KDQuery _KDQuery)
+        {
+            arrowSpeed = 15f;
+
+            float randomX = UnityEngine.Random.Range(-1f, 1f);
+            float randomZ = UnityEngine.Random.Range(-1f, 1f);
+            Vector3 offset = new Vector3(randomX, 0, randomZ);
+            Vector3 startPosition = new Vector3(queryPosition.GetPositionVector2().x, _towerHeight, queryPosition.GetPositionVector2().y);
+
+            ProjectileMotionCalculator _projectileMotionCalculator = new ProjectileMotionCalculator();
+            path = _projectileMotionCalculator.CalculateVerticalDescenta(startPosition, endPoint + offset);
+
+            if (_coroutine == null)
+                _coroutine = _mono.StartCoroutine(ArrowFly(tree, PointsInWorld, EnemyList, _KDQuery));
         }
         private IEnumerator ArrowFly(KDTree tree, List<IKDTree> PointsInWorld, List<IEnemy> EnemyList, KDQuery _KDQuery)
         {

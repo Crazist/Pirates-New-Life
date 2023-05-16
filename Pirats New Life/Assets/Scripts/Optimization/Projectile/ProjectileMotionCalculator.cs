@@ -45,5 +45,19 @@ namespace GameInit.Optimization
 
             return points;
         }
+        public Vector3[] CalculateVerticalDescenta(Vector3 start, Vector3 end)
+        {
+            Vector3[] points = new Vector3[POINTS_COUNT];
+
+            for (int i = 0; i < POINTS_COUNT; i++)
+            {
+                float t = (float)i / (float)(POINTS_COUNT - 1);
+                Vector3 point = Vector3.Lerp(start, end, t);
+
+                points[i] = point;
+            }
+
+            return points;
+        }
     }
 }

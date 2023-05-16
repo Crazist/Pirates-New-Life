@@ -15,6 +15,9 @@ namespace GameInit.DropAndCollectGold
         private HeroComponent _heroComponent;
         private AIConnector _AIConnector;
 
+        private float dropTimer = 0.0f;
+        private float dropInterval = 0.5f;
+
         public DropCoins(Pools _pool, Transform _transform, ResourceManager _resourses, HeroComponent heroComponent, AIConnector AIConnector)
         {
             _AIConnector = AIConnector;
@@ -46,6 +49,19 @@ namespace GameInit.DropAndCollectGold
             if (Input.GetKeyDown(KeyCode.Space) && resourses.GetResource(ResourceType.Gold) != 0)
             {
                 DropCoin();
+            }
+            if (Input.GetKey(KeyCode.Space) && resourses.GetResource(ResourceType.Gold) != 0)
+            {
+                dropTimer += Time.deltaTime;
+                if (dropTimer >= dropInterval)
+                {
+                    DropCoin();
+                    dropTimer = 0.0f;
+                }
+            }
+            else
+            {
+                dropTimer = 0.0f;
             }
             CollectGold();
         }

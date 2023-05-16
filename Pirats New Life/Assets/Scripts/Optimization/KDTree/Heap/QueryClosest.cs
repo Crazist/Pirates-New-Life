@@ -255,6 +255,60 @@ namespace GameInit.Optimization.KDTree
                 }
             }
         }
+        public void ShildAllyRunForAttack(KDTree tree, IKDTree _queryPosition, float minDist = 0)
+        {
+
+            /// Smallest Squared Radius
+            float SSR = Single.PositiveInfinity;
+            float _minDist = 100;
+
+            float sqrDist;
+            int[] permutation = tree.permutation;
+            var _isEnemy = _queryPosition.CheckIfEnemy();
+            IKDTree[] points = tree.points;
+            int smallestIndex = -1;
+
+            var rootNode = tree.rootNode;
+
+            KDNode node = FindClosestNode(tree, _queryPosition);
+
+            // LEAF
+            for (int i = node.start; i < node.end; i++)
+            {
+                int index = permutation[i];
+                var defender = points[index];
+
+                if ((defender.CheckIfEnemy() != _isEnemy || defender.Type == EntityType.Wall) && defender.HP > 0 && _queryPosition.CheckIfCanDamage() && _queryPosition.HP > 0 && defender.Type != EntityType.Animals)
+                {
+                    sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - _queryPosition.GetPositionVector2());
+
+                    if (sqrDist <= SSR && sqrDist < _minDist)
+                    {
+                        SSR = sqrDist;
+                        smallestIndex = index;
+                    }
+                }
+            }
+
+            if (smallestIndex != -1)
+            {
+                var _defender = points[smallestIndex];
+
+                if(_defender.Type != EntityType.Wall)
+                {
+                    IWork _ally = (IWork)_queryPosition;
+
+                    Vector3 target = new Vector3();
+
+                    target.x = _defender.GetPositionVector2().x;
+                    target.z = _defender.GetPositionVector2().y;
+                    target.y = _heightPosition;
+
+                    _ally.Move(target, null);
+                }
+            }
+        }
+
         public void ArcherMove(KDTree tree, IKDTree queryPosition)
         {
 
@@ -359,7 +413,7 @@ namespace GameInit.Optimization.KDTree
             int[] permutation = tree.permutation;
             var _isEnemy = hero.CheckIfEnemy();
             IKDTree[] points = tree.points;
-            
+
             KDNode node = FindClosestNode(tree, hero);
 
             for (int i = node.start; i < node.end; i++)
@@ -371,7 +425,7 @@ namespace GameInit.Optimization.KDTree
                 {
                     IAnimal animal = (IAnimal)defender;
 
-                    if (defender.CheckIfEnemy() != _isEnemy && defender.HP > 0 )
+                    if (defender.CheckIfEnemy() != _isEnemy && defender.HP > 0)
                     {
                         sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - hero.GetPositionVector2());
 
@@ -401,9 +455,6 @@ namespace GameInit.Optimization.KDTree
                 }
             }
         }
-               
-            
-        
         public void DamageClosest(KDTree tree, IKDTree queryPosition)
         {
             float sqrDist;
@@ -415,13 +466,14 @@ namespace GameInit.Optimization.KDTree
             /// Smallest Squared Radius
             float SSR = Single.PositiveInfinity;
             float _minDistForDamage = 3f;
+            float _minDistForDamageWall = 10f;
             float _minDistForDamageArrow = 1.5f;
 
             var rootNode = tree.rootNode;
 
             KDNode node = FindClosestNode(tree, queryPosition);
 
-            
+
             // LEAF
             for (int i = node.start; i < node.end; i++)
             {
@@ -433,6 +485,7 @@ namespace GameInit.Optimization.KDTree
                     sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 
                     float _distanceAttack = queryPosition.Type == EntityType.Arrow ? _minDistForDamageArrow : _minDistForDamage;
+                    _distanceAttack = defender.Type == EntityType.Wall ? _minDistForDamageWall : _distanceAttack;
 
                     if (sqrDist <= SSR && sqrDist <= _distanceAttack)
                     {
@@ -456,7 +509,7 @@ namespace GameInit.Optimization.KDTree
                         {
                             EnemyList.Remove((IEnemy)defender);
                         }
-                        else if(defender.CheckIfEnemy() && defender.Type == EntityType.Animals)
+                        else if (defender.CheckIfEnemy() && defender.Type == EntityType.Animals)
                         {
                             AnimalList.Remove((IAnimal)defender);
                         }
@@ -467,7 +520,7 @@ namespace GameInit.Optimization.KDTree
                 {
                     queryPosition.Attack();
                     defender.GetDamage(queryPosition.CountOFDamage());
-                    if (defender.HP <= 0 && defender.Type != EntityType.Wall)
+                    if (defender.HP <= 0 && defender.Type != EntityType.Wall && defender.Type != EntityType.Animals)
                     {
                         PointsInWorld.Remove(defender);
                         if (defender.CheckIfEnemy())
@@ -486,6 +539,7 @@ namespace GameInit.Optimization.KDTree
             var _isEnemy = queryPosition.CheckIfEnemy();
             IKDTree[] points = tree.points;
             float SSR = Single.PositiveInfinity;
+            float _minDistForDamageTower = 350f;
             float _minDistForDamage = 150f;
             float _minCloseDistForDamage = 50f;
             int smallestIndex = -1;
@@ -497,7 +551,17 @@ namespace GameInit.Optimization.KDTree
                 int index = permutation[i];
                 var defender = points[index];
 
-                if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.HP > 0)
+                if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.Type == EntityType.Tower && defender.Type != EntityType.Animals)
+                {
+                    sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
+
+                    if (sqrDist <= SSR && sqrDist <= _minDistForDamageTower && sqrDist > _minCloseDistForDamage)
+                    {
+                        SSR = sqrDist;
+                        smallestIndex = index;
+                    }
+                }
+                else if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.HP > 0)
                 {
                     sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 
@@ -520,7 +584,14 @@ namespace GameInit.Optimization.KDTree
 
                 var arrow = _arrowPool.GetFreeElements(startPosition);
 
-                arrow.Shoot(queryPosition, endPosition, tree, PointsInWorld, EnemyList, _treeQuery);
+                if (queryPosition.Type == EntityType.Tower)
+                {
+                    arrow.ShootTower(queryPosition, endPosition, tree, PointsInWorld, EnemyList, _treeQuery);
+                }
+                else
+                {
+                    arrow.Shoot(queryPosition, endPosition, tree, PointsInWorld, EnemyList, _treeQuery);
+                }
 
                 if (queryPosition.HP <= 0)
                 {

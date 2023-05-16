@@ -1,6 +1,8 @@
+using Cysharp.Threading.Tasks;
 using GameInit.AI;
 using System;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -35,6 +37,7 @@ namespace GameInit.Enemy
         private int _damageInRun = 2;
         private int _standartDamage = 1;
         private bool _isDying = false;
+        private CancellationToken token;
         public int HP { get; set; } = 1;
         public EntityType Type { get; } = EntityType.Enemy;
 
@@ -51,6 +54,8 @@ namespace GameInit.Enemy
             {
                 _AIComponent.GetTransform().position = hit.position;
             }
+            CancellationTokenSource cts = new CancellationTokenSource();
+            token = cts.Token;
             _AIComponent.GetGm().SetActive(true);
             _standartSpeed = _AIComponent.GeNavMeshAgent().speed;
             _originalAcceleration = _AIComponent.GeNavMeshAgent().acceleration;
@@ -129,10 +134,11 @@ namespace GameInit.Enemy
         {
             return _damage;
         }
-        private IEnumerator AttackDelay()
+        
+        private async void AttackDelay()
         {
             _canDamage = false;
-            yield return new WaitForSecondsRealtime(_delayForAttack);
+            await UniTask.Delay(TimeSpan.FromSeconds(_delayForAttack), cancellationToken: token);
             _canDamage = true;
         }
 
@@ -141,7 +147,7 @@ namespace GameInit.Enemy
             if (_canDamage)
             {
                 _Animator.SetTrigger("attack");
-                _AIComponent.StartCoroutine(AttackDelay());
+                AttackDelay();
             }
         }
 
@@ -150,13 +156,13 @@ namespace GameInit.Enemy
             return _AIComponent;
         }
 
-        private IEnumerator SpellDeley(Vector3 position)
+        private async void SpellDeley(Vector3 position)
         {
             RefreshSkill = true;
             _Animator.SetBool("iddle", true);
 
-            yield return new WaitForSeconds(_spellWaitForCast);
-
+            await UniTask.Delay(TimeSpan.FromSeconds(_spellWaitForCast), cancellationToken: token);
+            
             _Animator.SetBool("iddle", false);
             _Animator.SetBool("charge", true);
 
@@ -167,28 +173,36 @@ namespace GameInit.Enemy
             _AIComponent.GeNavMeshAgent().acceleration = _spellAcceleration;
             _AIComponent.GeNavMeshAgent().stoppingDistance = _spellStopingDistance;
 
-            yield return new WaitForSeconds(_runTime);
 
-            _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
+            await UniTask.Delay(TimeSpan.FromSeconds(_runTime), cancellationToken: token);
+
+            _AIComponent.GeNavMeshAgent().speed = 0;
+
             _AIComponent.GeNavMeshAgent().acceleration = _originalAcceleration;
             _AIComponent.GeNavMeshAgent().stoppingDistance = _originalStopingDistance;
             _damage = _standartDamage;
 
             _Animator.SetBool("charge", false);
             _Animator.SetBool("walk", true);
+
+            await UniTask.Yield(PlayerLoopTiming.Update);
+
+            _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
+
             _Animator.Update(0f);
             if (_needToRunAway)
             {
-                _AIComponent.GetMonoBehaviour().StartCoroutine(ReturnDeley());
+                ReturnDeley();
             }
             else
             {
                 RefreshSkill = false;
             }
         }
-        private IEnumerator ReturnDeley()
+
+        private async void ReturnDeley()
         {
-            if(Vector2.SqrMagnitude(_AIComponent.GeNavMeshAgent().transform.position - _curTargetPosition) < DistanceForStartSpell)
+            if (Vector2.SqrMagnitude(_AIComponent.GeNavMeshAgent().transform.position - _curTargetPosition) < DistanceForStartSpell)
             {
                 Vector3 target = _curTargetPosition + new Vector3(UnityEngine.Random.Range(-_maxOffset, _maxOffset), 0, UnityEngine.Random.Range(-_maxOffset, _maxOffset));
 
@@ -208,13 +222,14 @@ namespace GameInit.Enemy
 
                 Move(target);
 
-                yield return new WaitForSeconds(_returnTime);
+                await UniTask.Delay(TimeSpan.FromSeconds(_returnTime), cancellationToken: token);
             }
-           
+
             _AIComponent.GeNavMeshAgent().speed = _standartSpeed;
 
             RefreshSkill = false;
         }
+        
         private IEnumerator Waiter(Action action, Vector3 position)
         {
             _AIComponent.GeNavMeshAgent().speed = _returnToBaseSpeed;
@@ -242,7 +257,7 @@ namespace GameInit.Enemy
             {
                 _damage = _damageInRun;
                 Move(_AIComponent.GetTransform().position);
-                _AIComponent.GetMonoBehaviour().StartCoroutine(SpellDeley(position));
+                SpellDeley(position);
             }
         }
 

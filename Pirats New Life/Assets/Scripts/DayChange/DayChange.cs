@@ -17,11 +17,11 @@ public class DayChange : MonoBehaviour
 
     private Action _dayChangeAction;
 
-    private float cycleProgress = 5.3f / 24f;
+    private float cycleProgress = 7.5f / 24f;
 
-    private const int StartDay = 5;
+    private const int StartDay = 8;
 
-    private const int StartNight = 22;
+    private const int StartNight = 20;
     private void OnValidate()
     {
         if(DirectionalLight != null)

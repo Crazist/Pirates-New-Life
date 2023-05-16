@@ -21,6 +21,7 @@ namespace GameInit.AI
         private bool _isDying;
         private int count = 1;
 
+        private const float _height = 0.46f;
         private const bool canPickUp = true;
         public Rabbit(AIComponent component, CoinDropAnimation coinDropAnimation, Vector3 position, float radiusRandomWalk, Pools coinPool, AnimalSpawner _spawner)
         {
@@ -121,7 +122,8 @@ namespace GameInit.AI
         private void Die()
         {
             _AnimalSpawner.RemoveCurCount();
-            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().position, count, _AIComponent.GetTransform().position, _coinPool, canPickUp);
+            var pos = new Vector3(_AIComponent.GetTransform().position.x, _height, _AIComponent.GetTransform().position.z);
+            _coinDropAnimation.RandomCoinJump(pos, count, pos, _coinPool, canPickUp);
             _AIComponent.GetGm().SetActive(false);
             _AIComponent.StopAllCoroutines();
         }

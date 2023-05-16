@@ -9,6 +9,7 @@ namespace GameInit.PoolPrefabs
         [SerializeField] private Coin coin;
         [SerializeField] private AIComponent enemy;
         [SerializeField] private ArrowComponent _arrow;
+        [SerializeField] private ArrowComponent _arrowRed;
 
         public Coin GetCoinPrefab()
         {
@@ -22,7 +23,10 @@ namespace GameInit.PoolPrefabs
         {
             return _arrow;
         }
-
+        public ArrowComponent GetArrowRedPrefab()
+        {
+            return _arrowRed;
+        }
     }
 }
 

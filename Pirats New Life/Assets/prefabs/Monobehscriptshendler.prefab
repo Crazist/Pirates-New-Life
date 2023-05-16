@@ -177,8 +177,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coin: {fileID: 783989943504792734, guid: abc1e419465ef45e7a7f961546ac1c8b, type: 3}
-  enemy: {fileID: 0}
-  _arrow: {fileID: 0}
+  enemy: {fileID: 7964042037693619126, guid: 96f6825363f9b7c4f8b5a2492dcd30f6, type: 3}
+  _arrow: {fileID: 2183056988189934081, guid: aac096338e893794c88690d077f5ee3f, type: 3}
+  _arrowRed: {fileID: 3049727430385889690, guid: 121231c14fec97249b68df5f16c9c150, type: 3}
 --- !u!114 &214590371546786440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,3 +200,4 @@ MonoBehaviour:
   _offsetFromTheWall: 20
   _radius: 5
   _AIComponent: {fileID: 706681399066928227, guid: 69a2c7225a44ded45a674ccce61159b9, type: 3}
+  _curCount: 0

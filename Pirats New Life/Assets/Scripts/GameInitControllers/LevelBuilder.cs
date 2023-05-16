@@ -30,6 +30,7 @@ namespace GameInit.Builders
             Pools _coinPool = new Pools(prefabHolder.GetCoinPrefab());
             EnemyPool _enemyPool = new EnemyPool(prefabHolder.GetEnemyPrefab());
             ArrowPool _arrowPool = new ArrowPool(prefabHolder.GetArrowPrefab());
+            ArrowPool _arrowRedPool = new ArrowPool(prefabHolder.GetArrowRedPrefab());
 
             ResourceManager _resourceManager = new ResourceManager();
 
@@ -37,7 +38,7 @@ namespace GameInit.Builders
 
             CoinDropAnimation _coinDropAnimation = new CoinDropAnimation();
 
-            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager, _arrowPool);
+            BuilderConnectors _builderConnectors = new BuilderConnectors(_coinPool, gameCyrcle, _resourceManager, _arrowPool, _arrowRedPool);
             
             ChestBuilder _chestBuilder = new ChestBuilder(gameCyrcle, _resourceManager, _coinPool, _coinDropAnimation);
             

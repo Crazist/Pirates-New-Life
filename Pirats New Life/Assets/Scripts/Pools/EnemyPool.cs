@@ -10,7 +10,7 @@ public class EnemyPool
     private AIComponent _prefab;
 
     private Transform _container;
-    private int _minCapacity = 10;
+    private int _minCapacity = 20;
     private int _maxCapacity = Int32.MaxValue;
     private bool _isExpand;
 
@@ -28,6 +28,8 @@ public class EnemyPool
         _prefab = prefab;
         _pool = new List<IEnemy>();
 
+        _container = new GameObject("EnemyContainer").transform;
+
         for (int i = 0; i < _minCapacity; i++)
         {
             CreateObj();
@@ -39,6 +41,8 @@ public class EnemyPool
        
         DefaultEnemy _enemy = new DefaultEnemy(createdObj);
         _enemy.GetAiComponent().GetGm().SetActive(isActibebydefault);
+
+        createdObj.transform.SetParent(_container);
 
         _pool.Add(_enemy);
 

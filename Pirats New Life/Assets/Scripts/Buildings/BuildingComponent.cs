@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameInit.Building;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class BuildingComponent : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class BuildingComponent : MonoBehaviour
     [SerializeField] BuildingsType type;
     [SerializeField] private bool _currentlyBuilding = false;
     [SerializeField] private bool _momentalBuild = true;
+    [SerializeField] private BuildNeedGoldShow _BuildNeedGoldShow;
 
     public int BaseCount { get; set; } = 1;
 
@@ -27,6 +29,7 @@ public class BuildingComponent : MonoBehaviour
     private Action _action;
     private bool inBuild = false;
     private Action<int> _dropBeforePickUp;
+    
     public GameObject GetGm()
     {
         return gameObject;
@@ -59,6 +62,10 @@ public class BuildingComponent : MonoBehaviour
     }
     public void SetInBuild(bool _inBuild)
     {
+        if (_inBuild)
+        {
+            _BuildNeedGoldShow.DeactiveBuildingNeeds();
+        }
         inBuild = _inBuild;
         _currentlyBuilding = _inBuild;
     }
@@ -87,6 +94,7 @@ public class BuildingComponent : MonoBehaviour
         {
             this.enabled = false;
             canProduce = false;
+            _BuildNeedGoldShow.DeactiveBuildingNeeds();
             return true;
         }
         return false;
@@ -99,11 +107,14 @@ public class BuildingComponent : MonoBehaviour
     {
         formsList[curForm - 1].gameObject.SetActive(false);
         formsList[curForm].gameObject.SetActive(true);
-        ChekMaxLvl();
     }
 
     public void SetCanProduce(bool canProd)
     {
+        if (!canProd && _BuildNeedGoldShow != null)
+        {
+            _BuildNeedGoldShow.DeactiveBuildingNeeds();
+        }
         canProduce = canProd;
         inBuild = false;
     }
@@ -118,6 +129,13 @@ public class BuildingComponent : MonoBehaviour
         {
             return;
         }
+       
+        if (other.TryGetComponent(out HeroComponent hero))
+        {
+            _BuildNeedGoldShow.ActiveBuildingNeeds();
+            _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + countOfGold.ToString());
+            _BuildNeedGoldShow.SetNameText(type.ToString());
+        }
 
         var _coin = other.gameObject.GetComponent<Coin>();
         if (_coin && !_coin.SecondTouch)
@@ -127,11 +145,24 @@ public class BuildingComponent : MonoBehaviour
             GoldCollects();
         }
     }
+    private void OnTriggerExit(Collider other)
+    {
+        if (!canProduce || curGold == countOfGold || _currentlyBuilding)
+        {
+            return;
+        }
 
+        if (other.TryGetComponent(out HeroComponent hero))
+        {
+            _BuildNeedGoldShow.DeactiveBuildingNeeds();
+        }
+    }
+   
     private void GoldCollects()
     {
         curGold++;
-        if(!inBuild)
+        _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + countOfGold.ToString());
+        if (!inBuild)
         StartCoroutine(GoldCollectorWaiter());
     }
     
@@ -184,6 +215,7 @@ public class BuildingComponent : MonoBehaviour
             _dropBeforePickUp.Invoke(curGold);
         }
         curGold = 0;
+        _BuildNeedGoldShow.SetGoldText(curGold.ToString() + "/" + countOfGold.ToString());
     }
     private IEnumerator BuildingInProgress()
     {

@@ -4,6 +4,7 @@ using GameInit.Connector;
 using GameInit.Pool;
 using UnityEngine;
 using GameInit.GameCyrcleModule;
+using GameInit.Building;
 
 namespace GameInit.AI
 {

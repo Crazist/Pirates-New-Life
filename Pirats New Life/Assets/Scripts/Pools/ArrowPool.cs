@@ -11,7 +11,7 @@ public class ArrowPool
     private ArrowComponent _prefab;
 
     private Transform _container;
-    private int _minCapacity = 10;
+    private int _minCapacity = 30;
     private int _maxCapacity = Int32.MaxValue;
     private bool _isExpand;
 
@@ -29,6 +29,8 @@ public class ArrowPool
         _prefab = prefab;
         _pool = new List<Arrow>();
 
+        _container = new GameObject("ArrowContainer").transform;
+
         for (int i = 0; i < _minCapacity; i++)
         {
             CreateObj();
@@ -41,6 +43,8 @@ public class ArrowPool
         Arrow arrow = new Arrow(createdObj);
 
         arrow.GetGm().GetGameObj().SetActive(isActibebydefault);
+
+        createdObj.transform.SetParent(_container);
 
         _pool.Add(arrow);
 
