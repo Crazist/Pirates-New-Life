@@ -4,7 +4,6 @@ using GameInit.Building;
 using GameInit.GameCyrcleModule;
 using GameInit.Pool;
 using GameInit.Animation;
-using GameInit.MainPositions;
 using GameInit.Optimization;
 
 namespace GameInit.Builders
@@ -17,15 +16,21 @@ namespace GameInit.Builders
         {
             _buildingsList = new List<Wall>();
 
-            TownHallComponent _townHallComponent = UnityEngine.Object.FindObjectOfType<TownHallComponent>();
+            BuildingTownHallComponent _townHallComponent = UnityEngine.Object.FindObjectOfType<BuildingTownHallComponent>();
 
             var allBuildingsComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
             
             CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors, heroComponent, pool, coinDropAnimation, cyrcle, _townHallComponent);
+            CreateTownHall(_townHallComponent, coinDropAnimation, pool, builderConnectors, cyrcle);
         }
 
+        private void CreateTownHall(BuildingTownHallComponent townHallComponent, CoinDropAnimation coinDropAnimation , Pools pool, BuilderConnectors builderConnectors, GameCyrcle _cyrcle)
+        {
+            TownHall _townHall = new TownHall(townHallComponent, coinDropAnimation, pool, _cyrcle, builderConnectors.GetAIWarConnector());
+            _cyrcle.AddDayChange(_townHall);
+        }
         private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, 
-            BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation, GameCyrcle _cyrcle, TownHallComponent _townHallComponent)
+            BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation, GameCyrcle _cyrcle, BuildingTownHallComponent _townHallComponent)
         {
             var _AIConnector = builderConnectors.GetAiConnector();
             var _WarConnector = builderConnectors.GetAIWarConnector();

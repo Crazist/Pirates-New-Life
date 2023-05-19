@@ -19,7 +19,8 @@ public class BuildingChecker : IBuilding
     private float _progress = 0;
     private float _timeToBuild;
     private int _index;
-    private List<Transform> _positions; 
+    private List<Transform> _positions;
+    private bool prepearForBuild = false;
     public BuildingChecker(Vector3 position, AIConnector connector, GameCyrcle cyrcle, Action buildFinished, float timeToBuild, List<Transform> positions = null) 
     {
         _positions = positions;
@@ -41,7 +42,6 @@ public class BuildingChecker : IBuilding
         {
             MoveBuilder();
         }
-    
     }
 
     public void SetBuilder(IWork worker)
@@ -54,11 +54,23 @@ public class BuildingChecker : IBuilding
     {
         if (_cyrcle.ChekIfDay() && _inBuild)
         {
+            prepearForBuild = true;
             _AIConnector.MoveToClosestAIBuilder(_position, StartBuilding, this);
         }
     }
     private void StartBuilding()
     {
+        if (!prepearForBuild)
+        {
+            _curentlyWorker.InWork = false;
+            _inBuild = false;
+            _AIConnector.MoveToClosest();
+            _curentlyWorker.GetRandomWalker().Move();
+            _curentlyWorker = null;
+            _progress = 0;
+            return;
+        }
+
         if (_curentlyWorker != null)
         {
             _curentlyWorker.InWork = true;
@@ -101,7 +113,7 @@ public class BuildingChecker : IBuilding
             RandomBuildPositionCoroutine(token);
         }
         
-        while (_cyrcle.ChekIfDay() && _progress < _timeToBuild && _curentlyWorker != null)
+        while (_cyrcle.ChekIfDay() && _progress < _timeToBuild && _curentlyWorker != null && prepearForBuild)
         {
             await UniTask.Delay(TimeSpan.FromSeconds(1)); // chek for build and randomPosition time, it will not work if it to similary
             _progress += 1.0f;
@@ -109,7 +121,7 @@ public class BuildingChecker : IBuilding
 
         cts.Cancel();
 
-        if (_progress >= _timeToBuild)
+        if (_progress >= _timeToBuild && prepearForBuild)
         {
             _curentlyWorker.InWork = false;
             _inBuild = false;
@@ -124,7 +136,19 @@ public class BuildingChecker : IBuilding
             // wall building interrupted due to day/night cycle
             _curentlyWorker.InWork = false;
             _inBuild = true;
+            _AIConnector.MoveToClosest();
+            _curentlyWorker.GetRandomWalker().Move();
             _curentlyWorker = null;
         }
+
+        if (!prepearForBuild)
+        {
+            _inBuild = false;
+            _progress = 0;
+        }
      }
+    public void CanselBuilding()
+    {
+        prepearForBuild = false;
+    }
 }

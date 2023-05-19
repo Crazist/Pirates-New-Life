@@ -1,4 +1,5 @@
 using GameInit.Animation;
+using GameInit.Connector;
 using GameInit.Pool;
 using GameInit.RandomWalk;
 using System.Collections;
@@ -17,19 +18,21 @@ namespace GameInit.AI
         private Pools _coinPool;
         private RandomWalker randomWalker;
         private AnimalSpawner _AnimalSpawner;
+        private AIConnector _AIConnector;
 
         private bool _isDying;
         private int count = 1;
 
         private const float _height = 0.46f;
         private const bool canPickUp = true;
-        public Rabbit(AIComponent component, CoinDropAnimation coinDropAnimation, Vector3 position, float radiusRandomWalk, Pools coinPool, AnimalSpawner _spawner)
+        public Rabbit(AIComponent component, CoinDropAnimation coinDropAnimation, Vector3 position, float radiusRandomWalk, Pools coinPool, AnimalSpawner _spawner, AIConnector AIConnector)
         {
             _AnimalSpawner = _spawner;
             _coinPool = coinPool;
             _AIComponent = component;
             _coinDropAnimation = coinDropAnimation;
-           
+            _AIConnector = AIConnector;
+
             randomWalker = new RandomWalker();
 
             _AIComponent.GetAnimator().SetBool("Iddle", true);
@@ -126,6 +129,7 @@ namespace GameInit.AI
             _coinDropAnimation.RandomCoinJump(pos, count, pos, _coinPool, canPickUp);
             _AIComponent.GetGm().SetActive(false);
             _AIComponent.StopAllCoroutines();
+            _AIConnector.CheckAndGoToCoin();
         }
         public Vector2 GetPositionVector2()
         {

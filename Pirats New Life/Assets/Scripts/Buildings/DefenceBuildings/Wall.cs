@@ -37,6 +37,10 @@ namespace GameInit.Building
         private bool _needToRepear = false;
         private Tower _towerFirst;
         private Tower _towerSecond;
+        private bool prepearForBuild = false;
+        private bool _rootWall = false;
+        private bool _buildFirstTime = true;
+        
         public int CirclePosition { get; set; }
         public bool IsRight { get; set; }
         public EntityType Type { get; } = EntityType.Wall;
@@ -83,9 +87,39 @@ namespace GameInit.Building
             inBuildProgress = true;
             _wallComponent.SetInBuild(inBuildProgress);
             MoveBuilder();
-            _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
         }
 
+        public void UpdateFast(int form)
+        {
+            prepearForBuild = false;
+
+            _towerFirst.UpdateFast(form);
+            _towerSecond.UpdateFast(form);
+
+            _rootWall = true;
+            
+            progress = 0;
+            _wallComponent.SetInBuild(false);
+           
+            _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
+            
+           
+            if (!isBuilded)
+            {
+                _wallComponent.SetForm(form - 1);
+                return;
+            }
+
+            _wallComponent.SetForm(form);
+
+            if (_wallComponent.ChekMaxLvl())
+                _wallComponent.SetCanProduce(false);
+            // wall is built
+            HP = form * _hpPerLvl;
+            _wallComponent.UpdateBuild();
+            _AIWarConnector.SetSwordManToNewPosition();
+            _AIWarConnector.RandomAnimalPosition();
+        }
         public bool GetBuildingState()
         {
             return isBuilded;
@@ -119,13 +153,15 @@ namespace GameInit.Building
 
         private void Reapear()
         {
-            if (_needToRepear && _isDay)
+            if (_needToRepear && _isDay && isBuilded)
             {
                 _AIConnector.MoveToClosestAIBuilder(RandomBuildPosition(), StartRepear, this);
             }
         }
         private void MoveBuilder()
         {
+            prepearForBuild = true;
+
             _isDay = _cyrcle.ChekIfDay();
 
             if (_isDay && inBuildProgress && !_coroutineInPlay)
@@ -135,7 +171,7 @@ namespace GameInit.Building
         }
         private void StartRepear()
         {
-            if (_isDay && !inBuildProgress && _curentlyWorker != null && !_coroutineInPlay)
+            if (_isDay && !inBuildProgress && _curentlyWorker != null && !_coroutineInPlay && isBuilded)
             {
                 _curentlyWorker.InWork = true;
                 _wallComponent.GetMonoBehaviour().StartCoroutine(Repearing());
@@ -143,6 +179,17 @@ namespace GameInit.Building
         }
         private void StartBuilding()
         {
+            if (!prepearForBuild)
+            {
+                prepearForBuild = false;
+                _curentlyWorker.InWork = false;
+                inBuildProgress = false;
+                _AIConnector.MoveToClosest();
+                _curentlyWorker.GetRandomWalker().Move();
+                _curentlyWorker = null;
+                return;
+            }
+
             if (_isDay && inBuildProgress && _curentlyWorker != null && !_coroutineInPlay)
             {
                 _curentlyWorker.InWork = true;
@@ -189,7 +236,8 @@ namespace GameInit.Building
         {
             _coroutineInPlay = true;
             _curCoroutineWaitMove = _wallComponent.GetMonoBehaviour().StartCoroutine(RandomBuildPositionCoroutine());
-            while (_isDay && progress < timeToBuild)
+            
+            while (_isDay && progress < timeToBuild && prepearForBuild)
             {
                 yield return new WaitForSeconds(1.0f); // wait for 1 second before checking progress again
                 progress += 1.0f;
@@ -197,9 +245,9 @@ namespace GameInit.Building
 
             _wallComponent.GetMonoBehaviour().StopCoroutine(_curCoroutineWaitMove);
 
-            if (progress >= timeToBuild)
+            if (progress >= timeToBuild && prepearForBuild)
             {
-                if (_wallComponent.GetCurForm() == _firstForm)
+                if (_buildFirstTime)
                 {
                     _towerFirst.SetProduce(true);
                     _towerSecond.SetProduce(true);
@@ -215,11 +263,12 @@ namespace GameInit.Building
                 if (_wallComponent.ChekMaxLvl())
                     _wallComponent.SetCanProduce(false);
                 // wall is built
-                HP = HP + _hpPerLvl;
+                _buildFirstTime = false;
                 _curentlyWorker.InWork = false;
                 isBuilded = true;
                 inBuildProgress = false;
                 _wallComponent.UpdateBuild();
+                HP = _hpPerLvl * _wallComponent.GetCurForm();
                 _wallComponent.SetInBuild(false);
                 Debug.Log("Wall built!");
                 _AIConnector.MoveToClosest();
@@ -227,16 +276,31 @@ namespace GameInit.Building
                 _curentlyWorker = null;
                 _AIWarConnector.SetSwordManToNewPosition();
                 _AIWarConnector.RandomAnimalPosition();
+                
+                if (_wallComponent.GetCurForm() < _wallComponent.GetFormList().Count - 1)
+                {
+                    _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() * 3);
+                }
             }
             else
             {
                 // wall building interrupted due to day/night cycle
                 _curentlyWorker.InWork = false;
                 inBuildProgress = true;
+                _AIConnector.MoveToClosest();
+                _curentlyWorker.GetRandomWalker().Move();
                 _curentlyWorker = null;
                 Debug.Log("Wall building interrupted.");
             }
 
+            if (!prepearForBuild)
+            {
+                progress = 0;
+                isBuilded = true;
+                inBuildProgress = false;
+            }
+
+            prepearForBuild = false;
             _coroutineInPlay = false;
         }
 
@@ -267,7 +331,7 @@ namespace GameInit.Building
         }
         public void GetDamage(int damage)
         {
-            if (HP - damage <= 0)
+            if (isBuilded &&  HP - damage <= 0)
             {
                 Die();
                 HP = 0;
@@ -280,6 +344,7 @@ namespace GameInit.Building
         }
         private void Die()
         {
+            _buildFirstTime = true;
             isBuilded = false;
             foreach (var wall in _walls)
             {
@@ -288,14 +353,26 @@ namespace GameInit.Building
                     wall.GetWallComponent().SetCanProduce(false);
                 }
             }
+
+            _wallComponent.enabled = true;
             _AIWarConnector.SetSwordManToNewPosition();
             _AIWarConnector.RandomAnimalPosition();
             _wallComponent.StopAllCoroutines();
             _wallComponent.SetCanProduce(true);
+            var _curform = _wallComponent.GetCurForm();
             _wallComponent.ResetForm();
-            _wallComponent.SetCountForGold(_wallComponent.BaseCount);
+            _wallComponent.SetForm(_curform - 1);
             _towerFirst.Destroy();
             _towerSecond.Destroy();
+            
+            if (_rootWall)
+            {
+                _wallComponent.SetCountForGold(_wallComponent.GetCurCountOFGold() / 3);
+            }
+            else
+            {
+                _wallComponent.SetCountForGold(_wallComponent.BaseCount);
+            }
         }
         public bool CheckIfEnemy()
         {

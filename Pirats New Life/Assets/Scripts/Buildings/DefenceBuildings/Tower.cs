@@ -21,12 +21,15 @@ public class Tower :  IKDTree
     private CancellationToken token;
     private BuildingChecker _BuildingChecker;
     private AIWarConnector _AIWarConnector;
+    private bool _isBuild = false;
     private int _curGold = 0;
     private bool checkForGold = false;
     private int curForm = 0;
     private int _damage = 0;
     private float _delayForAttack = 4f;
     private bool _canDamage = true;
+    private bool _rootTower = false;
+    private bool firstBuild = true;
 
     private const bool _canPickUp = false;
     private const int _moneyWaitDelay = 1;
@@ -82,15 +85,21 @@ public class Tower :  IKDTree
     }
     private void BuildingFinish()
     {
-        if(curForm == 0)
+        _isBuild = true;
+
+        if (firstBuild)
         {
+            firstBuild = false;
             _AIWarConnector.TowerList.Add(this);
         }
-        _damage++;
-        _delayForAttack = _delayForAttack - 0.5f;
+       
         _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(false);
         curForm++;
         _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(true);
+
+        _damage = curForm;
+        _delayForAttack = _delayForAttack - ((curForm) * 0.5f);
+
         //MoveBuilder();
         if (curForm < _TowerBuildingComponent.GetFormList().Count - 1)
         {
@@ -102,6 +111,43 @@ public class Tower :  IKDTree
             _TowerBuildingComponent.SetCanProduce(false);
         }
     }
+    public void UpdateFast(int form)
+    {
+        _rootTower = true;
+        _BuildingChecker.CanselBuilding();
+
+        _rootTower = true;
+
+        _TowerBuildingComponent.SetNewCountOfgold(_TowerBuildingComponent.GetCountOfGold() * 3);
+        
+        if (!_isBuild)
+        {
+            curForm = form - 1;
+            _TowerBuildingComponent.SetCanProduce(true);
+            return;
+        }
+       
+        _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(false);
+        
+        curForm = form;
+
+        if (curForm < _TowerBuildingComponent.GetFormList().Count - 1)
+        {
+            _TowerBuildingComponent.SetCanProduce(true);
+        }
+        else
+        {
+            _TowerBuildingComponent.SetCanProduce(false);
+        }
+
+        _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(true);
+
+        _damage = curForm;
+        _delayForAttack = _delayForAttack - ((curForm) * 0.5f);
+
+        _AIWarConnector.SetSwordManToNewPosition();
+        _AIWarConnector.RandomAnimalPosition();
+    }
     private async void AttackDelay()
     {
         _canDamage = false;
@@ -110,13 +156,28 @@ public class Tower :  IKDTree
     }
     public void Destroy()
     {
+        firstBuild = true;
        _AIWarConnector.TowerList.Remove(this);
        _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(false);
        _TowerBuildingComponent.SetCanProduce(false);
-       curForm = 0;
-       _TowerBuildingComponent.GetFormList()[curForm].gameObject.SetActive(true);
-       _damage = 0;
-       _delayForAttack = 4;
+       _TowerBuildingComponent.GetFormList()[0].gameObject.SetActive(true);
+        if (_isBuild)
+        {
+            _TowerBuildingComponent.SetNewCountOfgold(_TowerBuildingComponent.GetCountOfGold() / 3);
+        }
+     
+        _isBuild = false;
+
+        if (!_rootTower)
+        {
+            curForm = 0;
+        }
+        else
+        {
+            curForm--;
+        }
+        _damage = 0;
+        _delayForAttack = 4;
     }
     public void Attack()
     {

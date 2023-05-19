@@ -99,12 +99,14 @@ public class ArrowPool
     {
         var obj = GetFreeElements(pos);
         obj.GetGm().GetTransform().rotation = rotation;
+        obj.GetGm().GetGameObj().SetActive(true);
         return obj;
     }
     public Arrow GetFreeElements(Vector3 pos)
     {
         var obj = GetFreeElements();
         obj.GetGm().GetTransform().position = pos;
+        obj.GetGm().GetGameObj().SetActive(true);
         return obj;
     }
     public Arrow GetClosestEngagedElements(Vector3 pos)
@@ -153,12 +155,12 @@ public class ArrowPool
         }
         if (_isExpand)
         {
-            return CreateObj(true);
+            return CreateObj();
         }
 
         if (_pool.Count < _maxCapacity)
         {
-            return CreateObj(true);
+            return CreateObj();
         }
         throw new Exception("Pool is over!");
     }

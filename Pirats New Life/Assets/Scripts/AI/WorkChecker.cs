@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using GameInit.Connector;
 using GameInit.Pool;
 using GameInit.Animation;
-using GameInit.GameCyrcleModule;
 using GameInit.Builders;
-using GameInit.MainPositions;
+using GameInit.Building;
 
 namespace GameInit.AI
 {
@@ -16,7 +13,7 @@ namespace GameInit.AI
         private CoinDropAnimation _coinDropAnimation;
         private Pools _pool;
         private HeroComponent _heroComponent;
-        private TownHallComponent _townHallComponent;
+        private BuildingTownHallComponent _townHallComponent;
         private AIConnector _AIConnector;
 
         
@@ -28,7 +25,7 @@ namespace GameInit.AI
             _pool = pool;
             _coinDropAnimation = coinDropAnimation;
 
-            _townHallComponent = Object.FindObjectOfType<TownHallComponent>();
+            _townHallComponent = Object.FindObjectOfType<BuildingTownHallComponent>();
             _townHallComponent.GetWar(_AIWarConnector);
 
         }

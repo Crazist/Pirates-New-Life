@@ -28,7 +28,7 @@ namespace GameInit.Enemy
         private float _originalAcceleration;
         private float _spellAcceleration = 10f;
         private float _originalStopingDistance;
-        private float _spellStopingDistance = 2.6f;
+        private float _spellStopingDistance = 2.4f;
         private Vector3 _curTargetPosition;
         private float _maxOffset = 1;
         private float _runTime = 2.5f;

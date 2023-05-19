@@ -480,7 +480,7 @@ namespace GameInit.Optimization.KDTree
                 int index = permutation[i];
                 var defender = points[index];
 
-                if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && queryPosition.HP > 0 || queryPosition.Type == EntityType.Arrow)
+                if (defender.CheckIfEnemy() != _isEnemy && queryPosition.CheckIfCanDamage() && defender.HP > 0 && (queryPosition.HP > 0)  || (queryPosition.Type == EntityType.Arrow && defender.Type != EntityType.Wall))
                 {
                     sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - queryPosition.GetPositionVector2());
 

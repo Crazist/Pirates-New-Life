@@ -17,13 +17,13 @@ namespace GameInit.Enemy
         [SerializeField] private ParticleSystem _paticle;
         [SerializeField] private float _delayForSpawnEnemyIfInZone = 3f;
         
-        private Action<EnemySpawnComponent> _closeToPortal;
+        private Action _closeToPortal;
         private bool _isPlaying = false;
         private bool _isPlayerInside = false;
         private Coroutine _coroutine;
         public int Multiplier { get { return _multiplier; } }
 
-        public void SetAction(Action<EnemySpawnComponent> _action)
+        public void SetAction(Action _action)
         {
             _closeToPortal = _action;
         }
@@ -98,7 +98,7 @@ namespace GameInit.Enemy
             while (_isPlayerInside)
             {
                 yield return new WaitForSeconds(_delayForSpawnEnemyIfInZone);
-                _closeToPortal.Invoke(this);
+                _closeToPortal.Invoke();
             }
         }
     }

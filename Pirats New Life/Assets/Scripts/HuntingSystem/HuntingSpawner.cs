@@ -12,6 +12,7 @@ namespace GameInit.AI
     {
         private AnimalSpawner[] _AnimalSpawners;
         private AIWarConnector _AIWarConnector;
+        private AIConnector _AIConnector;
         private CoinDropAnimation _CoinDropAnimation;
         private GameCyrcle _cyrcle;
         private Pools pool;
@@ -30,6 +31,7 @@ namespace GameInit.AI
             pool = coinPool;
             _CoinDropAnimation = coinDropAnimation;
             _AIWarConnector = _conectorsBuilder.GetAIWarConnector();
+            _AIConnector = _conectorsBuilder.GetAiConnector();
         }
 
         private void SpawnRabits()
@@ -85,7 +87,7 @@ namespace GameInit.AI
 
                         var obj = GameObject.Instantiate(spawner.GetEnemy(), position, Quaternion.identity);
 
-                        Rabbit rabbit = new Rabbit(obj, _CoinDropAnimation, _positionToMove, spawner.GetRadius(), pool, spawner);
+                        Rabbit rabbit = new Rabbit(obj, _CoinDropAnimation, _positionToMove, spawner.GetRadius(), pool, spawner, _AIConnector);
 
                         spawner.AddCurCount();
 

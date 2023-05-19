@@ -2791,7 +2791,7 @@ NavMeshObstacle:
   m_MoveThreshold: 0
   m_Carve: 1
   m_CarveOnlyStationary: 0
-  m_Center: {x: -3.7, y: 0.9, z: 0}
+  m_Center: {x: -3.7, y: 0.63, z: 0}
   m_TimeToStationary: 0
 --- !u!1001 &5876952012119983112
 PrefabInstance:
@@ -3138,7 +3138,7 @@ NavMeshObstacle:
   m_MoveThreshold: 0
   m_Carve: 1
   m_CarveOnlyStationary: 0
-  m_Center: {x: -2.94, y: 0.9, z: 0}
+  m_Center: {x: -2.94, y: 0.63, z: 0}
   m_TimeToStationary: 0
 --- !u!4 &7295513790253969399 stripped
 Transform:
