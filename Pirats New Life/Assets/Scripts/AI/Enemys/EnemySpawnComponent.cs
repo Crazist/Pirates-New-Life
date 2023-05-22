@@ -17,16 +17,9 @@ namespace GameInit.Enemy
         [SerializeField] private ParticleSystem _paticle;
         [SerializeField] private float _delayForSpawnEnemyIfInZone = 3f;
         
-        private Action _closeToPortal;
         private bool _isPlaying = false;
         private bool _isPlayerInside = false;
-        private Coroutine _coroutine;
         public int Multiplier { get { return _multiplier; } }
-
-        public void SetAction(Action _action)
-        {
-            _closeToPortal = _action;
-        }
 
         private void Start()
         {
@@ -56,10 +49,6 @@ namespace GameInit.Enemy
                 }
                 
                 _isPlayerInside = true;
-                if (_coroutine == null)
-                {
-                    _coroutine = StartCoroutine(RepeatAction());
-                }
             }
         }
         private void OnTriggerExit(Collider other)
@@ -73,11 +62,6 @@ namespace GameInit.Enemy
                 }
                 
                 _isPlayerInside = false;
-                if (_coroutine != null)
-                {
-                    StopCoroutine(_coroutine);
-                    _coroutine = null;
-                }
             }
         }
         public Transform GetTransformSpawn()
@@ -92,14 +76,6 @@ namespace GameInit.Enemy
         public float GetSpawnDiffMin()
         {
             return spawnDiffMin;
-        }
-        private IEnumerator RepeatAction()
-        {
-            while (_isPlayerInside)
-            {
-                yield return new WaitForSeconds(_delayForSpawnEnemyIfInZone);
-                _closeToPortal.Invoke();
-            }
         }
     }
 }

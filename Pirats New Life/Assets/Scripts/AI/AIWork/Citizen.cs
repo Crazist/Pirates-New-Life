@@ -38,6 +38,7 @@ namespace GameInit.AI
         private const bool _canDamage = false;
         public bool InMove { get; set; } = false;
         public bool InWork { get; set; } = false;
+        public SideType Side { get; set; } = SideType.None;
         public bool GoingForCoin { get; set; } = false;
         public EntityType Type { get; } = EntityType.Ally;
         public int HP { get; set; } = 1;

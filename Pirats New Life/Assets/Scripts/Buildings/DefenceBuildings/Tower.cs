@@ -12,6 +12,7 @@ public class Tower :  IKDTree
 {
     public int HP { get; set; } = 0;
     public EntityType Type { get;} = EntityType.Tower;
+    public SideType Side { get; set; } = SideType.None;
 
     private TowerBuildingComponent _TowerBuildingComponent;
     private Action _action;
@@ -145,8 +146,8 @@ public class Tower :  IKDTree
         _damage = curForm;
         _delayForAttack = _delayForAttack - ((curForm) * 0.5f);
 
-        _AIWarConnector.SetSwordManToNewPosition();
-        _AIWarConnector.RandomAnimalPosition();
+        _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
+        _AIWarConnector.GetSideCalculation().RandomAnimalPosition();
     }
     private async void AttackDelay()
     {

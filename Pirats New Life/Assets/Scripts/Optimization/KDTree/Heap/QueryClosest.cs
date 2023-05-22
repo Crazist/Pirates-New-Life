@@ -467,6 +467,7 @@ namespace GameInit.Optimization.KDTree
             float SSR = Single.PositiveInfinity;
             float _minDistForDamage = 3f;
             float _minDistForDamageWall = 10f;
+            float _minDistForSpawner = 1000f;
             float _minDistForDamageArrow = 1.5f;
 
             var rootNode = tree.rootNode;
@@ -486,6 +487,7 @@ namespace GameInit.Optimization.KDTree
 
                     float _distanceAttack = queryPosition.Type == EntityType.Arrow ? _minDistForDamageArrow : _minDistForDamage;
                     _distanceAttack = defender.Type == EntityType.Wall ? _minDistForDamageWall : _distanceAttack;
+                    _distanceAttack = queryPosition.Type == EntityType.EnemySpawner ? _minDistForSpawner : _distanceAttack;
 
                     if (sqrDist <= SSR && sqrDist <= _distanceAttack)
                     {
@@ -519,7 +521,12 @@ namespace GameInit.Optimization.KDTree
                 else
                 {
                     queryPosition.Attack();
-                    defender.GetDamage(queryPosition.CountOFDamage());
+
+                    if(queryPosition.CountOFDamage() > 0)
+                    {
+                        defender.GetDamage(queryPosition.CountOFDamage());
+                    }
+                    
                     if (defender.HP <= 0 && defender.Type != EntityType.Wall && defender.Type != EntityType.Animals)
                     {
                         PointsInWorld.Remove(defender);

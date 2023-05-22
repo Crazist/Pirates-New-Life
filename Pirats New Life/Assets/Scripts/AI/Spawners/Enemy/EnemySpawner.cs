@@ -4,15 +4,17 @@ using System;
 using UnityEngine;
 using GameInit.Builders;
 using GameInit.Connector;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace GameInit.AI.Spawner
 {
     public class EnemySpawner : IKDTree
     {
-        public EntityType Type { get; set; }
-        public int HP { get; set; }
+        public EntityType Type { get; set; } = EntityType.EnemySpawner;
+        public SideType Side { get; set; } = SideType.None;
+        public int HP { get; set; } = 10;
 
-        private Action _closeToPortal;
         private GameCyrcle _cyrcle;
         private EnemySpawnComponent _EnemySpawnComponent;
         private EnemyPool _EnemyPool;
@@ -22,8 +24,13 @@ namespace GameInit.AI.Spawner
         private int maxEnemies = 50; // максимальное количество врагов
         private int currentEnemies = 0; // изначальное количество врагов
         private int multiplier = 1; // количество умножений на 2\
+        private bool _canDamage = true;
+        private float _delayForAttack = 3;
+        private CancellationToken token;
+        private bool _isAlive = true;
 
-
+        private const bool _isEnemy = true;
+        
         public EnemySpawner(EnemySpawnComponent EnemySpawnComponent, GameCyrcle cyrcle, EnemyPool EnemyPool, BuilderConnectors builderConnectors)
         {
             _cyrcle = cyrcle;
@@ -31,25 +38,10 @@ namespace GameInit.AI.Spawner
             _EnemyPool = EnemyPool;
             _AIWarConnector = builderConnectors.GetAIWarConnector();
 
+            CancellationTokenSource cts = new CancellationTokenSource();
+            token = cts.Token;
+
             multiplier = EnemySpawnComponent.Multiplier;
-
-            _closeToPortal += SpawnEnemyIfToClose;
-
-            EnemySpawnComponent.SetAction(_closeToPortal);
-        }
-
-        private void SpawnEnemyIfToClose()
-        {
-            if (!_cyrcle.ChekIfDay())
-            {
-                var position = _EnemySpawnComponent.GetTransformSpawn().position;
-
-                DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
-
-                _AIWarConnector.PointsInWorld.Add(enemy);
-                _AIWarConnector.EnemyList.Add(enemy);
-                _AIWarConnector.UpdateTree();
-            }
         }
         private void Spawnenemy()
         {
@@ -88,36 +80,88 @@ namespace GameInit.AI.Spawner
         }
         public void DayChange()
         {
-            Spawnenemy();
+            if (!_cyrcle.ChekIfDay())
+            {
+                _canDamage = true;
+            }
+            else
+            {
+                _canDamage = false;
+            }
+
+            if (_isAlive)
+            {
+                Spawnenemy();
+            }
         }
         public void Attack()
         {
-            throw new System.NotImplementedException();
+            if (_canDamage)
+            {
+                AttackDelay();
+            }
+        }
+        private async void AttackDelay()
+        {
+            _canDamage = false;
+
+            var position = _EnemySpawnComponent.GetTransformSpawn().position;
+
+            DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
+
+            _AIWarConnector.PointsInWorld.Add(enemy);
+            _AIWarConnector.EnemyList.Add(enemy);
+            _AIWarConnector.UpdateTree();
+
+            await UniTask.Delay(TimeSpan.FromSeconds(_delayForAttack), cancellationToken: token);
+            
+            if (!_cyrcle.ChekIfDay())
+            {
+                _canDamage = true;
+            }
         }
 
         public bool CheckIfCanDamage()
         {
-            throw new System.NotImplementedException();
+            return _canDamage;
         }
 
         public bool CheckIfEnemy()
         {
-            throw new System.NotImplementedException();
+            return _isEnemy;
         }
 
         public int CountOFDamage()
         {
-            throw new System.NotImplementedException();
+            return 0; //damage enother way
         }
 
         public void GetDamage(int damage)
         {
-            throw new System.NotImplementedException();
+            if (HP - damage <= 0)
+            {
+                Die();
+                HP = 0;
+            }
+            else
+            {
+                HP = HP - damage;
+            }
+        }
+        private void Die()
+        {
+            _isAlive = false;
+            _EnemySpawnComponent.gameObject.SetActive(false);
+            _AIWarConnector.PointsInWorld.Remove(this);
         }
 
         public Vector2 GetPositionVector2()
         {
-            throw new System.NotImplementedException();
+            Vector2 _positionOnVector2;
+            _positionOnVector2.x = _EnemySpawnComponent.GetTransformSpawn().position.x;
+            _positionOnVector2.y = _EnemySpawnComponent.GetTransformSpawn().position.z;
+
+            return _positionOnVector2;
         }
     }
 

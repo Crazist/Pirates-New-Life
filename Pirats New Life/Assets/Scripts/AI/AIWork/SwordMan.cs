@@ -33,6 +33,7 @@ public class SwordMan :  IWork, IKDTree
     
     public int HP { get; set; } = 10;
     public bool InMove { get; set; } = false;
+    public SideType Side { get; set; } = SideType.None;
     public bool InWork { get; set; } = false;
     public EntityType Type { get; } = EntityType.Ally;
     public bool GoingForCoin { get; set; } = false;

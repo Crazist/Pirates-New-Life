@@ -39,17 +39,8 @@ namespace GameInit.Connector
         private float lastUpdateTime = 0.0f;
         private const float updateInterval = 0.5f;
         private Transform[] _EnemySpawnerPsoition;
-        private Wall lastRightWall = null;
-        private Wall lastLeftWall = null;
-
-        private float radiusRandomWalkInDay = 10;
-        private float radiusRandomWalkInNight = 3;
-
-        private const float _wallOffset = 22f;
-        private const float radiusRandomWalkAnimal = 20f;
-        private const int offsetSwordMan = 4;
-        private const int offsetArcher = 7;
-        private const int offsetArcherInday = 10;
+        private SideCalculation _SideCalculation;
+        
         public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool, ArrowPool arrowRedPool)
         {
             PointsInWorld = new List<IKDTree>();
@@ -74,6 +65,8 @@ namespace GameInit.Connector
             _treeQuery = new KDQuery();
 
             InitEnemySpawnerPosition();
+
+            _SideCalculation = new SideCalculation(this,cyrcle);
         }
         
         private void InitEnemySpawnerPosition()
@@ -87,93 +80,6 @@ namespace GameInit.Connector
                 _EnemySpawnerPsoition[i] = _enemySpawnComponent[i].transform;
             }
             _treeQuery.SetEnemySpawner(_gameCyrcle, _EnemySpawnerPsoition, PointsInWorld, EnemyList, AnimalList);
-        }
-
-        public void RandomAnimalPosition()
-        {
-            List<IAnimal> AnimalListSorted = new List<IAnimal>(AnimalList.Count);
-
-            Vector3 wallPos = Vector3.zero;
-            
-            if (lastRightWall != null)
-            {
-                wallPos = lastRightWall.GetPositionVector3();
-            }
-            else if (lastLeftWall != null)
-            {
-                wallPos = lastLeftWall.GetPositionVector3();
-            }
-            else
-            {
-                return;
-            }
-
-            // Sort animals by distance to the wall position
-            for (int i = 0; i < AnimalList.Count; i++)
-            {
-                IAnimal closestAnimal = null;
-                float closestDistance = Mathf.Infinity;
-
-                foreach (IAnimal animal in AnimalList)
-                {
-                    if (AnimalListSorted.Contains(animal))
-                    {
-                        continue;
-                    }
-
-                    float distance = Vector2.SqrMagnitude(new Vector2(animal.GetAiComponent().GetTransform().position.x, animal.GetAiComponent().GetTransform().position.z) - new Vector2(wallPos.x, wallPos.z));
-
-                    if (distance < closestDistance)
-                    {
-                        closestAnimal = animal;
-                        closestDistance = distance;
-                    }
-                }
-
-                AnimalListSorted.Add(closestAnimal);
-            }
-
-            Vector3 targetWall = Vector3.zero;
-            // ѕеремещаем Archer по последовательности стен
-            if (lastRightWall != null)
-            {
-                for (int i = 0; i < AnimalListSorted.Count / 2; i++)
-                {
-                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x + _wallOffset, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                    
-
-                    if (targetWall != Vector3.zero)
-                    {
-                        AnimalListSorted[i].ChangePositionForRandomWallk(targetWall, radiusRandomWalkAnimal);
-                    }
-                }
-            }
-            if (lastLeftWall != null)
-            {
-                int sort = 0;
-                int count = 0;
-
-                if (lastRightWall != null)
-                {
-                    sort = AnimalListSorted.Count / 2;
-                    count = AnimalListSorted.Count;
-                }
-                else
-                {
-                    count = AnimalListSorted.Count / 2;
-                }
-                
-                for (int i = sort; i < count; i++)
-                {
-                    
-                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x - _wallOffset, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                    
-                    if (targetWall != Vector3.zero)
-                    {
-                        AnimalListSorted[i].ChangePositionForRandomWallk(targetWall, radiusRandomWalkAnimal);
-                    }
-                }
-            }
         }
         public void GetHeroComponent(HeroMove HeroMove)
         {
@@ -198,7 +104,6 @@ namespace GameInit.Connector
                 lastUpdateTime = Time.time;
             }
         }
-
         private void UpdateEnemyRunForAttack()
         {
             for (int i = 0; i < EnemyList.Count; i++)
@@ -206,7 +111,6 @@ namespace GameInit.Connector
                 _treeQuery.EnemyRunForAttack(_tree, EnemyList[i]);
             }
         }
-
         private void UpdateAllyRunForAttack()
         {
             for (int i = 0; i < SwordManList.Count; i++)
@@ -214,7 +118,6 @@ namespace GameInit.Connector
                 _treeQuery.ShildAllyRunForAttack(_tree, (IKDTree)SwordManList[i]);
             }
         }
-
         private void UpdateArcherMoveAndShoot()
         {
             for (int i = 0; i < ArcherList.Count; i++)
@@ -230,149 +133,18 @@ namespace GameInit.Connector
                 _treeQuery.ShootClosest(_tree, TowerList[i], _arrowRedPool, _treeQuery);
             }
         }
-
         private void UpdateDamageClosest()
         {
             for (int i = 0; i < PointsInWorld.Count; i++)
             {
-                if (PointsInWorld[i].HP > 0)
+                if (PointsInWorld[i].HP > 0 && PointsInWorld[i].CheckIfCanDamage())
                     _treeQuery.DamageClosest(_tree, PointsInWorld[i]);
             }
         }
-
         private void UpdateEnimalsRunAway()
         {
            if(_HeroMove != null)
             _treeQuery.EnimalsRunAway(_tree, (IKDTree)_HeroMove);
-        }
-        public void SetSwordManToNewPosition()
-        {
-            Wall _lastRightWall = null;
-            Wall _lastLeftWall = null;
-
-            // Ќаходим последнюю незавершенную стену справа и слева
-            for (int i = 0; i < RightWall.Count; i++)
-            {
-                if (RightWall[i].isBuilded)
-                {
-                    _lastRightWall = RightWall[i];
-                }
-            }
-            for (int i = 0; i < LeftWall.Count; i++)
-            {
-                if (LeftWall[i].isBuilded)
-                {
-                    _lastLeftWall = LeftWall[i];
-                }
-            }
-
-            lastRightWall = _lastRightWall;
-            lastLeftWall = _lastLeftWall;
-
-            MoveSwordMans(_lastRightWall, _lastLeftWall);
-            MoveArcherMans(_lastRightWall, _lastLeftWall);
-        }
-        private void MoveSwordMans(Wall lastRightWall, Wall lastLeftWall)
-        {
-            // ѕеремещаем SwordMan по последовательности стен
-            for (int i = 0; i < SwordManList.Count; i++)
-            {
-                Vector3 targetWall = Vector3.zero;
-                if (i % 2 == 0 && lastRightWall != null)  // „етные SwordMan передвигаютс€ к lastRightWall, нечетные - к lastLeftWall
-                {
-                    targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetSwordMan, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                }
-                else if (lastLeftWall != null)
-                {
-                    targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetSwordMan, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                }
-
-                if (targetWall != Vector3.zero)
-                {
-                    SwordManList[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-                }
-            }
-
-            // ѕоследний SwordMan передвигаетс€ к lastLeftWall, если она есть
-            if (SwordManList.Count > 0 && lastLeftWall != null)
-            {
-                Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetSwordMan, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                SwordManList[SwordManList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-            }
-            else if (SwordManList.Count > 0 && lastRightWall != null)
-            {
-                Vector3 targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetSwordMan, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                SwordManList[SwordManList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-            }
-        }
-        private void MoveArcherMans(Wall lastRightWall, Wall lastLeftWall)
-        {
-            // ѕеремещаем Archer по последовательности стен
-
-            if (_gameCyrcle.ChekIfDay())
-            {
-
-                for (int i = 0; i < ArcherList.Count; i++)
-                {
-                    Vector3 targetWall = Vector3.zero;
-                    if (i % 2 == 0 && lastRightWall != null)  // „етные Archer передвигаютс€ к lastRightWall, нечетные - к lastLeftWall
-                    {
-                        targetWall = new Vector3(lastRightWall.GetPositionVector3().x + offsetArcherInday, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                    }
-                    else if (lastLeftWall != null)
-                    {
-                        targetWall = new Vector3(lastLeftWall.GetPositionVector3().x - offsetArcherInday, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                    }
-
-                    if (targetWall != Vector3.zero)
-                    {
-                        ArcherList[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
-                    }
-                }
-                // ѕоследний Archer передвигаетс€ к lastLeftWall, если она есть
-                if (ArcherList.Count > 0 && lastLeftWall != null)
-                {
-                    Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x - offsetArcherInday, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                    ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
-                }
-                else if (ArcherList.Count > 0 && lastRightWall != null)
-                {
-                    Vector3 targetWall = new Vector3(lastRightWall.GetPositionVector3().x + offsetArcherInday, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                    ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
-                }
-            }
-            else
-            {
-
-                for (int i = 0; i < ArcherList.Count; i++)
-                {
-                    Vector3 targetWall = Vector3.zero;
-                    if (i % 2 == 0 && lastRightWall != null)  // „етные Archer передвигаютс€ к lastRightWall, нечетные - к lastLeftWall
-                    {
-                        targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetArcher, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                    }
-                    else if (lastLeftWall != null)
-                    {
-                        targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetArcher, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                    }
-
-                    if (targetWall != Vector3.zero)
-                    {
-                        ArcherList[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-                    }
-                }
-                // ѕоследний Archer передвигаетс€ к lastLeftWall, если она есть
-                if (ArcherList.Count > 0 && lastLeftWall != null)
-                {
-                    Vector3 targetWall = new Vector3(lastLeftWall.GetPositionVector3().x + offsetArcher, lastLeftWall.GetPositionVector3().y, lastLeftWall.GetPositionVector3().z);
-                    ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-                }
-                else if (ArcherList.Count > 0 && lastRightWall != null)
-                {
-                    Vector3 targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetArcher, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
-                    ArcherList[ArcherList.Count - 1].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
-                }
-            }
         }
         public void UpdateTree()
         {
@@ -382,17 +154,14 @@ namespace GameInit.Connector
         {
             _tree.DrawNode(_tree.rootNode);
         }
+        public SideCalculation GetSideCalculation()
+        {
+            return _SideCalculation;
+        }
         public void OnDayChange()
         {
-             SetSwordManToNewPosition();
-        }
-        public Wall GetLastRightWall()
-        {
-            return lastRightWall;
-        }
-        public Wall GetLastLeftWall()
-        {
-            return lastLeftWall;
+            _SideCalculation.SetSwordManToNewPosition();
+            // SetSwordManToNewPosition();
         }
     }
 }

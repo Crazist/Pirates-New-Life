@@ -16,7 +16,6 @@ namespace GameInit.AI
         private GameCyrcle _cyrcle;
         private List<EnemySpawner> _EnemySpawnersPrivateList;
 
-
         public AISpawner(CampComponent[] camps, BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, EnemySpawnComponent[] _enemySpawnComponents, GameCyrcle cyrcle, EnemyPool EnemyPool)
         {
             EnemySpawnersList = new List<IKDTree>();
@@ -36,6 +35,7 @@ namespace GameInit.AI
 
                 EnemySpawnersList.Add(enemySpawner);
                 _EnemySpawnersPrivateList.Add(enemySpawner);
+                builderConnectors.GetAIWarConnector().PointsInWorld.Add(enemySpawner);
             }
         }
         private void CreateAllySpawners(CampComponent[] camps, Pools pool, BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
@@ -47,7 +47,6 @@ namespace GameInit.AI
                 AllySpawnersList.Add(enemySpawner);
             }
         }
-
         public void OnDayChange()
         {
             if (!_cyrcle.ChekIfDay())

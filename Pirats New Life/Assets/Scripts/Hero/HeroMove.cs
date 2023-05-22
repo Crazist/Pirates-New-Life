@@ -32,6 +32,7 @@ namespace GameInit.Hero
         //  private ParticleSystem _particleSystemMoveTo;
         public int HP { get; set; } = 1;
         public EntityType Type { get; } = EntityType.Hero;
+        public SideType Side { get; set; } = SideType.None;
 
         public HeroMove(HeroComponent heroComponent, UIBuilder UIBuilder, CoinDropAnimation CoinDropAnimation, ResourceManager ResourceManager, Pools coinPool)
         {

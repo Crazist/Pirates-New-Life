@@ -24,6 +24,7 @@ namespace GameInit.Projectiles
 
         public int HP { get; set; } = -1;
         public EntityType Type { get; } = EntityType.Arrow;
+        public SideType Side { get; set; } = SideType.None;
 
         public Arrow(ArrowComponent component)
         {

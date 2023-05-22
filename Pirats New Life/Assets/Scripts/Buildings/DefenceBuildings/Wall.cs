@@ -44,6 +44,7 @@ namespace GameInit.Building
         public int CirclePosition { get; set; }
         public bool IsRight { get; set; }
         public EntityType Type { get; } = EntityType.Wall;
+        public SideType Side { get; set; } = SideType.None;
 
         private const bool canPickUp = false;
         private const int _firstForm = 1;
@@ -117,8 +118,8 @@ namespace GameInit.Building
             // wall is built
             HP = form * _hpPerLvl;
             _wallComponent.UpdateBuild();
-            _AIWarConnector.SetSwordManToNewPosition();
-            _AIWarConnector.RandomAnimalPosition();
+            _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
+            _AIWarConnector.GetSideCalculation().RandomAnimalPosition();
         }
         public bool GetBuildingState()
         {
@@ -274,8 +275,8 @@ namespace GameInit.Building
                 _AIConnector.MoveToClosest();
                 _curentlyWorker.GetRandomWalker().Move();
                 _curentlyWorker = null;
-                _AIWarConnector.SetSwordManToNewPosition();
-                _AIWarConnector.RandomAnimalPosition();
+                _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
+                _AIWarConnector.GetSideCalculation().RandomAnimalPosition();
                 
                 if (_wallComponent.GetCurForm() < _wallComponent.GetFormList().Count - 1)
                 {
@@ -355,8 +356,8 @@ namespace GameInit.Building
             }
 
             _wallComponent.enabled = true;
-            _AIWarConnector.SetSwordManToNewPosition();
-            _AIWarConnector.RandomAnimalPosition();
+            _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
+            _AIWarConnector.GetSideCalculation().RandomAnimalPosition();
             _wallComponent.StopAllCoroutines();
             _wallComponent.SetCanProduce(true);
             var _curform = _wallComponent.GetCurForm();

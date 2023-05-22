@@ -30,6 +30,7 @@ namespace GameInit.AI
         private const int radiusRandomWalk = 5;
         public bool InMove { get; set; } = false;
         public bool InWork { get; set; } = false;
+        public SideType Side { get; set; } = SideType.None;
         public bool GoingForCoin { get; set; } = false;
         
         public Stray(AIComponent component, int id, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, RandomWalker randomWalker)

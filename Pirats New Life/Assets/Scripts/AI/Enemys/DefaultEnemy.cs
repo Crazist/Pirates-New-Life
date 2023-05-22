@@ -40,6 +40,7 @@ namespace GameInit.Enemy
         private CancellationToken token;
         public int HP { get; set; } = 1;
         public EntityType Type { get; } = EntityType.Enemy;
+        public SideType Side { get; set; } = SideType.None;
 
         private const float _heightPosition = 0.46f;
         private const float _zeroSpeed = 0f;

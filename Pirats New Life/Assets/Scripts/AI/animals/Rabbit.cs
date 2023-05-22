@@ -11,6 +11,7 @@ namespace GameInit.AI
     {
         public int HP { get; set; } = 1;
         public EntityType Type { get; } = EntityType.Animals;
+        public SideType Side { get; set; } = SideType.None;
         public bool InMove { get; set; } = false;
 
         private AIComponent _AIComponent;

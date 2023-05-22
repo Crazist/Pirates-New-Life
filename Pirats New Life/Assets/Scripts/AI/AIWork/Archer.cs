@@ -32,6 +32,7 @@ public class Archer : IWork, IKDTree
     private const bool _isEnemy = false;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
+    public SideType Side { get; set; } = SideType.None;
     public EntityType Type { get; } = EntityType.Ally;
     public bool GoingForCoin { get; set; } = false;
     public int HP { get; set; } = 1;

@@ -36,6 +36,7 @@ public class Builder : IWork, IKDTree, IBuild
     public int HP { get; set; } = 1;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
+    public SideType Side { get; set; } = SideType.None;
     public bool GoingForCoin { get; set; } = false;
     public EntityType Type { get; } = EntityType.Ally;
 

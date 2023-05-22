@@ -101,7 +101,7 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
-            _AIWarConnector.SetSwordManToNewPosition();
+            _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
         }
         private void CreateArcher(IWork work)
         {
@@ -112,7 +112,7 @@ namespace GameInit.AI
             _AIConnector.CitizenList.Remove(work);
             _AIConnector.MoveToClosest();
             _AIWarConnector.UpdateTree();
-            _AIWarConnector.SetSwordManToNewPosition();
+            _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
         }
       
         private void SwapWorkForCitizen()
