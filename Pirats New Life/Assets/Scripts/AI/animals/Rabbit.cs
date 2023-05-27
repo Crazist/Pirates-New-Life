@@ -41,8 +41,9 @@ namespace GameInit.AI
             randomWalker.Init(_AIComponent.GeNavMeshAgent(), position, this, radiusRandomWalk);
         }
 
-        public void ChangePositionForRandomWallk(Vector3 pos, float radius)
+        public void ChangePositionForRandomWallk(Vector3 _pos, float radius)
         {
+            var pos = new Vector3(_pos.x, _height, _pos.z);
             randomWalker.ChangeOnlyPositionAndStartMove(pos, radius);
         }
 
@@ -127,7 +128,7 @@ namespace GameInit.AI
         {
             _AnimalSpawner.RemoveCurCount();
             var pos = new Vector3(_AIComponent.GetTransform().position.x, _height, _AIComponent.GetTransform().position.z);
-            _coinDropAnimation.RandomCoinJump(pos, count, pos, _coinPool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(pos, count, _coinPool, canPickUp);
             _AIComponent.GetGm().SetActive(false);
             _AIComponent.StopAllCoroutines();
             _AIConnector.CheckAndGoToCoin();

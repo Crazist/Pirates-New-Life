@@ -1,14 +1,22 @@
 using GameInit.Building;
 using GameInit.Connector;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameInit.GameCyrcleModule;
+using GameInit.Attack;
 
 namespace GameInit.AI
 {
     public class SideCalculation
     {
+        public List<IKDTree> ArcherLeftSide { get; set; }
+        public List<IKDTree> ArcherRightSide { get; set; }
+        public List<IKDTree> SworManLeftSide { get; set; }
+        public List<IKDTree> SworManRightSide { get; set; }
+
+        private ArcherAttack _ArcherAttack;
+        private SwordManAttack _SwordManAttack;
+
         private Wall lastRightWall = null;
         private Wall lastLeftWall = null;
         private AIWarConnector _AIWarConnector;
@@ -28,6 +36,18 @@ namespace GameInit.AI
             _AIWarConnector = aIWarConnector;
             _gameCyrcle = gameCyrcle;
 
+            ArcherLeftSide = new List<IKDTree>();
+            ArcherRightSide = new List<IKDTree>();
+            SworManLeftSide = new List<IKDTree>();
+            SworManRightSide = new List<IKDTree>();
+        }
+        public void SetAttackComponentsArcher(ArcherAttack ArcherAttack)
+        {
+            _ArcherAttack = ArcherAttack;
+        }
+        public void SetAttackComponentsSwordMan(SwordManAttack SwordManAttack)
+        {
+            _SwordManAttack = SwordManAttack;
         }
         public void SetSwordManToNewPosition()
         {
@@ -58,6 +78,9 @@ namespace GameInit.AI
         }
         private void MoveSwordMans(Wall lastRightWall, Wall lastLeftWall)
         {
+            SworManLeftSide.Clear();
+            SworManRightSide.Clear();
+
             int rightCount = 0;
             int leftCount = 0;
             var swordManList = _AIWarConnector.SwordManList;
@@ -88,6 +111,7 @@ namespace GameInit.AI
             for (int i = 0; i < noneType.Count; i++)
             {
                 var swordMan = (IKDTree)noneType[i];
+                var _attackSwordMan = (IAttack)noneType[i];
                 Vector3 targetWall = Vector3.zero;
                 // Если есть пустое место справа, перемещаем мечника туда
                 if ((rightCount <= leftCount || lastLeftWall == null) && lastRightWall != null)
@@ -104,8 +128,16 @@ namespace GameInit.AI
                     leftCount++;
                 }
 
-                if (lastRightWall != null || lastLeftWall != null)
+                if (lastRightWall != null && !_attackSwordMan.InAttack)
+                {
+                    SworManRightSide.Add(swordMan);
                     noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                }
+                else if (lastLeftWall != null && !_attackSwordMan.InAttack)
+                {
+                    SworManLeftSide.Add(swordMan);
+                    noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                }
             }
 
             for (int i = 0; i < withType.Count; i++)
@@ -167,12 +199,27 @@ namespace GameInit.AI
                     }
                 }
 
-                if (lastRightWall != null || lastLeftWall != null)
+                var _attackSwordMan = (IAttack)withType[i];
+
+                if (lastRightWall != null && !_attackSwordMan.InAttack)
+                {
+                    SworManRightSide.Add(swordMan);
                     withType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                }
+                else if (lastLeftWall != null && !_attackSwordMan.InAttack)
+                {
+                    SworManLeftSide.Add(swordMan);
+                    withType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                }
             }
+            _SwordManAttack.SetRightText(SworManRightSide.Count);
+            _SwordManAttack.SetLeftText(SworManLeftSide.Count);
         }
         private void MoveArcher(Wall lastRightWall, Wall lastLeftWall)
         {
+            ArcherLeftSide.Clear();
+            ArcherRightSide.Clear();
+
             int rightCount = 0;
             int leftCount = 0;
             var ArcherList = _AIWarConnector.ArcherList;
@@ -203,6 +250,7 @@ namespace GameInit.AI
             for (int i = 0; i < noneType.Count; i++)
             {
                 var archer = (IKDTree)noneType[i];
+                var _attackArcher = (IAttack)archer;
                 Vector3 targetWall = Vector3.zero;
                 // Если есть пустое место справа, перемещаем мечника туда
                 if ((rightCount <= leftCount || lastLeftWall == null) && lastRightWall != null)
@@ -215,6 +263,7 @@ namespace GameInit.AI
                     {
                         targetWall = new Vector3(lastRightWall.GetPositionVector3().x - offsetArcher, lastRightWall.GetPositionVector3().y, lastRightWall.GetPositionVector3().z);
                     }
+
                     archer.Side = SideType.RightFar;
                     rightCount++;
                 }
@@ -232,16 +281,31 @@ namespace GameInit.AI
                     archer.Side = SideType.LeftFar;
                     leftCount++;
                 }
-
-                if (_gameCyrcle.ChekIfDay())
+                
+                if (_gameCyrcle.ChekIfDay() && !_attackArcher.InAttack)
                 {
-                    if (lastRightWall != null || lastLeftWall != null)
+                    if (lastRightWall != null)
+                    {
+                        ArcherRightSide.Add(archer);
                         noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
+                    }
+                    else if(lastLeftWall != null && !_attackArcher.InAttack)
+                    {
+                        noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
+                    }
                 } 
                 else
                 {
-                    if (lastRightWall != null || lastLeftWall != null)
+                    if (lastRightWall != null && !_attackArcher.InAttack)
+                    {
+                        ArcherRightSide.Add(archer);
                         noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                    }
+                    else if (lastLeftWall != null && !_attackArcher.InAttack)
+                    {
+                        ArcherLeftSide.Add(archer);
+                        noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                    }
                 }
             }
 
@@ -348,17 +412,22 @@ namespace GameInit.AI
                     }
                 }
 
-                if (_gameCyrcle.ChekIfDay())
+                var _attackArcher = (IAttack)archer;
+
+                if (lastRightWall != null && !_attackArcher.InAttack)
                 {
-                    if (lastRightWall != null || lastLeftWall != null)
-                        noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInDay);
+                    ArcherRightSide.Add(archer);
+                    withType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
                 }
-                else
+                else if (lastLeftWall != null && !_attackArcher.InAttack)
                 {
-                    if (lastRightWall != null || lastLeftWall != null)
-                        noneType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
+                    ArcherLeftSide.Add(archer);
+                    withType[i].GetRandomWalker().ChangeOnlyPositionAndStartMove(targetWall, radiusRandomWalkInNight);
                 }
             }
+           
+            _ArcherAttack.SetRightText(ArcherRightSide.Count);
+            _ArcherAttack.SetLeftText(ArcherLeftSide.Count);
         }
         public void RandomAnimalPosition()
         {

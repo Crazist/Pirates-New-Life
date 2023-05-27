@@ -51,7 +51,7 @@ public class Tower :  IKDTree
     }
     private void DropBeforePickUpCoin(int count)
     {
-        _coinDropAnimation.RandomCoinJump(_TowerBuildingComponent.transform.position, count, _TowerBuildingComponent.transform.position, _coinPool, _canPickUp);
+        _coinDropAnimation.RandomCoinJump(_TowerBuildingComponent.transform.position, count, _coinPool, _canPickUp);
     }
     private async void CountMoney()
     {

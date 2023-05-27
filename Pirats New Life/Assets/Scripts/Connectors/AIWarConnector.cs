@@ -10,6 +10,7 @@ using System.Diagnostics;
 using GameInit.Enemy;
 using GameInit.Hero;
 using GameInit.Building;
+using UnityEngine.AI;
 
 namespace GameInit.Connector
 {
@@ -38,7 +39,7 @@ namespace GameInit.Connector
         private ArrowPool _arrowRedPool;
         private float lastUpdateTime = 0.0f;
         private const float updateInterval = 0.5f;
-        private Transform[] _EnemySpawnerPsoition;
+        private List<EnemySpawnComponent> _EnemySpawnerPsoition;
         private SideCalculation _SideCalculation;
         
         public AIWarConnector(Pools pool, GameCyrcle cyrcle, ResourceManager resourceManager, AIConnector AIConnector, ArrowPool arrowPool, ArrowPool arrowRedPool)
@@ -73,11 +74,11 @@ namespace GameInit.Connector
         {
             var  _enemySpawnComponent = UnityEngine.Object.FindObjectsOfType<EnemySpawnComponent>();
 
-            _EnemySpawnerPsoition = new Transform[_enemySpawnComponent.Length];
+            _EnemySpawnerPsoition = new List<EnemySpawnComponent>();
 
             for (int i = 0; i < _enemySpawnComponent.Length; i++)
             {
-                _EnemySpawnerPsoition[i] = _enemySpawnComponent[i].transform;
+                _EnemySpawnerPsoition.Add(_enemySpawnComponent[i]);
             }
             _treeQuery.SetEnemySpawner(_gameCyrcle, _EnemySpawnerPsoition, PointsInWorld, EnemyList, AnimalList);
         }
@@ -145,6 +146,119 @@ namespace GameInit.Connector
         {
            if(_HeroMove != null)
             _treeQuery.EnimalsRunAway(_tree, (IKDTree)_HeroMove);
+        }
+        public void UpdateAttack(List<IKDTree> army, bool isRight, AttackTypes type)
+        {
+            float offset = 20;
+
+            if (type == AttackTypes.ArcherType)
+            {
+                offset = 10;
+            }
+            else
+            {
+                offset = 7;
+            }
+
+            EnemySpawnComponent rightSpawner = null;
+            EnemySpawnComponent leftSpawner = null;
+
+            foreach (var item in _EnemySpawnerPsoition)
+            {
+                if (item.IsRight)
+                {
+                    rightSpawner = item;
+                }
+                else
+                {
+                    leftSpawner = item;
+                }
+            }
+
+            List<Vector3> occupiedPositions = new List<Vector3>(); // —писок зан€тых позиций
+
+            if (isRight)
+            {
+                foreach (var item in army)
+                {
+                    var unit = (IAttack)item;
+                    unit.InAttack = true;
+
+                    var iWorkArcmy = (IWork)item;
+                    iWorkArcmy.GetRandomWalker().StopRandomWallk();
+
+                    var targetPos = new Vector3(rightSpawner.transform.position.x - offset, 0.46f, rightSpawner.transform.position.z);
+
+                    while (occupiedPositions.Contains(targetPos))
+                    {
+                        // ≈сли позици€ уже зан€та, смещаем юнита немного выше по оси Z
+                        targetPos += new Vector3(0, 0.1f, 0);
+
+                        // ѕровер€ем, зан€та ли нова€ позици€ после смещени€
+                        if (!occupiedPositions.Contains(targetPos))
+                        {
+                            targetPos = GetFreeNavMeshPosition(targetPos);
+                            targetPos = new Vector3(targetPos.x - offset, 0.46f, targetPos.z);
+                            break; // ≈сли нова€ позици€ свободна, выходим из цикла
+                        }
+                    }
+
+                    iWorkArcmy.Move(targetPos, null);
+
+                    occupiedPositions.Add(targetPos); // ƒобавл€ем позицию в список зан€тых позиций
+                }
+            }
+            else
+            {
+                foreach (var item in army)
+                {
+                    var unit = (IAttack)item;
+                    unit.InAttack = true;
+
+                    var iWorkArcmy = (IWork)item;
+                    iWorkArcmy.GetRandomWalker().StopRandomWallk();
+                    
+                    var targetPos = new Vector3(leftSpawner.transform.position.x + offset, 0.46f, leftSpawner.transform.position.z);
+
+                    while (occupiedPositions.Contains(targetPos))
+                    {
+                        // ≈сли позици€ уже зан€та, смещаем юнита немного выше по оси Z
+                        targetPos += new Vector3(0, 0.1f, 0);
+
+                        // ѕровер€ем, зан€та ли нова€ позици€ после смещени€
+                        if (!occupiedPositions.Contains(targetPos))
+                        {
+                            targetPos = GetFreeNavMeshPosition(targetPos);
+                            targetPos = new Vector3(targetPos.x + offset, 0.46f, targetPos.z);
+                            break; // ≈сли нова€ позици€ свободна, выходим из цикла
+                        }
+                    }
+
+                    iWorkArcmy.Move(targetPos, null);
+
+                    occupiedPositions.Add(targetPos); // ƒобавл€ем позицию в список зан€тых позиций
+                }
+            }
+        }
+        private Vector3 GetFreeNavMeshPosition(Vector3 targetPos)
+        {
+            // ѕроверьте, доступна ли целева€ позици€ на NavMesh
+            if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+            {
+                return hit.position; // ¬озвращаем целевую позицию, так как она свободна на NavMesh
+            }
+            else
+            {
+                // ÷елева€ позици€ недоступна, ищем ближайшую свободную позицию на краю NavMesh
+                if (NavMesh.FindClosestEdge(targetPos, out NavMeshHit closestEdge, NavMesh.AllAreas))
+                {
+                    return closestEdge.position; // ¬озвращаем позицию на краю NavMesh
+                }
+                else
+                {
+                    return Vector3.zero; // ¬озвращаем нулевой вектор, если не удалось найти свободную позицию
+                }
+            }
         }
         public void UpdateTree()
         {

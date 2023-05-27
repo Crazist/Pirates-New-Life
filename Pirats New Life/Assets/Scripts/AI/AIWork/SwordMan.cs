@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwordMan :  IWork, IKDTree
+public class SwordMan :  IWork, IKDTree, IAttack
 {
     private AIComponent _AIComponent;
     private ItemsType _type = ItemsType.Sword;
@@ -30,7 +30,8 @@ public class SwordMan :  IWork, IKDTree
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
     private const bool _isEnemy = false;
-    
+
+    public bool InAttack { get; set; } = false;
     public int HP { get; set; } = 10;
     public bool InMove { get; set; } = false;
     public SideType Side { get; set; } = SideType.None;
@@ -100,7 +101,7 @@ public class SwordMan :  IWork, IKDTree
     {
         if (_coinsCount > 1)
         {
-            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1,  _pool, canPickUp);
             _coinsCount = 1;
         }
     }
@@ -231,7 +232,7 @@ public class SwordMan :  IWork, IKDTree
 
     private void Die()
     {
-       
+        InAttack = false;
     }
     public bool CheckIfEnemy()
     {

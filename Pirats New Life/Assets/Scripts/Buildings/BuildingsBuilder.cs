@@ -5,6 +5,7 @@ using GameInit.GameCyrcleModule;
 using GameInit.Pool;
 using GameInit.Animation;
 using GameInit.Optimization;
+using GameInit.Attack;
 
 namespace GameInit.Builders
 {
@@ -18,16 +19,56 @@ namespace GameInit.Builders
 
             BuildingTownHallComponent _townHallComponent = UnityEngine.Object.FindObjectOfType<BuildingTownHallComponent>();
 
+            var _AttackComponents = UnityEngine.Object.FindObjectsOfType<AttackComponent>();
+
             var allBuildingsComponents = UnityEngine.Object.FindObjectsOfType<BuildingComponent>();
             
             CreateBuildings(allBuildingsComponents, resourceManager, builderConnectors, heroComponent, pool, coinDropAnimation, cyrcle, _townHallComponent);
-            CreateTownHall(_townHallComponent, coinDropAnimation, pool, builderConnectors, cyrcle);
+            TownHall _townHall = CreateTownHall(_townHallComponent, coinDropAnimation, pool, builderConnectors, cyrcle);
+            CreateSideArcherAttackBuildings(_AttackComponents, cyrcle, builderConnectors, _townHall, pool, coinDropAnimation);
+            CreateSideSwordManAttackBuildings(_AttackComponents, cyrcle, builderConnectors, _townHall, pool, coinDropAnimation);
         }
 
-        private void CreateTownHall(BuildingTownHallComponent townHallComponent, CoinDropAnimation coinDropAnimation , Pools pool, BuilderConnectors builderConnectors, GameCyrcle _cyrcle)
+        private TownHall CreateTownHall(BuildingTownHallComponent townHallComponent, CoinDropAnimation coinDropAnimation , Pools pool, BuilderConnectors builderConnectors, GameCyrcle _cyrcle)
         {
             TownHall _townHall = new TownHall(townHallComponent, coinDropAnimation, pool, _cyrcle, builderConnectors.GetAIWarConnector());
             _cyrcle.AddDayChange(_townHall);
+
+            return _townHall;
+        }
+        private void CreateSideArcherAttackBuildings(AttackComponent[] _AttackComponents, GameCyrcle _cyrcle, BuilderConnectors builderConnectors, TownHall _townHall, Pools pool, CoinDropAnimation coinDropAnimation)
+        {
+            List<AttackComponent> components = new List<AttackComponent>();
+
+            foreach (var component in _AttackComponents)
+            {
+                component.gameObject.SetActive(false);
+
+                if (component.Type == AttackTypes.ArcherType)
+                {
+                    components.Add(component);
+                }
+            }
+            ArcherAttack _archerAttack = new ArcherAttack(components, _cyrcle, builderConnectors, _townHall, coinDropAnimation, pool);
+            builderConnectors.GetAIWarConnector().GetSideCalculation().SetAttackComponentsArcher(_archerAttack);
+            _cyrcle.AddDayChange(_archerAttack);
+        }
+        private void CreateSideSwordManAttackBuildings(AttackComponent[] _AttackComponents, GameCyrcle _cyrcle, BuilderConnectors builderConnectors, TownHall _townHall, Pools pool, CoinDropAnimation coinDropAnimation)
+        {
+            List<AttackComponent> components = new List<AttackComponent>();
+
+            foreach (var component in _AttackComponents)
+            {
+                component.gameObject.SetActive(false);
+
+                if (component.Type == AttackTypes.SwordManType)
+                {
+                    components.Add(component);
+                }
+            }
+            SwordManAttack _swordManAttack = new SwordManAttack(components, _cyrcle, builderConnectors, _townHall, coinDropAnimation, pool);
+            builderConnectors.GetAIWarConnector().GetSideCalculation().SetAttackComponentsSwordMan(_swordManAttack);
+            _cyrcle.AddDayChange(_swordManAttack);
         }
         private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, 
             BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation, GameCyrcle _cyrcle, BuildingTownHallComponent _townHallComponent)

@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Archer : IWork, IKDTree
+public class Archer : IWork, IKDTree, IAttack
 {
     private AIComponent _AIComponent;
     private ItemsType _type = ItemsType.Bowl;
@@ -30,6 +30,7 @@ public class Archer : IWork, IKDTree
     private const float _minimalDistanceToHero = 1f;
     private const int radiusRandomWalk = 5;
     private const bool _isEnemy = false;
+    public bool InAttack { get; set; } = false;
     public bool InMove { get; set; } = false;
     public bool InWork { get; set; } = false;
     public SideType Side { get; set; } = SideType.None;
@@ -99,7 +100,7 @@ public class Archer : IWork, IKDTree
     {
         if (_coinsCount > 1)
         {
-            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _pool, canPickUp);
             _coinsCount = 1;
         }
     }
@@ -234,7 +235,7 @@ public class Archer : IWork, IKDTree
 
     private void Die()
     {
-       
+        InAttack = false;
     }
     public bool CheckIfEnemy()
     {

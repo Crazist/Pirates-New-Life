@@ -35,13 +35,13 @@ namespace GameInit.TraderLogic
         }
         private void DropBeforePickUpCoin(int count)
         {
-            _coinDropAnimation.RandomCoinJump(_TraderComponent.transform.position, count, _TraderComponent.transform.position, _coinPool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_TraderComponent.transform.position, count,  _coinPool, canPickUp);
         }
         private void DropCoins()
         {
             if(_canDrop && _money >= _TraderComponent.GoldCount)
             {
-                _coinDropAnimation.RandomCoinJump(_TraderComponent.transform.position, (int)_money, _TraderComponent.transform.position, _coinPool, canPickUp);
+                _coinDropAnimation.RandomCoinJump(_TraderComponent.transform.position, (int)_money,  _coinPool, canPickUp);
                 _money = 0;
                 _TraderComponent.CanPick(true);
             }

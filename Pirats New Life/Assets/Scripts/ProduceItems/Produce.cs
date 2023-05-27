@@ -22,7 +22,6 @@ namespace GameInit.Building
         private BuildingComponent _buildingComponent;
        
         private const float _heightPosition = 0.46f;
-
         private const bool canPickUp = false;
         public Produce(ProduceComponent produceComponent, AIConnector AIConnector, Pools coinPool, CoinDropAnimation coinDropAnimation, BuildingComponent buildingComponent)
         {
@@ -39,7 +38,7 @@ namespace GameInit.Building
         }
         private void DropBeforePickUpCoin(int count)
         {
-            _coinDropAnimation.RandomCoinJump(_buildingComponent.GetBuildPositions()[0].position, count, _buildingComponent.GetBuildPositions()[0].position, _coinPool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_buildingComponent.GetBuildPositions()[0].position, count,  _coinPool, canPickUp);
         }
 
         private void BuidItem()

@@ -9,6 +9,7 @@ namespace GameInit.GameCyrcleModule
     [DisallowMultipleComponent]
     public class GameCyrcle : MonoBehaviour
     {
+        public int DayCount { get; set; }
         //  private readonly Dictionary<CyrcleMethod, List<ICallable>> _classesToUpdate = new Dictionary<CyrcleMethod, List<ICallable>>();
         private bool dayChange = true;
         // ====== TEST ======
@@ -116,6 +117,12 @@ namespace GameInit.GameCyrcleModule
                 day.OnDayChange();
             }
             dayChange = true;
+          
+            if (isDay)
+            {
+                DayCount++;
+            }
+
         }
         public bool ChekIfDay()
         {

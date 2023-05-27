@@ -17,6 +17,9 @@ namespace GameInit.RandomWalk
         private bool _inPlay = false;
         private float _randomTime;
 
+        private Coroutine _CheckForStartRandomWallk;
+        private Coroutine _StartRandomWallk;
+
         private const float _randomTimeForRabbits = 4f;
         public void Init(NavMeshAgent agent, Vector3 pos, IWork work, float radius)
         {
@@ -27,7 +30,7 @@ namespace GameInit.RandomWalk
             _inPlay = false;
 
             _randomTime = Random.Range(5, 15);
-            _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(CheckForStartRandomWallk());
+            _CheckForStartRandomWallk = _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(CheckForStartRandomWallk());
         }
         public void Init(NavMeshAgent agent, Vector3 pos, IAnimal animal, float radius)
         {
@@ -79,7 +82,7 @@ namespace GameInit.RandomWalk
 
                 if (_work != null &&!_inPlay && !_work.InWork)
                 {
-                    _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(StartRandomWallk());
+                    _StartRandomWallk = _work.GetAiComponent().GetMonoBehaviour().StartCoroutine(StartRandomWallk());
                 }
                 else if (_animal != null && !_inPlay)
                 {
@@ -110,7 +113,17 @@ namespace GameInit.RandomWalk
             _randomTime = _randomTimeForRabbits;
             _inPlay = false;
         }
-
+        public void StopRandomWallk()
+        {
+            if(_CheckForStartRandomWallk != null)
+            {
+                _work.GetAiComponent().GetMonoBehaviour().StopCoroutine(_CheckForStartRandomWallk);
+            }
+            if(_StartRandomWallk != null)
+            {
+                _work.GetAiComponent().GetMonoBehaviour().StopCoroutine(_StartRandomWallk);
+            }
+        }
     }
 }
 

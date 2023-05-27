@@ -25,6 +25,7 @@ namespace GameInit.Building
         private int curForm = 0;
         private bool _dropMoney = true;
 
+        private const float _heightPosition = 0.46f;
         private const bool _canPickUp = false;
         private const int _firstForm = 1;
         private const int _moneyWaitDelay = 1;
@@ -52,7 +53,8 @@ namespace GameInit.Building
         }
         private void DropBeforePickUpCoin(int count)
         {
-            _coinDropAnimation.RandomCoinJump(_BuildingTownHallComponent.transform.position, count, _BuildingTownHallComponent.transform.position, _coinPool, _canPickUp);
+            var pos = new Vector3(_BuildingTownHallComponent.transform.position.x, _heightPosition, _BuildingTownHallComponent.transform.position.z);
+            _coinDropAnimation.RandomCoinJump(pos, count, _coinPool, _canPickUp);
         }
         private void DropMoneyPerDay()
         {
@@ -68,7 +70,7 @@ namespace GameInit.Building
                 _BuildingTownHallComponent.GetParticlePrefab().SetActive(true);
                 _dropMoney = !_dropMoney;
                 _BuildingTownHallComponent.GetChestAnim();
-                _coinDropAnimation.RandomCoinJump(_BuildingTownHallComponent.GetChestPos(), _BuildingTownHallComponent.GetCountMoneyPerDay() * curForm * 2, _BuildingTownHallComponent.GetChestPos(), _coinPool, _canPickUp);
+                _coinDropAnimation.RandomCoinJump(_BuildingTownHallComponent.GetChestPos(), _BuildingTownHallComponent.GetCountMoneyPerDay() * curForm * 2,  _coinPool, _canPickUp);
             }
         }
         private async void CountMoney()
@@ -120,6 +122,15 @@ namespace GameInit.Building
                 _BuildingTownHallComponent.SetCanProduce(false);
             }
             UpdateClosestWalls();
+        }
+        public bool IsMaxForm()
+        {
+            if (curForm == _BuildingTownHallComponent.GetFormList().Count - 1)
+            {
+                return true;
+            }
+
+            return false;
         }
         public void OnDayChange()
         {

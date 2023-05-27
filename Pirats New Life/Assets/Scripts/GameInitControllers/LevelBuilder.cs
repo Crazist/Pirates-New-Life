@@ -58,7 +58,7 @@ namespace GameInit.Builders
 
         private void Hacks(ResourceManager _resourceManager)
         {
-            _resourceManager.SetResource(ResourceType.Gold, 200);
+            _resourceManager.SetResource(ResourceType.Gold, 300);
         }
         private void OnDestroy()
         {

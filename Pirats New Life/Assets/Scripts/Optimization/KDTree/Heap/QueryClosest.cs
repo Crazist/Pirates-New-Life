@@ -1,4 +1,5 @@
 using GameInit.AI;
+using GameInit.Enemy;
 using GameInit.GameCyrcleModule;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace GameInit.Optimization.KDTree
     public partial class KDQuery
     {
         private GameCyrcle _GameCyrcle;
-        private Transform[] _EnemySpawnerPsoition;
+        private List<EnemySpawnComponent> _EnemySpawnComponents;
         private List<IKDTree> PointsInWorld;
         private List<IEnemy> EnemyList;
         private List<IAnimal> AnimalList;
@@ -20,13 +21,13 @@ namespace GameInit.Optimization.KDTree
         private const float _heightPosition = 0.46f;
         private const float _minDistanceForEndSpell = 40;
 
-        public void SetEnemySpawner(GameCyrcle _cyrcle, Transform[] EnemySpawnerPsoition, List<IKDTree> _PointsInWorld, List<IEnemy> _EnemyList, List<IAnimal> _AnimalList)
+        public void SetEnemySpawner(GameCyrcle _cyrcle, List<EnemySpawnComponent> EnemySpawnComponents, List<IKDTree> _PointsInWorld, List<IEnemy> _EnemyList, List<IAnimal> _AnimalList)
         {
             PointsInWorld = _PointsInWorld;
             EnemyList = _EnemyList;
             AnimalList = _AnimalList;
             _GameCyrcle = _cyrcle;
-            _EnemySpawnerPsoition = EnemySpawnerPsoition;
+            _EnemySpawnComponents = EnemySpawnComponents;
         }
 
         public KDNode FindClosestNode(KDTree tree, IKDTree queryPosition)
@@ -226,16 +227,16 @@ namespace GameInit.Optimization.KDTree
                     float minDistance = Mathf.Infinity;
                     Transform nearestSpawner = null;
 
-                    for (int g = 0; g < _EnemySpawnerPsoition.Length; g++)
+                    for (int g = 0; g < _EnemySpawnComponents.Count; g++)
                     {
                         Vector2 pos1 = new Vector2(_enemy.GetAiComponent().GetTransform().position.x, _enemy.GetAiComponent().GetTransform().position.z);
-                        Vector2 pos2 = new Vector2(_EnemySpawnerPsoition[g].position.x, _EnemySpawnerPsoition[g].position.z);
+                        Vector2 pos2 = new Vector2(_EnemySpawnComponents[g].transform.position.x, _EnemySpawnComponents[g].transform.position.z);
                         float distance = Vector2.SqrMagnitude(pos1 - pos2);
 
                         if (distance < minDistance)
                         {
                             minDistance = distance;
-                            nearestSpawner = _EnemySpawnerPsoition[g];
+                            nearestSpawner = _EnemySpawnComponents[g].transform;
                         }
                     }
 
@@ -278,7 +279,7 @@ namespace GameInit.Optimization.KDTree
                 int index = permutation[i];
                 var defender = points[index];
 
-                if ((defender.CheckIfEnemy() != _isEnemy || defender.Type == EntityType.Wall) && defender.HP > 0 && _queryPosition.CheckIfCanDamage() && _queryPosition.HP > 0 && defender.Type != EntityType.Animals)
+                if ((defender.CheckIfEnemy() != _isEnemy || defender.Type == EntityType.Wall) && defender.HP > 0 && _queryPosition.CheckIfCanDamage() && _queryPosition.HP > 0 && defender.Type != EntityType.Animals && defender.Type != EntityType.EnemySpawner)
                 {
                     sqrDist = Vector2.SqrMagnitude(defender.GetPositionVector2() - _queryPosition.GetPositionVector2());
 
@@ -308,7 +309,6 @@ namespace GameInit.Optimization.KDTree
                 }
             }
         }
-
         public void ArcherMove(KDTree tree, IKDTree queryPosition)
         {
 
@@ -530,7 +530,7 @@ namespace GameInit.Optimization.KDTree
                     if (defender.HP <= 0 && defender.Type != EntityType.Wall && defender.Type != EntityType.Animals)
                     {
                         PointsInWorld.Remove(defender);
-                        if (defender.CheckIfEnemy())
+                        if (defender.CheckIfEnemy() && defender.Type != EntityType.EnemySpawner)
                         {
                             EnemyList.Remove((IEnemy)defender);
                         }

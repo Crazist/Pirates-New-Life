@@ -97,7 +97,7 @@ public class Farmer : IWork, IKDTree
     {
         if (_coinsCount > 1)
         {
-            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1, _AIComponent.GetTransform().position, _pool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_AIComponent.GetTransform().localPosition, _coinsCount - 1,  _pool, canPickUp);
             _coinsCount = 1;
         }
     }

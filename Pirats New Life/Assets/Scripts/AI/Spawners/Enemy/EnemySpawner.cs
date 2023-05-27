@@ -152,6 +152,7 @@ namespace GameInit.AI.Spawner
         {
             _isAlive = false;
             _EnemySpawnComponent.gameObject.SetActive(false);
+            _EnemySpawnComponent.enabled = false;
             _AIWarConnector.PointsInWorld.Remove(this);
         }
 

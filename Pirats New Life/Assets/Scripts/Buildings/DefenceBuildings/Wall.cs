@@ -73,7 +73,7 @@ namespace GameInit.Building
         }
         private void DropBeforePickUpCoin(int count)
         {
-            _coinDropAnimation.RandomCoinJump(_wallComponent.GetBuildPositions()[1].position, count, _wallComponent.GetBuildPositions()[1].position, _coinPool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_wallComponent.GetBuildPositions()[1].position, count,  _coinPool, canPickUp);
         }
 
         public void SetBuilder(IWork worker)

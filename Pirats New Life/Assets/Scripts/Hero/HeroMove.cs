@@ -116,13 +116,13 @@ namespace GameInit.Hero
                 if (_countGold > 0)
                 {
                     _countGold = 0;
-                    _CoinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _countGold, _heroComponent.transform.position, _coinPool, false);
+                    _CoinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _countGold, _coinPool, false);
                 }
                 HP = 0;
                 return;
             }
             
-            _CoinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _resiveDamage, _heroComponent.transform.position, _coinPool, false);
+            _CoinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _resiveDamage,  _coinPool, false);
             _CameraControl.ShakeCameraAnimation();
         }
         
@@ -170,7 +170,7 @@ namespace GameInit.Hero
                         _layerMask,
                         QueryTriggerInteraction.Ignore))
                 {
-                    if (_heroComponent.isActiveAndEnabled)
+                    if (_heroComponent.isActiveAndEnabled && HP > 0)
                     {
                         _heroComponent.Agent.SetDestination(_raycastHit.point);
                     }

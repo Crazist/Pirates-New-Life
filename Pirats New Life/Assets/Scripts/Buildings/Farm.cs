@@ -64,7 +64,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
     }
     private void DropBeforePickUpCoin(int count)
     {
-        _coinDropAnimation.RandomCoinJump(_farmComponent.GetBuildPositions()[0].position, count, _farmComponent.GetBuildPositions()[0].position, _pool, _canPickUp);
+        _coinDropAnimation.RandomCoinJump(_farmComponent.GetBuildPositions()[0].position, count,  _pool, _canPickUp);
     }
     public void SetBuilder(IWork worker)
     {
@@ -103,7 +103,7 @@ public class Farm : IBuilding, IDayChange, IUpdate
             formList[_curForm].SetActive(false);
             _curForm = _standartForm + 1;
             formList[_curForm].SetActive(true);
-            _coinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _curGold - 1, _heroComponent.transform.position, _pool, canPickUp);
+            _coinDropAnimation.RandomCoinJump(_heroComponent.transform.position, _curGold - 1,  _pool, canPickUp);
             _curGold = 0;
             CheckIfNeedGoWork();
         }

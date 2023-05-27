@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae9970aa5007e4cb98465f9ffae9ffb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _untouchableTime: 4
+  _untouchableTime: 1.5
   rb: {fileID: 6333361930211191620}
   _transform: {fileID: 6909516462997023868}
 --- !u!54 &6333361930211191620

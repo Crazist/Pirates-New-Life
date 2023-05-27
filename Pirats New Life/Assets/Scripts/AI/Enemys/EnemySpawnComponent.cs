@@ -8,6 +8,8 @@ namespace GameInit.Enemy
 {
     public class EnemySpawnComponent : MonoBehaviour
     {
+        public bool IsRight { get { return isRight; } }
+
         [SerializeField] private int _count = 2;
         [SerializeField] private AIComponent _AIComponent;
         [SerializeField] private float spawnDiffMax = 3;
@@ -15,7 +17,7 @@ namespace GameInit.Enemy
         [SerializeField] private Transform transformSpawnPosition;
         [SerializeField] private int _multiplier = 1;
         [SerializeField] private ParticleSystem _paticle;
-        [SerializeField] private float _delayForSpawnEnemyIfInZone = 3f;
+        [SerializeField] private bool isRight;
         
         private bool _isPlaying = false;
         private bool _isPlayerInside = false;
