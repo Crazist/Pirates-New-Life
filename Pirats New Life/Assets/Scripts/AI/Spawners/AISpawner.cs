@@ -16,7 +16,7 @@ namespace GameInit.AI
         private GameCyrcle _cyrcle;
         private List<EnemySpawner> _EnemySpawnersPrivateList;
 
-        public AISpawner(CampComponent[] camps, BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, EnemySpawnComponent[] _enemySpawnComponents, GameCyrcle cyrcle, EnemyPool EnemyPool)
+        public AISpawner(CampComponent[] camps, BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, EnemySpawnComponent[] _enemySpawnComponents, GameCyrcle cyrcle, EnemyPool EnemyPool, WorkChecker _workChecker)
         {
             EnemySpawnersList = new List<IKDTree>();
             _EnemySpawnersPrivateList = new List<EnemySpawner>();
@@ -25,7 +25,7 @@ namespace GameInit.AI
             _cyrcle = cyrcle;
 
             CreateEnemySpawners(_enemySpawnComponents, cyrcle, EnemyPool, builderConnectors);
-            CreateAllySpawners(camps, pool, builderConnectors, coinDropAnimation, heroComponent);
+            CreateAllySpawners(camps, pool, builderConnectors, coinDropAnimation, heroComponent, _workChecker);
         }
         private void CreateEnemySpawners(EnemySpawnComponent[] _enemySpawnComponents, GameCyrcle cyrcle, EnemyPool EnemyPool, BuilderConnectors builderConnectors)
         {
@@ -38,11 +38,11 @@ namespace GameInit.AI
                 builderConnectors.GetAIWarConnector().PointsInWorld.Add(enemySpawner);
             }
         }
-        private void CreateAllySpawners(CampComponent[] camps, Pools pool, BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent)
+        private void CreateAllySpawners(CampComponent[] camps, Pools pool, BuilderConnectors builderConnectors, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, WorkChecker _workChecker)
         {
             foreach (var spawner in camps)
             {
-                var enemySpawner = new AllySpawner(spawner, builderConnectors, pool, coinDropAnimation, heroComponent);
+                var enemySpawner = new AllySpawner(spawner, builderConnectors, pool, coinDropAnimation, heroComponent, _workChecker);
 
                 AllySpawnersList.Add(enemySpawner);
             }

@@ -12,6 +12,7 @@ namespace GameInit.Enemy
     {
         public bool InMove { get; set; }
         public bool RefreshSkill { get; set; } = false;
+        public bool CanStayInDay { get; set; } = false;
         public float DistanceForStartSpell { get; } = 70;
 
         private AIComponent _AIComponent;
@@ -38,7 +39,7 @@ namespace GameInit.Enemy
         private int _standartDamage = 1;
         private bool _isDying = false;
         private CancellationToken token;
-        public int HP { get; set; } = 1;
+        public int HP { get; set; } = 2;
         public EntityType Type { get; } = EntityType.Enemy;
         public SideType Side { get; set; } = SideType.None;
 
@@ -115,6 +116,7 @@ namespace GameInit.Enemy
         {
             _AIComponent.GetGm().SetActive(false);
             _AIComponent.StopAllCoroutines();
+            CanStayInDay = false;
             _canDamage = true;
             RefreshSkill = false;
             _AIComponent.GeNavMeshAgent().speed = _standartSpeed;

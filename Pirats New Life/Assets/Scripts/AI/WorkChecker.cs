@@ -61,7 +61,7 @@ namespace GameInit.AI
             return stray;
         }
 
-        private IWork CreateCitizen(IWork work)
+        public IWork CreateCitizen(IWork work)
         {
             var citizen = new Citizen(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetBuildingsPosition(), _AIConnector);
             _AIWarConnector.PointsInWorld.Add(citizen);
@@ -72,7 +72,7 @@ namespace GameInit.AI
             _AIConnector.MoveToClosest();
             return citizen;
         }
-        private IWork CreateBuilder(IWork work)
+        public IWork CreateBuilder(IWork work)
         {
             var builder = new Builder(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetBuildingsPosition(), _AIConnector);
             _AIConnector.BuilderList.Add(builder);
@@ -82,7 +82,7 @@ namespace GameInit.AI
             _AIWarConnector.UpdateTree();
             return builder;
         }
-        private IWork CreateFarmer(IWork work)
+        public IWork CreateFarmer(IWork work)
         {
             var farmer = new Farmer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetBuildingsPosition());
             _AIConnector.FarmerList.Add(farmer);
@@ -92,7 +92,7 @@ namespace GameInit.AI
             _AIWarConnector.UpdateTree();
             return farmer;
         }
-        private void CreateSwordMan(IWork work)
+        public void CreateSwordMan(IWork work)
         {
             var swordMan = new SwordMan(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetBuildingsPosition());
             _AIWarConnector.PointsInWorld.Add(swordMan);
@@ -103,7 +103,7 @@ namespace GameInit.AI
             _AIWarConnector.UpdateTree();
             _AIWarConnector.GetSideCalculation().SetSwordManToNewPosition();
         }
-        private void CreateArcher(IWork work)
+        public void CreateArcher(IWork work)
         {
             var archer = new Archer(work.GetAiComponent(), work.GetId(), _pool, _coinDropAnimation, _heroComponent, work.GetRandomWalker(), _townHallComponent.GetBuildingsPosition());
             _AIWarConnector.ArcherList.Add(archer);

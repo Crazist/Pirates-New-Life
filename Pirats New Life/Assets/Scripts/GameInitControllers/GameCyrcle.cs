@@ -16,6 +16,7 @@ namespace GameInit.GameCyrcleModule
         private readonly List<IUpdate> _updates = new List<IUpdate>(100);
         private readonly List<ILateUpdate> _lateUpdates = new List<ILateUpdate>(20);
         private readonly List<IDayChange> _dayUpdates = new List<IDayChange>();
+        private readonly List<IGuiUpdate> _GuiUpdates = new List<IGuiUpdate>();
 
         [SerializeField] private DayChange _dayChange;
 
@@ -64,7 +65,10 @@ namespace GameInit.GameCyrcleModule
         {
             _dayUpdates.Add(dayUpdates);
         }
-
+        public void AddGuiUpdate(IGuiUpdate guiUpdates)
+        {
+            _GuiUpdates.Add(guiUpdates);
+        }
         public void Remove(IUpdate update)
         {
             _updates.Remove(update);
@@ -77,6 +81,10 @@ namespace GameInit.GameCyrcleModule
         public void Remove(IDayChange dayUpdates)
         {
             _dayUpdates.Remove(dayUpdates);
+        }
+        public void Remove(IGuiUpdate guiUpdates)
+        {
+            _GuiUpdates.Remove(guiUpdates);
         }
         // ==================
 
@@ -93,7 +101,13 @@ namespace GameInit.GameCyrcleModule
                 update?.OnUpdate();
             }
         }
-
+        private void OnGUI()
+        {
+            foreach (var update in _GuiUpdates.ToArray())
+            {
+                update?.OnGuiUpdate();
+            }
+        }
         private void LateUpdate()
         {
             /*foreach (var item in _classesToUpdate[CyrcleMethod.LateUpdate].ToArray())

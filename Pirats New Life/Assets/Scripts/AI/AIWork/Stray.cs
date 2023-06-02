@@ -239,6 +239,11 @@ namespace GameInit.AI
 
             return _positionOnVector2;
         }
+        public void UpgradeWithCommand(ItemsType type)
+        {
+            _type = type;
+            CollectGold();
+        }
     }
 }
 

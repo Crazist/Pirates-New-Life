@@ -80,15 +80,6 @@ namespace GameInit.AI.Spawner
         }
         public void DayChange()
         {
-            if (!_cyrcle.ChekIfDay())
-            {
-                _canDamage = true;
-            }
-            else
-            {
-                _canDamage = false;
-            }
-
             if (_isAlive)
             {
                 Spawnenemy();
@@ -109,16 +100,15 @@ namespace GameInit.AI.Spawner
 
             DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
 
+            (enemy as IEnemy).CanStayInDay = true;
+
             _AIWarConnector.PointsInWorld.Add(enemy);
             _AIWarConnector.EnemyList.Add(enemy);
             _AIWarConnector.UpdateTree();
 
             await UniTask.Delay(TimeSpan.FromSeconds(_delayForAttack), cancellationToken: token);
             
-            if (!_cyrcle.ChekIfDay())
-            {
-                _canDamage = true;
-            }
+            _canDamage = true;
         }
 
         public bool CheckIfCanDamage()

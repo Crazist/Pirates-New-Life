@@ -7,6 +7,7 @@ using GameInit.PoolPrefabs;
 using GameInit.AI;
 using GameInit.Animation;
 using GameInit.TraderLogic;
+using GameInit.Hacks;
 
 namespace GameInit.Builders
 {
@@ -47,10 +48,14 @@ namespace GameInit.Builders
 
             BuildingsBuilder _buildingsBuilder = new BuildingsBuilder(gameCyrcle, _resourceManager, _builderConnectors, _heroBuilder.GetHeroComponent(), _coinPool, _coinDropAnimation);
 
-            AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool, _coinDropAnimation, _heroBuilder, gameCyrcle, _enemyPool);
+            WorkChecker _workChecker = new WorkChecker(_coinDropAnimation, _coinPool, _heroBuilder, _builderConnectors);
 
-            gameCyrcle.Add(new WorkChecker( _coinDropAnimation,  _coinPool, _heroBuilder, _builderConnectors));
-            
+            AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool, _coinDropAnimation, _heroBuilder, gameCyrcle, _enemyPool, _workChecker);
+
+            HacksBuilder _hacksBuilder = new HacksBuilder(gameCyrcle, _resourceManager, _aiBuilder);
+
+            gameCyrcle.Add(_workChecker);
+
             gameCyrcle.AddDayChange(new Trader(gameCyrcle, _coinDropAnimation, _coinPool));
             
             Hacks(_resourceManager);

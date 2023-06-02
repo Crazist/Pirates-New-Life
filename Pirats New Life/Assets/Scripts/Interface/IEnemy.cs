@@ -6,6 +6,7 @@ public interface IEnemy
 {
     public bool InMove { get; set; }
     public bool RefreshSkill { get; set; }
+    public bool CanStayInDay { get; set; }
     public float DistanceForStartSpell { get; }
     public void Move(Vector3 position);
     public void MoveToBase(Vector3 position, Action action);

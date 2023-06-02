@@ -151,7 +151,7 @@ namespace GameInit.Optimization.KDTree
                 IEnemy _enemy = (IEnemy)queryPosition;
                 _minDist = _enemy.DistanceForStartSpell;
 
-                if (!_GameCyrcle.ChekIfDay())
+                if (!_GameCyrcle.ChekIfDay() || _enemy.CanStayInDay)
                 {
                     if (_minDist != 0 && (SSR >= _minDist || SSR <= _minDistanceForEndSpell) && _defender.Type != EntityType.Wall && !_enemy.RefreshSkill)
                     {
@@ -222,7 +222,7 @@ namespace GameInit.Optimization.KDTree
                         _enemy.UseSpell(target, false);
                     }
                 }
-                else
+                else if(!_enemy.CanStayInDay)
                 {
                     float minDistance = Mathf.Infinity;
                     Transform nearestSpawner = null;

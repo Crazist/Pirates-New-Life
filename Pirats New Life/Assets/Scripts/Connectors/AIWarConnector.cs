@@ -223,7 +223,7 @@ namespace GameInit.Connector
                     while (occupiedPositions.Contains(targetPos))
                     {
                         // ≈сли позици€ уже зан€та, смещаем юнита немного выше по оси Z
-                        targetPos += new Vector3(0, 0.1f, 0);
+                        targetPos += new Vector3(0, 0.3f, 0);
 
                         // ѕровер€ем, зан€та ли нова€ позици€ после смещени€
                         if (!occupiedPositions.Contains(targetPos))
@@ -252,11 +252,13 @@ namespace GameInit.Connector
                 // ÷елева€ позици€ недоступна, ищем ближайшую свободную позицию на краю NavMesh
                 if (NavMesh.FindClosestEdge(targetPos, out NavMeshHit closestEdge, NavMesh.AllAreas))
                 {
-                    return closestEdge.position; // ¬озвращаем позицию на краю NavMesh
+                    Vector3 closestPosition = closestEdge.position;
+                    closestPosition.x = targetPos.x; // ”становка значени€ X равным исходной позиции X
+                    return closestPosition;
                 }
                 else
                 {
-                    return Vector3.zero; // ¬озвращаем нулевой вектор, если не удалось найти свободную позицию
+                    return Vector3.zero;
                 }
             }
         }
@@ -274,6 +276,11 @@ namespace GameInit.Connector
         }
         public void OnDayChange()
         {
+            foreach (var item in EnemyList)
+            {
+                item.CanStayInDay = false;
+            }
+
             _SideCalculation.SetSwordManToNewPosition();
             // SetSwordManToNewPosition();
         }
