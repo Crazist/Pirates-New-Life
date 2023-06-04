@@ -14,17 +14,20 @@ public class AllySpawner
     private CoinDropAnimation _coinDropAnimation;
     private HeroComponent _heroComponent;
     private WorkChecker _workChecker;
+    private Camera _camera;
+    private LayerMask spawnLayer;
 
     private int _countOfDays = 1;
     private int _spawnCountOfStrayPerDays = 2;
 
     private const float heightPosition = 0.46f;
     private const int _minDayToSpawnStray = 3;
-    
+
     private readonly Vector3 _spawnPointDefault = new Vector3(-8.78f, heightPosition, 17.2f);
 
     public AllySpawner(CampComponent campComponent, BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, WorkChecker workChecker)
     {
+        _camera = Camera.main;
         _CampComponent = campComponent;
         _AIConnector = builderConnectors.GetAiConnector();
         _pool = pool;
@@ -32,6 +35,7 @@ public class AllySpawner
         _heroComponent = heroComponent;
         _workChecker = workChecker;
 
+        spawnLayer = LayerMask.GetMask("Wallk");
 
         SpawnStray();
     }
@@ -108,7 +112,18 @@ public class AllySpawner
     {
         for (int i = 0; i < _count; i++)
         {
-            var position = _spawnPointDefault;
+            Vector3 position = Input.mousePosition;
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+           
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, spawnLayer))
+            {
+                position = hit.point;
+            }
+            else
+            {
+                position = _spawnPointDefault;
+            }
 
             var _AIComponent = GameObject.Instantiate(_CampComponent.GetCitizenPrefab(), position, Quaternion.identity);
 

@@ -11,7 +11,7 @@ namespace GameInit.Builders
     public class HeroBuilder
     {
         public HeroComponent HeroComponent { get; private set; }
-        HeroMove _move;
+        private HeroMove _move;
         public HeroBuilder(GameCyrcle GameCyrcle, Pools _pool, ResourceManager resources, BuilderConnectors builderConnectors, BuilderConnectors _BuilderConnectors, UIBuilder _UIBuilder, CoinDropAnimation _CoinDropAnimation, ResourceManager _resourceManager)
         {
             HeroComponent hero = Object.FindObjectOfType<HeroComponent>();

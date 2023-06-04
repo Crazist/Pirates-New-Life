@@ -12,10 +12,10 @@ namespace GameInit.AI
     {
         public List<IKDTree> EnemySpawnersList { get; set; }
         public List<AllySpawner> AllySpawnersList { get; set; }
+        public List<EnemySpawner> _EnemySpawnersPrivateList { get; set; }
 
         private GameCyrcle _cyrcle;
-        private List<EnemySpawner> _EnemySpawnersPrivateList;
-
+        
         public AISpawner(CampComponent[] camps, BuilderConnectors builderConnectors, Pools pool, CoinDropAnimation coinDropAnimation, HeroComponent heroComponent, EnemySpawnComponent[] _enemySpawnComponents, GameCyrcle cyrcle, EnemyPool EnemyPool, WorkChecker _workChecker)
         {
             EnemySpawnersList = new List<IKDTree>();

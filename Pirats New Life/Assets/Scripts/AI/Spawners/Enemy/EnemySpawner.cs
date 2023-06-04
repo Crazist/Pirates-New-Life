@@ -19,8 +19,8 @@ namespace GameInit.AI.Spawner
         private EnemySpawnComponent _EnemySpawnComponent;
         private EnemyPool _EnemyPool;
         private AIWarConnector _AIWarConnector;
+        private Camera _camera;
 
-        private float heightPosition = 0.46f;
         private int maxEnemies = 50; // максимальное количество врагов
         private int currentEnemies = 0; // изначальное количество врагов
         private int multiplier = 1; // количество умножений на 2\
@@ -28,15 +28,21 @@ namespace GameInit.AI.Spawner
         private float _delayForAttack = 3;
         private CancellationToken token;
         private bool _isAlive = true;
+        private LayerMask spawnLayer;
 
         private const bool _isEnemy = true;
-        
+        private const float heightPosition = 0.46f;
+
+        private readonly Vector3 _spawnPointDefault = new Vector3(-8.78f, heightPosition, 17.2f);
+
         public EnemySpawner(EnemySpawnComponent EnemySpawnComponent, GameCyrcle cyrcle, EnemyPool EnemyPool, BuilderConnectors builderConnectors)
         {
             _cyrcle = cyrcle;
             _EnemySpawnComponent = EnemySpawnComponent;
             _EnemyPool = EnemyPool;
             _AIWarConnector = builderConnectors.GetAIWarConnector();
+            _camera = Camera.main;
+            spawnLayer = LayerMask.GetMask("Wallk");
 
             CancellationTokenSource cts = new CancellationTokenSource();
             token = cts.Token;
@@ -78,6 +84,54 @@ namespace GameInit.AI.Spawner
                 }
             }
         }
+        public void SpawnDefaultEnemy(int count = 1)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 position = Input.mousePosition;
+                Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, spawnLayer))
+                {
+                    position = hit.point;
+                }
+                else
+                {
+                    position = _spawnPointDefault;
+                }
+
+                DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
+
+                enemy.CanStayInDay = true;
+
+                _AIWarConnector.PointsInWorld.Add(enemy);
+                _AIWarConnector.EnemyList.Add(enemy);
+                _AIWarConnector.UpdateTree();
+            }
+        }
+        public void SpawnEnemyWaveCommand(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var pos = _EnemySpawnComponent.GetTransformSpawn().position;
+                var diffmax = _EnemySpawnComponent.GetSpawnDiffMax();
+                var diffmin = _EnemySpawnComponent.GetSpawnDiffMin();
+
+                var x = UnityEngine.Random.Range(diffmin, diffmax);
+                var z = UnityEngine.Random.Range(diffmin, diffmax);
+
+                var position = new Vector3(pos.x + x, heightPosition, pos.z + z);
+
+                DefaultEnemy enemy = (DefaultEnemy)_EnemyPool.GetFreeElements(position);
+
+                enemy.CanStayInDay = true;
+
+                _AIWarConnector.PointsInWorld.Add(enemy);
+                _AIWarConnector.EnemyList.Add(enemy);
+                _AIWarConnector.UpdateTree();
+            }
+        }
         public void DayChange()
         {
             if (_isAlive)
@@ -107,7 +161,7 @@ namespace GameInit.AI.Spawner
             _AIWarConnector.UpdateTree();
 
             await UniTask.Delay(TimeSpan.FromSeconds(_delayForAttack), cancellationToken: token);
-            
+
             _canDamage = true;
         }
 

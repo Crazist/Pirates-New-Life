@@ -6,37 +6,32 @@ using UnityEngine;
 
 namespace GameInit.Hacks
 {
-    public class Console : IGuiUpdate
+    public class Console : IGuiUpdate, IUpdate
     {
         private bool _showConsole;
 
         private Commands _commands;
 
         private string _input;
-        private bool _isBackQuotePressed;
-
+        
         private List<object> commandList;
+       
         public Console(Commands commands)
         {
             _commands = commands;
             commandList = _commands.GetList();
         }
-       
-        public void OnGuiUpdate()
+
+        public void OnUpdate()
         {
             if (Input.GetKeyDown(KeyCode.BackQuote))
             {
-                if (!_isBackQuotePressed)
-                {
-                    _isBackQuotePressed = true;
-                    _showConsole = !_showConsole;
-                }
+               _showConsole = !_showConsole;
             }
-            else if (Input.GetKeyUp(KeyCode.BackQuote))
-            {
-                _isBackQuotePressed = false;
-            }
+       }
 
+        public void OnGuiUpdate()
+        {
             if (!_showConsole) { return; }
 
             float boxHeight = 30f;
@@ -44,6 +39,7 @@ namespace GameInit.Hacks
 
             GUI.Box(new Rect(0, y, Screen.width, 30), "");
             GUI.backgroundColor = new Color(0, 0, 0, 0);
+            GUI.SetNextControlName("ConsoleInput"); // Установка имени контрола
             _input = GUI.TextField(new Rect(10f, y + 5f, Screen.width - 20f, 20f), _input);
 
             Event e = Event.current;
@@ -51,6 +47,17 @@ namespace GameInit.Hacks
             {
                 CheckCommand();
             }
+            else if(e.type == EventType.KeyDown && Event.current.keyCode == KeyCode.BackQuote || Event.current.character == '`')
+            {
+                if (GUI.GetNameOfFocusedControl() == "ConsoleInput") // Проверка фокуса на другие элементы
+                {
+                    _showConsole = !_showConsole;
+                    _input = "";
+                    GUI.FocusControl(null);
+                }
+            }
+
+            GUI.FocusControl("ConsoleInput");
         }
         private void CheckCommand()
         {
@@ -62,10 +69,11 @@ namespace GameInit.Hacks
                 {
                     DebugCommandBase commandBase = commandList[i] as DebugCommandBase;
 
-                    if (_input != null &&  _input.Contains(commandBase.comandId))
+                    if (_input != null && properties[0].Equals(commandBase.comandId))
                     {
                         if(commandList[i] as DebugCommand != null) 
                         {
+                            if(properties.Length < 2)
                             (commandList[i] as DebugCommand).Invoke();
                         }
                         else if (_input != null && commandList[i] as DebugCommand<int> != null && properties.Length > 1)

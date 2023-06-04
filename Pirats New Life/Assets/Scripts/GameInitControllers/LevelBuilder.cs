@@ -52,7 +52,7 @@ namespace GameInit.Builders
 
             AIBuilder _aiBuilder = new AIBuilder(_builderConnectors, _coinPool, _coinDropAnimation, _heroBuilder, gameCyrcle, _enemyPool, _workChecker);
 
-            HacksBuilder _hacksBuilder = new HacksBuilder(gameCyrcle, _resourceManager, _aiBuilder);
+            HacksBuilder _hacksBuilder = new HacksBuilder(gameCyrcle, _resourceManager, _aiBuilder, _heroBuilder, _builderConnectors);
 
             gameCyrcle.Add(_workChecker);
 

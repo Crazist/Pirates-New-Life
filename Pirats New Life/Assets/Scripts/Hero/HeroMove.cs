@@ -10,7 +10,6 @@ namespace GameInit.Hero
     {
         private HeroComponent _heroComponent;
         private RaycastHit _raycastHit;
-        private LayerMask _layerMask;
         private UIBuilder __UIBuilder;
         private ResourceManager _ResourceManager;
         private CoinDropAnimation _CoinDropAnimation;
@@ -46,7 +45,6 @@ namespace GameInit.Hero
 
          //   _particleSystemMoveTo = heroComponent.ParticleSystemMoveTo;
 
-            _layerMask = 1 >> 0; // Default Layer
             _Animator = heroComponent.GetAnimator();
             heroComponent.GetMono().StartCoroutine(Animate());
         }
@@ -166,9 +164,7 @@ namespace GameInit.Hero
                 if (Physics.Raycast(
                         UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition),
                         out _raycastHit,
-                        Mathf.Infinity,
-                        _layerMask,
-                        QueryTriggerInteraction.Ignore))
+                        Mathf.Infinity))
                 {
                     if (_heroComponent.isActiveAndEnabled && HP > 0)
                     {
