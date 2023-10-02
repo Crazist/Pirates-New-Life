@@ -51,7 +51,6 @@ namespace GameInit.Builders
             }
             ArcherAttack _archerAttack = new ArcherAttack(components, _cyrcle, builderConnectors, _townHall, coinDropAnimation, pool);
             builderConnectors.GetAIWarConnector().GetSideCalculation().SetAttackComponentsArcher(_archerAttack);
-            _cyrcle.AddDayChange(_archerAttack);
         }
         private void CreateSideSwordManAttackBuildings(AttackComponent[] _AttackComponents, GameCyrcle _cyrcle, BuilderConnectors builderConnectors, TownHall _townHall, Pools pool, CoinDropAnimation coinDropAnimation)
         {
@@ -68,7 +67,6 @@ namespace GameInit.Builders
             }
             SwordManAttack _swordManAttack = new SwordManAttack(components, _cyrcle, builderConnectors, _townHall, coinDropAnimation, pool);
             builderConnectors.GetAIWarConnector().GetSideCalculation().SetAttackComponentsSwordMan(_swordManAttack);
-            _cyrcle.AddDayChange(_swordManAttack);
         }
         private void CreateBuildings(BuildingComponent[] buildingsComponenets, ResourceManager resourceManager, 
             BuilderConnectors builderConnectors, HeroComponent heroComponent, Pools pool, CoinDropAnimation coinDropAnimation, GameCyrcle _cyrcle, BuildingTownHallComponent _townHallComponent)

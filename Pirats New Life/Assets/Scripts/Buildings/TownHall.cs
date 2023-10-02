@@ -25,6 +25,8 @@ namespace GameInit.Building
         private int curForm = 0;
         private bool _dropMoney = true;
 
+        private Action townHallFinishBuild;
+
         private const float _heightPosition = 0.46f;
         private const bool _canPickUp = false;
         private const int _firstForm = 1;
@@ -120,6 +122,7 @@ namespace GameInit.Building
             else
             {
                 _BuildingTownHallComponent.SetCanProduce(false);
+                townHallFinishBuild.Invoke();
             }
             UpdateClosestWalls();
         }
@@ -131,6 +134,10 @@ namespace GameInit.Building
             }
 
             return false;
+        }
+        public void SetAction(Action act)
+        {
+            townHallFinishBuild += act;
         }
         public void OnDayChange()
         {

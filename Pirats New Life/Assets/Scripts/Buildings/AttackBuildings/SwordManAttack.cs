@@ -12,7 +12,7 @@ using GameInit.Pool;
 
 namespace GameInit.Attack
 {
-    public class SwordManAttack : IDayChange
+    public class SwordManAttack
     {
         private AttackComponent _sworManComponentRight;
         private AttackComponent _sworManComponentLeft;
@@ -49,6 +49,8 @@ namespace GameInit.Attack
 
             _townHall = townHall;
 
+            _townHall.SetAction(BuildSide);
+            
             CancellationTokenSource cts = new CancellationTokenSource();
             token = cts.Token;
 
@@ -175,7 +177,8 @@ namespace GameInit.Attack
         {
             _sworManComponentLeft.SetGoldText(count);
         }
-        public void OnDayChange()
+
+        private void BuildSide()
         {
             if (_cyrcle.ChekIfDay() && _cyrcle.DayCount >= minDaysForAttack && !isBuild && _townHall.IsMaxForm())
             {

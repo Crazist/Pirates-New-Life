@@ -12,7 +12,7 @@ using GameInit.Pool;
 
 namespace GameInit.Attack
 {
-    public class ArcherAttack : IDayChange
+    public class ArcherAttack
     {
         private AttackComponent _archerComponentRight;
         private AttackComponent _archerComponentLeft;
@@ -49,6 +49,8 @@ namespace GameInit.Attack
 
             _townHall = townHall;
 
+            _townHall.SetAction(BuildSideArcher);
+            
             CancellationTokenSource cts = new CancellationTokenSource();
             token = cts.Token;
 
@@ -175,7 +177,7 @@ namespace GameInit.Attack
         {
             _archerComponentLeft.SetGoldText(count);
         }
-        public void OnDayChange()
+        private void BuildSideArcher()
         {
             if (_cyrcle.ChekIfDay() && _cyrcle.DayCount >= minDaysForAttack && !isBuild && _townHall.IsMaxForm())
             {
